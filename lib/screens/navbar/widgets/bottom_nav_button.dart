@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/app_sizes.dart';
@@ -50,7 +51,7 @@ class BottomNavBTN extends StatelessWidget {
               curve: Curves.easeIn,
               child: Icon(
                 icon,
-                color: Colors.yellow[300],
+                color: CupertinoColors.white,
                 size: AppSizes.blockSizeHorizontal * 8,
               ),
             ),

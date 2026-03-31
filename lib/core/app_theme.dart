@@ -31,6 +31,13 @@ ThemeData _baseTheme(Brightness brightness) {
           ? SystemUiOverlayStyle.light
           : SystemUiOverlayStyle.dark,
     ),
+    bottomNavigationBarTheme:BottomNavigationBarThemeData(
+      backgroundColor: base.colorScheme.surface,
+      selectedItemColor: base.colorScheme.primary,
+      unselectedItemColor: base.colorScheme.onSurface.withOpacity(0.6),
+      elevation: 0,
+      type: BottomNavigationBarType.fixed,
+    ),
     listTileTheme: ListTileThemeData(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       iconColor: base.colorScheme.onSurface,

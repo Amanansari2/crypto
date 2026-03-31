@@ -76,7 +76,7 @@ double animatedPositionedLEftValue(int currentIndex, BuildContext context) {
 }
 
 final List<Color> gradient = [
-  Colors.yellow.withOpacity(0.8),
-  Colors.yellow.withOpacity(0.5),
+  CupertinoColors.activeOrange.withOpacity(0.8),
+  CupertinoColors.activeOrange.withOpacity(0.5),
   Colors.transparent
 ];

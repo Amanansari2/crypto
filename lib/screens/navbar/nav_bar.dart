@@ -1,3 +1,4 @@
+import 'package:crypto_tutorial_app/providers/theme/theme_provider.dart';
 import 'package:crypto_tutorial_app/screens/navbar/provider/nav_provider.dart';
 import 'package:crypto_tutorial_app/screens/navbar/widgets/bottom_nav_button.dart';
 import 'package:crypto_tutorial_app/screens/navbar/widgets/clipper.dart';
@@ -45,11 +46,11 @@ class _HomeViewState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.watch<ThemeProvider>().isDarkMode;
     final currentIndex = context.watch<NavProvider>().index;
     AppSizes().init(context);
     return Scaffold(
-      backgroundColor: Colors.black,
-
+      // backgroundColor:isDark? CupertinoColors.black : CupertinoColors.white,
       body: Stack(
         children: [
           Positioned.fill(
@@ -64,14 +65,14 @@ class _HomeViewState extends State<NavBar> {
             bottom: 10,
             right: 0,
             left: 0,
-            child: bottomNav(currentIndex, context  ),
+            child: bottomNav(currentIndex, context, isDark  ),
           ),
         ],
       ),
     );
   }
 
-  Widget bottomNav(int currentIndex, BuildContext context) {
+  Widget bottomNav(int currentIndex, BuildContext context, bool isDark,) {
     return Padding(
       padding: EdgeInsets.fromLTRB(
           AppSizes.blockSizeHorizontal * 4.5, 0,
@@ -84,7 +85,7 @@ class _HomeViewState extends State<NavBar> {
             height: AppSizes.blockSizeHorizontal * 18,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              color: Colors.grey[900],
+              color: Colors.grey[900] ,
               borderRadius: BorderRadius.circular(30),
             ),
             child: Stack(
@@ -155,7 +156,7 @@ class _HomeViewState extends State<NavBar> {
                           height: AppSizes.blockSizeHorizontal * 1,
                           width: AppSizes.blockSizeHorizontal * 12,
                           decoration: BoxDecoration(
-                            color: Colors.yellow,
+                            color: CupertinoColors.activeOrange,
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
