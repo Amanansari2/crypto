@@ -1,5 +1,6 @@
+import 'package:crypto_tutorial_app/screens/chart/chart_widget.dart';
 import 'package:crypto_tutorial_app/screens/home_screen.dart';
-import 'package:crypto_tutorial_app/screens/widgets/first_screen.dart';
+import 'package:crypto_tutorial_app/screens/wallet/wallet_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -27,6 +28,22 @@ const int kTopCount = 200; // show top 200 in list to keep it snappy
 // Colors for up/down
 const int kGreenHex = 0xFF16C784;
 const int kRedHex = 0xFFEA3943;
+const int kBlueHex = 0xFF2962FF;
+const int kDarkBlueHex = 0xFF0D47A1;
+const int kLightBlueHex = 0xFF42A5F5;
+const int kYellowHex = 0xFFFFC107;
+const int kLightYellowHex = 0xFFFFEB3B;
+const int kDarkYellowHex = 0xFFF57F17;
+const int kCyanHex = 0xFF00BCD4;
+const int kTealHex = 0xFF009688;
+
+
+// Orange
+const int kOrangeHex = 0xFFFF9800;
+const int kDeepOrangeHex = 0xFFFF5722;
+
+
+
 
 // Currency symbols
 const Map<String, String> kCurrencySymbols = {
@@ -48,14 +65,12 @@ String currencySymbolFor(String code) =>
 
 
 List<Widget> screens = [
-  const FirstScreen(),
 
+  const Home(),
   const HomeScreen(),
+  const WalletScreen(),
 
-  const SampleWidget(
-    label: 'EXPLORE',
-    color: Colors.cyan,
-  ),
+
 
 ];
 
