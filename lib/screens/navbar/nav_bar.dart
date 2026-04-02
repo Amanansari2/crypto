@@ -85,7 +85,7 @@ class _HomeViewState extends State<NavBar> {
             height: AppSizes.blockSizeHorizontal * 18,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              color: Colors.grey[900] ,
+              color: isDark ? Colors.white : Colors.black ,
               borderRadius: BorderRadius.circular(30),
             ),
             child: Stack(

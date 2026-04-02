@@ -1,13 +1,15 @@
+
 import 'package:crypto_tutorial_app/models/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../core/constants.dart';
+import '../core/formatters.dart';
 import '../providers/crypto_provider.dart';
+import '../providers/theme/theme_provider.dart';
 import '../widgets/crypto_list_tile.dart';
 import '../widgets/error_view.dart';
-import '../core/formatters.dart';
-import '../core/constants.dart';
 import 'details_screen.dart';
 import 'favorites_screen.dart';
 
@@ -108,6 +110,16 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => Navigator.of(
               context,
             ).push(MaterialPageRoute(builder: (_) => const FavoritesScreen())),
+          ),
+          IconButton(
+            onPressed: (){
+              context.read<ThemeProvider>().toggleTheme();
+            },
+            icon: Icon(
+              context.read<ThemeProvider>().isDarkMode
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
+            ),
           ),
         ],
         bottom: PreferredSize(
@@ -219,11 +231,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: shown.length + (hasHeader ? 1 : 0),
                         itemBuilder: (_, i) {
+
+
                           if (hasHeader && i == 0) {
                             return _TopMovers(
                               gainers: topGainers,
                               losers: topLosers,
                               currencySymbol: provider.currencySymbol,
+                              onTap: (id) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (_) => DetailsScreen(cryptoId: id))
+                                );
+                              },
                             );
                           }
                           final index = hasHeader ? i - 1 : i;
@@ -284,10 +304,12 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _TopMovers extends StatelessWidget {
+  final Function(int cryptoId)? onTap;
   const _TopMovers({
     required this.gainers,
     required this.losers,
     required this.currencySymbol,
+    this.onTap
   });
 
   final List<Crypto> gainers;
@@ -324,12 +346,14 @@ class _TopMovers extends StatelessWidget {
                   crypto: c,
                   positive: true,
                   currencySymbol: currencySymbol,
+                  onTap: onTap,
                 ),
               for (final c in losers)
                 _MoverCard(
                   crypto: c,
                   positive: false,
                   currencySymbol: currencySymbol,
+                  onTap: onTap,
                 ),
             ],
           ),
@@ -340,10 +364,12 @@ class _TopMovers extends StatelessWidget {
 }
 
 class _MoverCard extends StatelessWidget {
+  final Function(int cryptoId)? onTap;
   const _MoverCard({
     required this.crypto,
     required this.positive,
     required this.currencySymbol,
+    this.onTap
   });
   final Crypto crypto;
   final bool positive;
@@ -354,57 +380,60 @@ class _MoverCard extends StatelessWidget {
     final color = positive ? const Color(kGreenHex) : const Color(kRedHex);
     final cs = Theme.of(context).colorScheme;
 
-    return Container(
-      width: 160,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        border: Border.all(color: color.withOpacity(0.5)),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 12,
-                backgroundColor: cs.surfaceContainerHighest,
-                backgroundImage: NetworkImage(crypto.iconUrl),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  crypto.symbol,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
+    return GestureDetector(
+      onTap: () => onTap?.call(crypto.id),
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          border: Border.all(color: color.withOpacity(0.5)),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 12,
+                  backgroundColor: cs.surfaceContainerHighest,
+                  backgroundImage: NetworkImage(crypto.iconUrl),
                 ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          Text(
-            crypto.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 12,
-              color: cs.onSurface.withOpacity(0.7),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    crypto.symbol,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            formatPrice(crypto.quote.price, currencySymbol: currencySymbol),
-            style: TextStyle(fontWeight: FontWeight.w700, color: cs.onSurface),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            '${(crypto.quote.percentChange24h ?? 0).toStringAsFixed(2)}%',
-            style: TextStyle(fontWeight: FontWeight.w800, color: color),
-          ),
-        ],
+            const Spacer(),
+            Text(
+              crypto.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                color: cs.onSurface.withOpacity(0.7),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              formatPrice(crypto.quote.price, currencySymbol: currencySymbol),
+              style: TextStyle(fontWeight: FontWeight.w700, color: cs.onSurface),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              '${(crypto.quote.percentChange24h ?? 0).toStringAsFixed(2)}%',
+              style: TextStyle(fontWeight: FontWeight.w800, color: color),
+            ),
+          ],
+        ),
       ),
     );
   }

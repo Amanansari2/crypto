@@ -120,214 +120,21 @@
 // }
 
 
-import 'package:chart_sparkline/chart_sparkline.dart';
-import 'package:crypto_tutorial_app/screens/chart/select_coin.dart';
+import 'package:crypto_tutorial_app/core/constants.dart';
+import 'package:crypto_tutorial_app/screens/chart/widget/item.dart';
+import 'package:crypto_tutorial_app/screens/chart/widget/item_second.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import '../../models/coin_model.dart';
-import 'package:http/http.dart' as http;
-
-class Item extends StatelessWidget {
-  final dynamic item; // ideally proper model use karo
-
-  const Item({super.key, required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    double myHeight = MediaQuery.of(context).size.height;
-    double myWidth = MediaQuery.of(context).size.width;
-
-    final prices = item.sparklineIn7D?.price ?? [];
-
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: myWidth * 0.06,
-        vertical: myHeight * 0.02,
-      ),
-      child: Row(
-        children: [
-          /// Image
-          Expanded(
-            flex: 1,
-            child: SizedBox(
-              height: myHeight * 0.05,
-              child: Image.network(
-                item.image ?? '',
-                errorBuilder: (_, __, ___) =>
-                const Icon(Icons.error, color: Colors.grey),
-              ),
-            ),
-          ),
-
-          SizedBox(width: myWidth * 0.02),
-
-          /// Name + Symbol
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.id ?? '',
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '0.4 ${item.symbol ?? ''}',
-                  style: const TextStyle(
-                      fontSize: 18, color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-
-          SizedBox(width: myWidth * 0.01),
-
-          /// Chart
-          Expanded(
-            flex: 2,
-            child: SizedBox(
-              height: myHeight * 0.05,
-              child: prices.isEmpty
-                  ? const SizedBox()
-                  : Sparkline(
-                data: prices,
-                lineWidth: 2.0,
-                lineColor: item.marketCapChangePercentage24H >= 0
-                    ? Colors.green
-                    : Colors.red,
-                fillMode: FillMode.below,
-                fillGradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: item.marketCapChangePercentage24H >= 0
-                      ? [Colors.green, Colors.green.shade100]
-                      : [Colors.red, Colors.red.shade100],
-                ),
-              ),
-            ),
-          ),
-
-          SizedBox(width: myWidth * 0.04),
-
-          /// Price + Change
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '\$ ${item.currentPrice?.toStringAsFixed(2) ?? '0.00'}',
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: [
-                    Text(
-                      '${item.priceChange24H >= 0 ? '+' : '-'}\$${item.priceChange24H?.abs().toStringAsFixed(2) ?? '0.00'}',
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                    SizedBox(width: myWidth * 0.03),
-                    Text(
-                      '${item.marketCapChangePercentage24H?.toStringAsFixed(2) ?? '0.00'}%',
-                      style: TextStyle(
-                        color: item.marketCapChangePercentage24H >= 0
-                            ? Colors.green
-                            : Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+import '../../providers/theme/theme_provider.dart';
 
 
 
 
 
-class Item2 extends StatelessWidget {
-  var item;
-  Item2({this.item});
 
-  @override
-  Widget build(BuildContext context) {
-    double myHeight = MediaQuery.of(context).size.height;
-    double myWidth = MediaQuery.of(context).size.width;
-    return Padding(
-      padding: EdgeInsets.symmetric(
-          horizontal: myWidth * 0.03, vertical: myHeight * 0.02),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (contest) => SelectCoin(selectItem: item,)));
-        },
-        child: Container(
-          padding: EdgeInsets.only(
-            left: myWidth * 0.03,
-            right: myWidth * 0.06,
-            top: myHeight * 0.02,
-            bottom: myHeight * 0.02,
-          ),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.grey)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                  height: myHeight * 0.035, child: Image.network(item.image)),
-              SizedBox(
-                height: myHeight * 0.02,
-              ),
-              Text(
-                item.id,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: myHeight * 0.01,
-              ),
-              Row(
-                children: [
-                  Text(
-                    item.priceChange24H.toString().contains('-')
-                        ? "-\$" +
-                        item.priceChange24H
-                            .toStringAsFixed(2)
-                            .toString()
-                            .replaceAll('-', '')
-                        : "\$" + item.priceChange24H.toStringAsFixed(2),
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey),
-                  ),
-                  SizedBox(
-                    width: myWidth * 0.03,
-                  ),
-                  Text(
-                    item.marketCapChangePercentage24H.toStringAsFixed(2) + '%',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                        color: item.marketCapChangePercentage24H >= 0
-                            ? Colors.green
-                            : Colors.red),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 
 class Home extends StatefulWidget {
@@ -348,6 +155,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     double myHeight = MediaQuery.of(context).size.height;
     double myWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: Container(
         height: myHeight,
@@ -357,15 +165,18 @@ class _HomeState extends State<Home> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color.fromARGB(255, 253, 225, 112),
-                Color(0xffFBC700),
+                Color(kLightBlueHex),
+                Color(kGreenHex),
+                Color(kRedHex),
               ]),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+
+
             Padding(
-              padding: EdgeInsets.symmetric(vertical: myHeight * 0.03),
+              padding: EdgeInsets.symmetric(vertical: myHeight * 0.05),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -373,20 +184,31 @@ class _HomeState extends State<Home> {
                     padding: EdgeInsets.symmetric(
                         horizontal: myWidth * 0.02, vertical: myHeight * 0.005),
                     decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(5)),
+                        color: Color(kDarkBlueHex).withOpacity(0.08),
+                        border: Border.all(color: Color(kDarkBlueHex).withOpacity(0.5)),
+                        borderRadius: BorderRadius.circular(12)),
                     child: Text(
                       'Main portfolio',
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
                   Text(
                     'Top 10 coins',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'Exprimental',
-                    style: TextStyle(fontSize: 18),
+                    'Experimental',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    onPressed: (){
+                      context.read<ThemeProvider>().toggleTheme();
+                    },
+                    icon: Icon(
+                      context.watch<ThemeProvider>().isDarkMode
+                          ? Icons.light_mode
+                          : Icons.dark_mode,
+                    ),
                   ),
                 ],
               ),
@@ -398,7 +220,7 @@ class _HomeState extends State<Home> {
                 children: [
                   Text(
                     '\$ 7,466.20',
-                    style: TextStyle(fontSize: 35),
+                    style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
                   ),
                   Container(
                     padding: EdgeInsets.all(myWidth * 0.02),
@@ -420,101 +242,51 @@ class _HomeState extends State<Home> {
                 children: [
                   Text(
                     '+162% all time',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
             SizedBox(
-              height: myHeight * 0.02,
+              height: myHeight * 0.01,
             ),
-            Container(
-              height: myHeight * 0.7,
-              width: myWidth,
-              decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                        blurRadius: 5,
-                        color: Colors.grey.shade300,
-                        spreadRadius: 3,
-                        offset: Offset(0, 3))
-                  ],
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50),
-                  )),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: myHeight * 0.03,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: myWidth * 0.08),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Assets',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        Icon(Icons.add)
-                      ],
+            Expanded(
+              child: Container(
+                width: myWidth,
+                decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                          blurRadius: 5,
+                          color: Colors.grey.shade300,
+                          spreadRadius: 3,
+                          offset: Offset(0, 3))
+                    ],
+                    color: context.watch<ThemeProvider>().isDarkMode ? Colors.black : Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50),
+                    )),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: myHeight * 0.03,
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight * 0.02,
-                  ),
-                  Container(
-                    height: myHeight * 0.36,
-                    child: isRefreshing == true
-                        ? Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xffFBC700),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: myWidth * 0.08),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Assets',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          Icon(Icons.add)
+                        ],
                       ),
-                    )
-                        : coinMarket == null || coinMarket!.length == 0
-                        ? Padding(
-                      padding: EdgeInsets.all(myHeight * 0.06),
-                      child: Center(
-                        child: Text(
-                          'Attention this Api is free, so you cannot send multiple requests per second, please wait and try again later.',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                    )
-                        : ListView.builder(
-                      itemCount: 4,
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Item(
-                          item: coinMarket![index],
-                        );
-                      },
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight * 0.02,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: myWidth * 0.05),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Recommend to Buy',
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: myHeight * 0.01,
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: myWidth * 0.03),
+
+                    SizedBox(
+                      height: myHeight * 0.36,
                       child: isRefreshing == true
                           ? Center(
                         child: CircularProgressIndicator(
@@ -532,20 +304,68 @@ class _HomeState extends State<Home> {
                         ),
                       )
                           : ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: coinMarket!.length,
+                        itemCount:  coinMarket!.length > 4 ? 4 : coinMarket!.length,
+                        physics: BouncingScrollPhysics(),
                         itemBuilder: (context, index) {
-                          return Item2(
+                          return Item(
                             item: coinMarket![index],
                           );
                         },
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight * 0.01,
-                  ),
-                ],
+                    SizedBox(
+                      height: myHeight * 0.02,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: myWidth * 0.05),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Recommend to Buy',
+                            style: TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: myHeight * 0.01,
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: myWidth * 0.03),
+                        child: isRefreshing == true
+                            ? Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xffFBC700),
+                          ),
+                        )
+                            : coinMarket == null || coinMarket!.length == 0
+                            ? Padding(
+                          padding: EdgeInsets.all(myHeight * 0.06),
+                          child: Center(
+                            child: Text(
+                              'Attention this Api is free, so you cannot send multiple requests per second, please wait and try again later.',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        )
+                            : ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: coinMarket!.length > 4 ? 4 : coinMarket!.length,
+                          itemBuilder: (context, index) {
+                            return Item2(
+                              item: coinMarket![index],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: myHeight * 0.01,
+                    ),
+                  ],
+                ),
               ),
             )
           ],
