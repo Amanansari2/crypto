@@ -222,8 +222,19 @@ class MainWrapper extends ConsumerWidget {
         child: Container(
           height: 70.h,
           decoration: BoxDecoration(
-            color: Colors.grey[900],
+            color: Theme
+                .of(context)
+                .colorScheme
+                .surface,
             borderRadius: BorderRadius.circular(30),
+
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.25),
+                blurRadius: 25,
+                spreadRadius: 1,
+              )
+            ],
           ),
           child: Stack(
             children: [
@@ -254,6 +265,7 @@ class MainWrapper extends ConsumerWidget {
               /// Indicator
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
                 left: animatedPositionedLEftValue(currentIndex, context),
                 bottom: 0,
                 child: Column(
@@ -264,11 +276,7 @@ class MainWrapper extends ConsumerWidget {
                         height: 60.h,
                         width: 50.w,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: AppColors.navGradient,
-                          ),
+                            gradient: AppColors.navGradient
                         ),
                       ),
                     ),
@@ -276,7 +284,7 @@ class MainWrapper extends ConsumerWidget {
                       height: 4.h,
                       width: 50.w,
                       decoration: BoxDecoration(
-                        color: Colors.yellow,
+                        color: AppColors.primary,
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),

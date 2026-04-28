@@ -1,3 +1,4 @@
+import 'package:crypto_app/features/market/ui/screens/market_screen.dart';
 import 'package:crypto_app/placeholder_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +18,10 @@ class AppRouter {
   );
   static final settingsNavigatorKey = GlobalKey<NavigatorState>(
     debugLabel: 'settingsNav',
+  );
+
+  static final marketNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'marketNav',
   );
 }
 
@@ -89,6 +94,19 @@ final routerProvider = Provider<GoRouter>((ref) {
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            navigatorKey: AppRouter.marketNavigatorKey,
+            routes: [
+              GoRoute(
+                path: RouteNames.market,
+                name: "Markets",
+                builder: (context, state) => const MarketScreen(),
+
+                routes: [],
               ),
             ],
           ),

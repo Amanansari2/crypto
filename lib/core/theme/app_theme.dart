@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../utils/constants/app_colors.dart';
+
 class AppTheme {
   static ThemeData lightTheme = _baseTheme(Brightness.light);
   static ThemeData darkTheme = _baseTheme(Brightness.dark);
@@ -10,10 +12,23 @@ class AppTheme {
   static ThemeData _baseTheme(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
 
-    final colorScheme = ColorScheme.fromSeed(
-      // seedColor: const Color(0xFF1E3A8A),
-      seedColor: const Color(0xFF2962FF),
+    final colorScheme = ColorScheme(
       brightness: brightness,
+
+      primary: AppColors.primary,
+      onPrimary: Colors.white,
+
+      secondary: AppColors.secondary,
+      onSecondary: Colors.white,
+
+      error: AppColors.red,
+      onError: Colors.white,
+
+      surface: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+      onSurface: isDark ? Colors.white : Colors.black,
+
+      background: isDark ? AppColors.darkBg : AppColors.lightBg,
+      onBackground: isDark ? Colors.white : Colors.black,
     );
 
     final base = ThemeData(
@@ -22,7 +37,7 @@ class AppTheme {
       brightness: brightness,
       colorScheme: colorScheme,
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      splashColor: colorScheme.primary.withOpacity(0.1),
+      splashColor: AppColors.primary.withOpacity(0.1),
       highlightColor: Colors.transparent,
     );
 
@@ -34,7 +49,7 @@ class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         titleTextStyle: base.textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
+          color: colorScheme.onBackground,
         ),
         systemOverlayStyle: isDark
             ? SystemUiOverlayStyle.light
