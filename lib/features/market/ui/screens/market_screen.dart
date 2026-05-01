@@ -1,9 +1,12 @@
+import 'package:crypto_app/app/router/route_names.dart';
 import 'package:crypto_app/core/utils/constants/app_colors.dart';
 import 'package:crypto_app/core/utils/constants/app_strings.dart';
+import 'package:crypto_app/features/market/provider/combined_market_provider.dart';
 import 'package:crypto_app/features/market/ui/shimmers/trending_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../provider/market_provider.dart';
 import '../../provider/tab_notifier.dart';
@@ -37,7 +40,9 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
   Widget build(BuildContext context) {
     final selectedTab = ref.watch(marketTabProvider);
 
-    final trending = ref.watch(trendingCoinsProvider);
+    // final trending = ref.watch(trendingCoinsProvider);
+    // final pairAsync = ref.watch(binancePairsProvider);
+    final combined = ref.watch(combinedMarketProvider);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -57,11 +62,12 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
 
             SizedBox(
               height: 130.h,
-              child: trending.when(
+              child: combined.when(
                 data: (data) {
                   final coins = data.coins;
+                  final pairs = data.pairs;
                   if (coins.isEmpty) {
-                    return const Center(child: Text("No trending coins"));
+                    return const Center(child: Text(AppStrings.noTrending));
                   }
 
                   return ListView.builder(
@@ -70,128 +76,169 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                     itemBuilder: (_, i) {
                       final coin = coins[i];
                       final change = coin.change24h;
+                      final symbol = coin.symbol.toUpperCase() + "USDT";
 
-                      return Container(
-                        width: 140.w,
-                        margin: EdgeInsets.symmetric(
-                          horizontal: 4.w,
-                          vertical: 2.h,
-                        ),
-                        padding: EdgeInsets.all(8.w),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18.r),
-                          color: isDark
-                              ? AppColors.blue.withOpacity(0.08)
-                              : AppColors.white,
+                      final isAvailable =
+                      pairs.any((p) => p.symbol == symbol);
 
-                          border: Border.all(
-                            color: isDark
-                                ? AppColors.blue.withOpacity(0.4)
-                                : Colors.grey.withOpacity(0.4),
-                          ),
-
-                          boxShadow: isDark
-                              ? []
-                              : [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 8,
-                                    spreadRadius: 2,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      return GestureDetector(
+                        onTap: isAvailable
+                            ? () {
+                          context.pushNamed(
+                              RouteNames.marketDetailName,
+                              pathParameters: {
+                                "symbol": symbol
+                              }
+                          );
+                        } : null,
+                        child: Stack(
                           children: [
-                            /// 🔝 Top Row (Image + Rank)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Image.network(coin.image, height: 25.h),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 8.w,
-                                        vertical: 2.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isDark
-                                            ? AppColors.blue.withOpacity(0.15)
-                                            : Colors.blue.shade50,
-                                        borderRadius: BorderRadius.circular(
-                                          6.r,
-                                        ),
+                            Opacity(
+                              opacity: isAvailable ? 1 : 0.5,
+                              child: Container(
+                                width: 140.w,
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: 4.w,
+                                  vertical: 2.h,
+                                ),
+                                padding: EdgeInsets.all(8.w),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18.r),
+                                  color: isDark
+                                      ? AppColors.blue.withOpacity(0.08)
+                                      : AppColors.white,
 
-                                        border: Border.all(
-                                          color: isDark
-                                              ? AppColors.blue.withOpacity(0.4)
-                                              : Colors.blue.shade100,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        "#${coin.rank}",
-                                        style: TextStyle(
-                                          fontSize: 8.sp,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 4.h),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? AppColors.blue.withOpacity(0.4)
+                                        : Colors.grey.withOpacity(0.4),
+                                  ),
 
-                                    Text(
-                                      coin.symbol,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 8.sp,
-                                      ),
+                                  boxShadow: isDark
+                                      ? []
+                                      : [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 8,
+                                      spreadRadius: 2,
+                                      offset: const Offset(0, 4),
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .spaceBetween,
+                                  children: [
 
-                            Text(
-                              coin.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10.sp,
+                                    /// 🔝 Top Row (Image + Rank)
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .start,
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .spaceBetween,
+                                      children: [
+                                        Image.network(coin.image, height: 25.h),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment
+                                              .center,
+                                          children: [
+                                            if(!isAvailable)...[
+                                              Icon(
+                                                Icons.block,
+                                                size: 12.sp,
+                                                color: AppColors.red,
+                                              ),
+                                              SizedBox(height: 4.h)
+                                            ],
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 8.w,
+                                                vertical: 2.h,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: isDark
+                                                    ? AppColors.blue
+                                                    .withOpacity(0.15)
+                                                    : Colors.blue.shade50,
+                                                borderRadius: BorderRadius
+                                                    .circular(
+                                                  6.r,
+                                                ),
+
+                                                border: Border.all(
+                                                  color: isDark
+                                                      ? AppColors.blue
+                                                      .withOpacity(0.4)
+                                                      : Colors.blue.shade100,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                "#${coin.rank}",
+                                                style: TextStyle(
+                                                  fontSize: 8.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 4.h),
+
+                                            Text(
+                                              coin.symbol,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 8.sp,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+
+                                    Text(
+                                      coin.name,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10.sp,
+                                      ),
+                                    ),
+
+                                    SparklineChart(
+                                      data: coin.sparklines,
+                                      isPositive: coin.change24h >= 0,
+                                      change: coin.change24h,
+                                    ),
+
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .spaceBetween,
+                                      children: [
+
+                                        /// 💰 Price
+                                        Text(
+                                          "\$ ${coin.price.toStringAsFixed(2)}",
+                                          style: TextStyle(
+                                            fontSize: 10.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+
+                                        /// 📊 Change %
+                                        Text(
+                                          "${change.toStringAsFixed(2)}%",
+                                          style: TextStyle(
+                                            color: change >= 0
+                                                ? AppColors.green
+                                                : AppColors.red,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 10.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-
-                            SparklineChart(
-                              data: coin.sparklines,
-                              isPositive: coin.change24h >= 0,
-                              change: coin.change24h,
-                            ),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                /// 💰 Price
-                                Text(
-                                  "\$ ${coin.price.toStringAsFixed(2)}",
-                                  style: TextStyle(
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-
-                                /// 📊 Change %
-                                Text(
-                                  "${change.toStringAsFixed(2)}%",
-                                  style: TextStyle(
-                                    color: change >= 0
-                                        ? AppColors.green
-                                        : AppColors.red,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10.sp,
-                                  ),
-                                ),
-                              ],
                             ),
                           ],
                         ),

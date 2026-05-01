@@ -10,4 +10,8 @@ class RouteNames {
   // nested
   static const String subHome = "subHome";
   static const String subSettings = "subSetting";
+  static const String marketDetail = "detail/:symbol";
+
+  //routeNames
+  static const String marketDetailName = "MarketDetail";
 }

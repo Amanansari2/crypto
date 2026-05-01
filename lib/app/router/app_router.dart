@@ -1,3 +1,4 @@
+import 'package:crypto_app/features/market/ui/screens/market_detail_screen.dart';
 import 'package:crypto_app/features/market/ui/screens/market_screen.dart';
 import 'package:crypto_app/placeholder_screen.dart';
 import 'package:flutter/material.dart';
@@ -106,7 +107,16 @@ final routerProvider = Provider<GoRouter>((ref) {
                 name: "Markets",
                 builder: (context, state) => const MarketScreen(),
 
-                routes: [],
+                routes: [
+                  GoRoute(
+                      path: RouteNames.marketDetail,
+                      name: RouteNames.marketDetailName,
+                      builder: (context, state) {
+                        final symbol = state.pathParameters['symbol']!;
+                        return MarketDetailScreen(symbol: symbol);
+                      }
+                  )
+                ],
               ),
             ],
           ),

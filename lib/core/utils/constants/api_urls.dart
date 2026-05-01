@@ -13,4 +13,10 @@ class ApiUrls {
   static const losers = "/market/losers";
   static const trending = "/market/trending";
   static const newCoins = "/market/new";
+
+  //------------------------
+  //Binance Url
+  //------------------------
+
+  static const getPairs = "/binance/pairs";
 }
