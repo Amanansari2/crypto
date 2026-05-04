@@ -17,11 +17,7 @@ class StatsSection extends StatelessWidget {
         InfoRow(label: "High", value: FormatHelper.price(data.high)),
         InfoRow(label: "Low", value: FormatHelper.price(data.low)),
         InfoRow(label: "Volume", value: FormatHelper.compact(data.volume)),
-        InfoRow(
-          label: "Bid",
-          value: FormatHelper.price(data.bid),
-          valueColor: AppColors.green,
-        ),
+
         InfoRow(
           label: "Ask",
           value: FormatHelper.price(data.ask),

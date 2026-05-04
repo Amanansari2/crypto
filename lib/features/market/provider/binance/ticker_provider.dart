@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as LogHelper;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,54 +7,43 @@ import '../../data/datasources/binance/socket/binance_socket_service.dart';
 import '../../data/models/binance/binance_ticker_model.dart';
 
 final tickerProvider =
-    AsyncNotifierProvider.family<TickerNotifier, BinanceTickerModel, String>(
+StreamNotifierProvider.family<TickerNotifier, BinanceTickerModel, String>(
       TickerNotifier.new,
     );
 
-class TickerNotifier extends AsyncNotifier<BinanceTickerModel> {
-  late final BinanceSocketService _socket;
-
+class TickerNotifier extends StreamNotifier<BinanceTickerModel> {
   final String symbol;
 
   TickerNotifier(this.symbol);
 
+  late BinanceSocketService _socket;
+
   @override
-  FutureOr<BinanceTickerModel> build() async {
+  Stream<BinanceTickerModel> build() {
     _socket = BinanceSocketService();
 
-    final completer = Completer<BinanceTickerModel>();
+    final controller = StreamController<BinanceTickerModel>();
 
-    Future.delayed(const Duration(seconds: 5), () {
-      if (!completer.isCompleted) {
-        completer.completeError("Ticker load timeout");
-      }
-    });
-
-    DateTime? lastUpdate;
+    LogHelper.log("🚀 TICKER STREAM STARTED");
 
     _socket.connect(
       stream: "${symbol.toLowerCase()}@ticker",
       onData: (data) {
-        final now = DateTime.now();
+        LogHelper.log("🔥 TICKER DATA: $data");
 
-        if (lastUpdate != null &&
-            now.difference(lastUpdate) < const Duration(milliseconds: 400)) {
-          return;
-        }
         final model = BinanceTickerModel.fromJson(data);
 
-        if (!completer.isCompleted) {
-          completer.complete(model);
-        }
-
-        state = AsyncData(model);
+        controller.add(model);
       },
     );
 
     ref.onDispose(() {
-      _socket.disconnect();
+      LogHelper.log("❌ TICKER DISPOSE");
+      _socket.disconnect("${symbol.toLowerCase()}@ticker");
+      controller.close();
     });
 
-    return completer.future;
+    return controller.stream;
   }
 }
+

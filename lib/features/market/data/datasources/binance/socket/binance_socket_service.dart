@@ -5,40 +5,41 @@ import 'dart:developer' as LogHelper;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class BinanceSocketService {
-  WebSocketChannel? _channel;
-  Timer? _reconnectTimer;
+  /// 🔥 Multiple sockets support
+  final Map<String, WebSocketChannel> _channels = {};
+  final Map<String, StreamSubscription> _subscriptions = {};
+  final Set<String> _reconnectingStreams = {};
 
-  bool _isConnected = false;
-  String? _currentStream;
-
-  StreamSubscription? _subscription;
-
+  /// 🔌 CONNECT
   void connect({
     required String stream,
     required Function(Map<String, dynamic>) onData,
+    bool isFutures = false
   }) {
-    if (_isConnected && _currentStream == stream && _channel != null) return;
-    _currentStream = stream;
-    _connectInternal(onData);
-  }
+    /// already connected
+    if (_channels[stream] != null) return;
+    final baseUrl = isFutures
+        ? "wss://fstream.binance.com/ws/"
+        : "wss://stream.binance.com:9443/ws/";
 
-  void _connectInternal(Function(Map<String, dynamic>) onData) {
-    if (_currentStream == null) return;
-    _subscription?.cancel();
-    _channel?.sink.close();
-
-    final url = "wss://stream.binance.com:9443/ws/$_currentStream";
+    final url = "$baseUrl$stream";
 
     try {
-      _channel = WebSocketChannel.connect(Uri.parse(url));
-      _isConnected = true;
+      final channel = WebSocketChannel.connect(Uri.parse(url));
 
-      LogHelper.log("✅ Connected to $_currentStream");
+      _channels[stream] = channel;
 
-      _subscription = _channel!.stream.listen(
-        (event) {
+      LogHelper.log("✅ Connected to $stream");
+
+      LogHelper.log("🌐 URL: $baseUrl$stream");
+
+
+      _subscriptions[stream] = channel.stream.listen(
+            (event) {
+          LogHelper.log("Raw Event: $event ");
           try {
             final data = jsonDecode(event);
+            LogHelper.log("Parsed $data");
             onData(data);
           } catch (e) {
             LogHelper.log("⚠️ JSON parse error: $e");
@@ -46,50 +47,55 @@ class BinanceSocketService {
         },
 
         onError: (e) {
-          _isConnected = false;
-          LogHelper.log("❌ Socket error: $e");
-          _handleReconnect(onData);
+          LogHelper.log("❌ Socket error ($stream): $e");
+          _reconnect(stream, onData, isFutures);
         },
 
         onDone: () {
-          _isConnected = false;
-          LogHelper.log("⚠️ Socket closed");
-          _handleReconnect(onData);
+          LogHelper.log("⚠️ Socket closed ($stream)");
+          _reconnect(stream, onData, isFutures);
         },
       );
     } catch (e) {
-      _isConnected = false;
-      LogHelper.log("❌ Connection failed: $e");
-      _handleReconnect(onData);
+      LogHelper.log("❌ Connection failed ($stream): $e");
     }
   }
 
-  void _handleReconnect(Function(Map<String, dynamic>) onData) {
-    if (_reconnectTimer != null || _currentStream == null) return;
+  void _reconnect(String stream, Function(Map<String, dynamic>) onData,
+      bool isFutures) {
+    if (_reconnectingStreams.contains(stream)) return;
 
-    _reconnectTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      LogHelper.log("🔄 Reconnecting...");
-      _connectInternal(onData);
+    _reconnectingStreams.add(stream);
 
-      if (_isConnected) {
-        timer.cancel();
-        _reconnectTimer = null;
-      }
+    _cleanup(stream);
+
+    Future.delayed(const Duration(seconds: 2), () {
+      LogHelper.log("🔄 Reconnecting $stream...");
+      _reconnectingStreams.remove(stream);
+      connect(stream: stream, onData: onData, isFutures: isFutures);
     });
   }
 
-  void disconnect() {
-    _reconnectTimer?.cancel();
-    _reconnectTimer = null;
+  /// ❌ DISCONNECT (single stream)
+  void disconnect(String stream) {
+    _cleanup(stream);
+    LogHelper.log("🔌 Disconnected $stream");
+  }
 
-    _subscription?.cancel();
-    _subscription = null;
+  /// 🔥 CLEANUP helper
+  void _cleanup(String stream) {
+    _subscriptions[stream]?.cancel();
+    _channels[stream]?.sink.close();
 
-    _channel?.sink.close();
-    _channel = null;
+    _subscriptions.remove(stream);
+    _channels.remove(stream);
+  }
 
-    _isConnected = false;
-
-    LogHelper.log("🔌 Disconnected");
+  /// ❌ optional: disconnect all
+  void disconnectAll() {
+    for (final stream in _channels.keys.toList()) {
+      _cleanup(stream);
+    }
+    LogHelper.log("🔌 Disconnected all streams");
   }
 }
