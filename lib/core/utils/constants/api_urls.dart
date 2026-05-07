@@ -19,4 +19,5 @@ class ApiUrls {
   //------------------------
 
   static const getPairs = "/binance/pairs";
+  static const getCandles = "/binance/candles";
 }

@@ -14,4 +14,5 @@ class RouteNames {
 
   //routeNames
   static const String marketDetailName = "MarketDetail";
+  static const String homeName = "Home";
 }

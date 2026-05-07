@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/home/ui/screens/home_screen.dart';
 import '../../features/navigation/ui/screens/bottom_nav_screen.dart';
 import '../../features/onboarding/ui/screen/onboarding_screen.dart';
 import 'route_names.dart';
@@ -51,9 +52,9 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: RouteNames.home,
-                name: "Home",
+                name: RouteNames.homeName,
                 builder: (context, state) =>
-                    const PlaceholderScreen(title: "home"),
+                const HomeScreen(),
 
                 routes: [
                   GoRoute(
