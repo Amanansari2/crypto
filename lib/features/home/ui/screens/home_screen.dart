@@ -18,12 +18,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: _bottomNav(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _header(),
+
               _tabs(),
               _pairSection(),
 
@@ -44,40 +43,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 🔶 HEADER
-  Widget _header() {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        children: [
-          const Text("Demo Trading",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.orange,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Text("Exit", style: TextStyle(color: Colors.white)),
-          )
-        ],
-      ),
-    );
-  }
 
   /// 🔶 TABS
   Widget _tabs() {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        children: [
-          Text("Futures",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          SizedBox(width: 20),
-          Text("Bots", style: TextStyle(color: Colors.grey)),
-        ],
-      ),
+      child: Text("Futures",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
     );
   }
 
@@ -413,15 +385,5 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 🔶 BOTTOM NAV
-  Widget _bottomNav() {
-    return BottomNavigationBar(
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: "Futures"),
-        BottomNavigationBarItem(icon: Icon(Icons.swap_horiz), label: "Spot"),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance), label: "Assets"),
-      ],
-    );
-  }
+
 }

@@ -96,7 +96,8 @@ class _MarketDetailScreenState extends ConsumerState<MarketDetailScreen> {
                       : AppColors.black,
                 ),
 
-                ChartScreen(symbol: widget.symbol, dark: isDark,),
+                Expanded(
+                    child: ChartScreen(symbol: widget.symbol, dark: isDark,)),
 
               ],
             ),
