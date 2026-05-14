@@ -389,6 +389,7 @@ class _ChartScreenState extends ConsumerState<ChartScreen> {
 
                     onActualRangeChanged: (ActualRangeChangedArgs args,) {
 
+
                       /// 🔥 CHART SYNC
                       if (args.orientation ==
                           AxisOrientation.horizontal) {
@@ -423,7 +424,7 @@ class _ChartScreenState extends ConsumerState<ChartScreen> {
                         return;
                       }
 
-                      if (state.candles.length < 30) {
+                      if (state.candles.length < 20) {
                         return;
                       }
 
@@ -464,75 +465,6 @@ class _ChartScreenState extends ConsumerState<ChartScreen> {
                         });
                       }
                     },
-
-
-                    // onActualRangeChanged:
-                    //     (
-                    //     ActualRangeChangedArgs
-                    //     args,
-                    //     ) {
-                    //
-                    //   final state =
-                    //   ref.read(
-                    //     candleProvider,
-                    //   );
-                    //
-                    //   if (state.isLoadingMore ||
-                    //       !state.hasMoreData) {
-                    //     return;
-                    //   }
-                    //
-                    //   if (state.candles.length <
-                    //       30) {
-                    //     return;
-                    //   }
-                    //
-                    //   final visibleMin =
-                    //       args.visibleMin;
-                    //
-                    //   if (visibleMin == null) {
-                    //     return;
-                    //   }
-                    //
-                    //   final triggerPoint =
-                    //       state
-                    //           .candles[20]
-                    //           .time
-                    //           .millisecondsSinceEpoch;
-                    //
-                    //   if (!_paginationLocked &&
-                    //       !state.isLoadingMore &&
-                    //       visibleMin <=
-                    //           triggerPoint) {
-                    //
-                    //     _paginationLocked =
-                    //     true;
-                    //
-                    //     Future.microtask(
-                    //           () async {
-                    //
-                    //         await ref
-                    //             .read(
-                    //           candleProvider
-                    //               .notifier,
-                    //         )
-                    //             .loadMore();
-                    //
-                    //         await Future.delayed(
-                    //           const Duration(
-                    //             milliseconds: 400,
-                    //           ),
-                    //         );
-                    //
-                    //         if (mounted) {
-                    //
-                    //           _paginationLocked =
-                    //           false;
-                    //         }
-                    //       },
-                    //     );
-                    //   }
-                    // },
 
                     trackballBehavior:
                     TrackballBehavior(
@@ -908,11 +840,11 @@ class _ChartScreenState extends ConsumerState<ChartScreen> {
                       // ),
 
                       primaryXAxis: DateTimeAxis(
-
                         onRendererCreated:
                             (DateTimeAxisController controller) {
                           _volumeXAxisController = controller;
                         },
+
 
                         initialVisibleMinimum: _initialMin,
 
