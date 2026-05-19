@@ -28,10 +28,12 @@ class _ChartScreenState extends ConsumerState<ChartScreen> {
   IndicatorType? _activeOverlayIndicator;
 
 
+  // DateTimeAxisController? _xAxisController;
+  //
+  // DateTimeAxisController? _volumeXAxisController;
 
-  DateTimeAxisController? _xAxisController;
-
-  DateTimeAxisController? _volumeXAxisController;
+  DateTime? _visibleMin;
+  DateTime? _visibleMax;
 
   bool _initialZoomApplied = false;
   DateTime? _initialMin;
@@ -288,20 +290,23 @@ class _ChartScreenState extends ConsumerState<ChartScreen> {
                     primaryXAxis:
                     DateTimeAxis(
 
-                      onRendererCreated:
-                          (DateTimeAxisController
-                      controller,) {
-                        _xAxisController =
-                            controller;
-                      },
+                      // onRendererCreated:
+                      //     (DateTimeAxisController
+                      // controller,) {
+                      //   _xAxisController =
+                      //       controller;
+                      // },
 
                       desiredIntervals: 2,
 
-                      initialVisibleMinimum:
-                      _initialMin,
+                      // initialVisibleMinimum:
+                      // _initialMin,
+                      //
+                      // initialVisibleMaximum:
+                      // _initialMax,
 
-                      initialVisibleMaximum:
-                      _initialMax,
+                      initialVisibleMinimum: _initialMin,
+                      initialVisibleMaximum: _initialMax,
 
                       majorGridLines:
                       MajorGridLines(
@@ -407,11 +412,17 @@ class _ChartScreenState extends ConsumerState<ChartScreen> {
                         _initialMax = max;
 
                         /// 🔥 sync volume chart
-                        _volumeXAxisController
-                            ?.visibleMinimum = min;
+                        // _volumeXAxisController
+                        //     ?.visibleMinimum = min;
+                        //
+                        // _volumeXAxisController
+                        //     ?.visibleMaximum = max;
 
-                        _volumeXAxisController
-                            ?.visibleMaximum = max;
+
+                        _visibleMin = min;
+                        _visibleMax = max;
+
+
                       }
 
                       /// 🔥 PAGINATION
@@ -840,15 +851,17 @@ class _ChartScreenState extends ConsumerState<ChartScreen> {
                       // ),
 
                       primaryXAxis: DateTimeAxis(
-                        onRendererCreated:
-                            (DateTimeAxisController controller) {
-                          _volumeXAxisController = controller;
-                        },
+                        // onRendererCreated:
+                        //     (DateTimeAxisController controller) {
+                        //   _volumeXAxisController = controller;
+                        // },
+
 
 
                         initialVisibleMinimum: _initialMin,
 
                         initialVisibleMaximum: _initialMax,
+
 
                         isVisible: false,
                       ),

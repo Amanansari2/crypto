@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/utils/constants/app_colors.dart';
+import '../../chart_engine/ui/screen/chart_screen.dart';
 import '../../provider/binance/ticker_provider.dart';
 import '../widgets/market_detail_widget/price_section.dart';
 import '../widgets/market_detail_widget/stats_section.dart';
@@ -98,6 +99,10 @@ class _MarketDetailScreenState extends ConsumerState<MarketDetailScreen> {
 
                 Expanded(
                     child: ChartScreen(symbol: widget.symbol, dark: isDark,)),
+
+                Expanded(
+                  child: CustomChartScreen(),
+                ),
 
               ],
             ),
