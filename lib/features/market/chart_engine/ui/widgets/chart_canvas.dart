@@ -67,9 +67,13 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
         final viewport = ref.read(viewportProvider);
 
         /// 🔥 PINCH ZOOM
-        /// 🔥 PINCH ZOOM
         if (details.pointerCount == 2) {
-          final newZoom = (_startZoom * details.scale).clamp(2.0, 150.0);
+          // final newZoom = (_startZoom * details.scale).clamp(2.0, 150.0);
+
+          double newZoom = (_startZoom * details.scale).clamp(3.0, 28.0);
+
+          /// 🔥 smooth stable zoom
+          newZoom = (newZoom * 10).round() / 10;
 
           /// 🔥 stable focal point
           final focalX = _startFocal.dx;
