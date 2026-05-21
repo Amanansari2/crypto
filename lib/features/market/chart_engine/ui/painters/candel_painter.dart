@@ -1,11 +1,10 @@
-
-
+import 'package:crypto_app/features/market/chart_engine/core/constants/chart_config.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/constants/app_colors.dart';
 import '../../core/models/candle_model.dart';
 import '../../core/models/viewport_model.dart';
-import '../../core/utils/price_converter.dart';
+import '../../core/utils/chart_math.dart';
 
 class CandlePainter extends CustomPainter {
   final List<CandleModel> candles;
@@ -76,9 +75,21 @@ class CandlePainter extends CustomPainter {
 
       final candle = candles[i];
 
+      // final x =
+      //     (i * viewport.candleWidth) -
+      //         viewport.scrollX;
+
       final x =
-          (i * viewport.candleWidth) -
-              viewport.scrollX;
+      ChartMath.indexToX(
+
+        index: i,
+
+        candleWidth:
+        viewport.candleWidth,
+
+        scrollX:
+        viewport.scrollX,
+      );
 
       /// 🔥 skip offscreen left
       if (x + viewport.candleWidth < 0) {
@@ -90,56 +101,76 @@ class CandlePainter extends CustomPainter {
         break;
       }
 
-      double bodyWidth;
-      double spacing;
+      // double bodyWidth;
+      // double spacing;
+      //
+      // if (viewport.candleWidth <= 6) {
+      //   /// minimum zoom
+      //   bodyWidth = viewport.candleWidth * 0.72;
+      //   spacing = viewport.candleWidth * 0.48;
+      // }
+      // else if (viewport.candleWidth <= 12) {
+      //   /// medium zoom
+      //   bodyWidth = viewport.candleWidth * 0.66;
+      //   spacing = viewport.candleWidth * 0.20;
+      // }
+      // else {
+      //   /// max zoom
+      //   bodyWidth = viewport.candleWidth * 0.52;
+      //   spacing = viewport.candleWidth * 0.08;
+      // }
 
-      if (viewport.candleWidth <= 6) {
-        /// minimum zoom
-        bodyWidth = viewport.candleWidth * 0.72;
-        spacing = viewport.candleWidth * 0.48;
-      }
-      else if (viewport.candleWidth <= 12) {
-        /// medium zoom
-        bodyWidth = viewport.candleWidth * 0.66;
-        spacing = viewport.candleWidth * 0.20;
-      }
-      else {
-        /// max zoom
-        bodyWidth = viewport.candleWidth * 0.52;
-        spacing = viewport.candleWidth * 0.08;
-      }
+      double bodyWidth =
+      ChartMath.candleBodyWidth(
+
+        candleWidth:
+        viewport.candleWidth,
+      );
+
+      double spacing =
+      ChartMath.candleSpacing(
+
+        candleWidth:
+        viewport.candleWidth,
+      );
 
       /// 🔥 limits
-      bodyWidth = bodyWidth.clamp(1.2, 22.0);
-      spacing = spacing.clamp(0.8, 6.0);
+      bodyWidth =
+          bodyWidth.clamp(ChartConfig.candleMinBody, ChartConfig.candleMaxBody);
+      spacing = spacing.clamp(ChartConfig.minSpacing, ChartConfig.maxSpacing);
 
       /// 🔥 pixel perfect snapping
-      final snappedX =
-          (x + spacing / 2)
-              .floorToDouble() + 0.5;
+      // final snappedX =
+      //     (x + spacing / 2)
+      //         .floorToDouble() + 0.5;
 
-      final openY = PriceConverter.priceToY(
+      final snappedX =
+      ChartMath.snappedX(
+        x: x, spacing: spacing,
+      );
+
+      final openY = ChartMath.priceToY(
         price: candle.open,
         minPrice: minPrice,
         maxPrice: maxPrice,
         height: size.height,
       );
 
-      final closeY = PriceConverter.priceToY(
+      final closeY = ChartMath.priceToY(
         price: candle.close,
         minPrice: minPrice,
         maxPrice: maxPrice,
         height: size.height,
       );
 
-      final highY = PriceConverter.priceToY(
+      final highY = ChartMath.priceToY(
         price: candle.high,
         minPrice: minPrice,
         maxPrice: maxPrice,
         height: size.height,
       );
 
-      final lowY = PriceConverter.priceToY(
+      final lowY = ChartMath.priceToY(
         price: candle.low,
         minPrice: minPrice,
         maxPrice: maxPrice,
@@ -160,12 +191,18 @@ class CandlePainter extends CustomPainter {
           snappedX + bodyWidth / 2;
 
 
+      // final wickPadding =
+      // viewport.candleWidth > 18
+      //     ? 2.0
+      //     : viewport.candleWidth > 10
+      //     ? 1.2
+      //     : 0.8;
+
       final wickPadding =
-      viewport.candleWidth > 18
-          ? 2.0
-          : viewport.candleWidth > 10
-          ? 1.2
-          : 0.8;
+      ChartMath.wickPadding(
+        candleWidth:
+        viewport.candleWidth,
+      );
 
       canvas.drawLine(
         Offset(wickX, highY - wickPadding),

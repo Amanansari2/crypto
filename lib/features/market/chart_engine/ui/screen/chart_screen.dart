@@ -1,10 +1,10 @@
+import 'package:crypto_app/features/market/chart_engine/core/constants/chart_config.dart';
 import 'package:crypto_app/features/market/chart_engine/overlays/price_labels/axis_price_label.dart';
 import 'package:crypto_app/features/market/chart_engine/providers/viewport_provider.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/chart_axis.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/time_axis.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/utils/constants/app_colors.dart';
 import '../../overlays/crosshair/crosshair_widget.dart';
@@ -23,18 +23,16 @@ class CustomChartScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context,
       WidgetRef ref,) {
-    const axisWidth = 40.0;
 
-    const timeAxisHeight = 14.0;
     final candlesAsync =
     ref.watch(candleProvider);
 
     return
       Container(
         clipBehavior: Clip.none,
-        padding: EdgeInsets.all(2),
+        padding: EdgeInsets.all(ChartConfig.chartPadding),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18.r),
+          borderRadius: BorderRadius.circular(ChartConfig.chartRadius),
 
           color: dark
               ? AppColors.blue.withOpacity(0.08)
@@ -89,13 +87,14 @@ class CustomChartScreen extends ConsumerWidget {
                                 ChartAxis(
                                   candles: candles,
                                   viewport: ref.watch(viewportProvider),
-                                  chartWidth: constraints.maxWidth - 40,
+                                  chartWidth: constraints.maxWidth -
+                                      ChartConfig.axisWidth,
                                 )
                               ],
                             ),
 
                             Positioned.fill(
-                              right: axisWidth,
+                              right: ChartConfig.axisWidth,
                               child: CrosshairWidget(
                                 candles: candles,
                               ),
@@ -104,16 +103,15 @@ class CustomChartScreen extends ConsumerWidget {
                             AxisPriceLabel(
                               candles: candles,
                               chartHeight: constraints.maxHeight,
-                              chartWidth: constraints.maxWidth - axisWidth,
+                              chartWidth: constraints.maxWidth -
+                                  ChartConfig.axisWidth,
                             ),
 
-                            // TimeLabel(
-                            //   candles: candles,
-                            //   chartWidth: constraints.maxWidth - 40,
-                            // ),
+
                             TimeLabel(
                               candles: candles,
-                              chartWidth: constraints.maxWidth - axisWidth,
+                              chartWidth: constraints.maxWidth -
+                                  ChartConfig.axisWidth,
                             ),
 
                           ],

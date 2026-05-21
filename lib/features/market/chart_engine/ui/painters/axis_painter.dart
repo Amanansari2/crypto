@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/constants/app_colors.dart';
+import '../../core/constants/chart_config.dart';
 import '../../core/models/candle_model.dart';
 import '../../core/models/viewport_model.dart';
-import '../../core/utils/price_converter.dart';
+import '../../core/utils/chart_math.dart';
+import '../../core/utils/visible_price_helper.dart';
 
 class AxisPainter extends CustomPainter {
   final List<CandleModel> candles;
@@ -30,47 +32,112 @@ class AxisPainter extends CustomPainter {
     );
 
     /// 🔥 visible candles
-    final startIndex = (viewport.scrollX / viewport.candleWidth).floor().clamp(
+    // final startIndex = (viewport.scrollX / viewport.candleWidth).floor().clamp(
+    //   0,
+    //   candles.length,
+    // );
+    //
+    // final visibleCount = (chartWidth / viewport.candleWidth).ceil();
+    //
+    // final endIndex = (startIndex + visibleCount).clamp(0, candles.length);
+    //
+    // if (startIndex >= endIndex) {
+    //   return;
+    // }
+
+    final startIndex =
+    (
+        viewport.scrollX /
+            viewport.candleWidth
+    )
+        .floor()
+        .clamp(
       0,
       candles.length,
     );
 
-    final visibleCount = (chartWidth / viewport.candleWidth).ceil();
+    final visibleCount =
+    ChartMath.visibleCount(
 
-    final endIndex = (startIndex + visibleCount).clamp(0, candles.length);
+      screenWidth:
+      chartWidth,
+
+      candleWidth:
+      viewport.candleWidth,
+    );
+
+    final endIndex =
+    (startIndex + visibleCount + ChartConfig.extraVisibleCandles)
+        .clamp(
+      0,
+      candles.length,
+    );
 
     if (startIndex >= endIndex) {
       return;
     }
 
     /// 🔥 visible range
-    double maxPrice = double.negativeInfinity;
+    // double maxPrice = double.negativeInfinity;
+    //
+    // double minPrice = double.infinity;
+    //
+    // for (int i = startIndex; i < endIndex; i++) {
+    //   final candle = candles[i];
+    //
+    //   if (candle.high > maxPrice) {
+    //     maxPrice = candle.high;
+    //   }
+    //
+    //   if (candle.low < minPrice) {
+    //     minPrice = candle.low;
+    //   }
+    // }
+    //
+    // double range = maxPrice - minPrice;
+    // if (range <= 0) {
+    //   return;
+    // }
+    //
+    // final padding = range * 0.08;
+    //
+    // maxPrice += padding;
+    // minPrice -= padding;
 
-    double minPrice = double.infinity;
+    // range = maxPrice - minPrice;
 
-    for (int i = startIndex; i < endIndex; i++) {
-      final candle = candles[i];
+    final visiblePrice =
+    VisiblePriceHelper.calculate(
 
-      if (candle.high > maxPrice) {
-        maxPrice = candle.high;
-      }
+      candles: candles,
 
-      if (candle.low < minPrice) {
-        minPrice = candle.low;
-      }
-    }
+      startIndex: startIndex,
 
-    double range = maxPrice - minPrice;
+      endIndex: endIndex,
+    );
+
+    double maxPrice =
+        visiblePrice.maxPrice;
+
+    double minPrice =
+        visiblePrice.minPrice;
+
+    double range =
+        maxPrice - minPrice;
+
     if (range <= 0) {
       return;
     }
 
-    final padding = range * 0.08;
+    final padding =
+        range * 0.08;
 
     maxPrice += padding;
+
     minPrice -= padding;
 
-    range = maxPrice - minPrice;
+    range =
+        maxPrice - minPrice;
 
     /// 🔥 adaptive formatter
     String formatPrice(double price, double range) {
@@ -86,58 +153,92 @@ class AxisPainter extends CustomPainter {
         return price.toStringAsFixed(2);
       }
 
-      return price.toStringAsFixed(1);
+      return price.toStringAsFixed(2);
     }
 
     /// 🔥 grid synced labels
 
-    final labels = [
-      (
-        price: maxPrice,
+    // final labels = [
+    //   (
+    //     price: maxPrice,
+    //
+    //     y: ChartMath.priceToY(
+    //       price: maxPrice,
+    //       minPrice: minPrice,
+    //       maxPrice: maxPrice,
+    //       height: size.height,
+    //     ),
+    //   ),
+    //
+    //   (
+    //     price: maxPrice - (range * 0.33),
+    //
+    //     y: ChartMath.priceToY(
+    //       price: maxPrice - (range * 0.33),
+    //
+    //       minPrice: minPrice,
+    //       maxPrice: maxPrice,
+    //       height: size.height,
+    //     ),
+    //   ),
+    //
+    //   (
+    //     price: maxPrice - (range * 0.66),
+    //
+    //     y: ChartMath.priceToY(
+    //       price: maxPrice - (range * 0.66),
+    //
+    //       minPrice: minPrice,
+    //       maxPrice: maxPrice,
+    //       height: size.height,
+    //     ),
+    //   ),
+    //
+    //   (
+    //     price: minPrice,
+    //
+    //     y: ChartMath.priceToY(
+    //       price: minPrice,
+    //       minPrice: minPrice,
+    //       maxPrice: maxPrice,
+    //       height: size.height,
+    //     ),
+    //   ),
+    // ];
 
-        y: PriceConverter.priceToY(
-          price: maxPrice,
+    final labels = List.generate(
+
+      ChartConfig.horizontalGridCount + 2,
+
+          (index) {
+        final ratio =
+            index /
+                (
+                    ChartConfig
+                        .horizontalGridCount + 1
+                );
+
+        final price =
+            maxPrice -
+                (range * ratio);
+
+        return (
+
+        price: price,
+
+        y: ChartMath.priceToY(
+
+          price: price,
+
           minPrice: minPrice,
+
           maxPrice: maxPrice,
+
           height: size.height,
         ),
-      ),
-
-      (
-        price: maxPrice - (range * 0.33),
-
-        y: PriceConverter.priceToY(
-          price: maxPrice - (range * 0.33),
-
-          minPrice: minPrice,
-          maxPrice: maxPrice,
-          height: size.height,
-        ),
-      ),
-
-      (
-        price: maxPrice - (range * 0.66),
-
-        y: PriceConverter.priceToY(
-          price: maxPrice - (range * 0.66),
-
-          minPrice: minPrice,
-          maxPrice: maxPrice,
-          height: size.height,
-        ),
-      ),
-
-      (
-        price: minPrice,
-
-        y: PriceConverter.priceToY(
-          price: minPrice,
-          minPrice: minPrice,
-          maxPrice: maxPrice,
-          height: size.height,
-        ),
-      ),
-    ];
+        );
+      },
+    );
 
     String? lastText;
 
@@ -150,6 +251,7 @@ class AxisPainter extends CustomPainter {
       }
 
       lastText = text;
+
 
       final textPainter = TextPainter(
         text: TextSpan(text: text, style: textStyle),

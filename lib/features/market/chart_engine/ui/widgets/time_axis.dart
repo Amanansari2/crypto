@@ -1,3 +1,4 @@
+import 'package:crypto_app/features/market/chart_engine/core/constants/chart_config.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/models/candle_model.dart';
@@ -14,7 +15,7 @@ class TimeAxis extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 14,
+      height: ChartConfig.timeAxisHeight,
 
       child: RepaintBoundary(
         child: CustomPaint(

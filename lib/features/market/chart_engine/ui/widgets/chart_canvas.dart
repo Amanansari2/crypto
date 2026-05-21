@@ -114,251 +114,256 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
       _initialized = true;
     });
 
-    return GestureDetector(
-      onScaleStart: (details) {
-        final viewport = ref.read(viewportProvider);
+    return LayoutBuilder(
+        builder: (context, constraints) {
+          final chartWidth = constraints.maxWidth;
+          final chartHeight = constraints.maxHeight;
+          return GestureDetector(
+            onScaleStart: (details) {
+              final viewport = ref.read(viewportProvider);
 
-        _startZoom = viewport.candleWidth;
-        _startScroll = viewport.scrollX;
-        _startFocal = details.localFocalPoint;
-      },
+              _startZoom = viewport.candleWidth;
+              _startScroll = viewport.scrollX;
+              _startFocal = details.localFocalPoint;
+            },
 
-      // onTapDown: (details) {
-      //   ref.read(crosshairProvider.notifier).toggle(details.localPosition);
-      // },
+            // onTapDown: (details) {
+            //   ref.read(crosshairProvider.notifier).toggle(details.localPosition);
+            // },
 
-      onTapDown: (details) {
-        final viewport =
-        ref.read(viewportProvider);
+            onTapDown: (details) {
+              final viewport =
+              ref.read(viewportProvider);
 
-        final result =
-        CrosshairEngine.snapToCandle(
+              final result =
+              CrosshairEngine.snapToCandle(
 
-          localDx:
-          details.localPosition.dx,
+                localDx:
+                details.localPosition.dx,
 
-          scrollX:
-          viewport.scrollX,
+                scrollX:
+                viewport.scrollX,
 
-          candleWidth:
-          viewport.candleWidth,
+                candleWidth:
+                viewport.candleWidth,
 
-          candleCount:
-          widget.candles.length,
-        );
+                candleCount:
+                widget.candles.length,
+              );
 
-        final safeY =
-        details.localPosition.dy
-            .clamp(
-          8.0,
-          size.height - 8.0,
-        );
+              final safeY =
+              details.localPosition.dy
+                  .clamp(
+                8.0,
+                size.height - 8.0,
+              );
 
-        final notifier =
-        ref.read(
-          crosshairProvider.notifier,
-        );
+              final notifier =
+              ref.read(
+                crosshairProvider.notifier,
+              );
 
-        /// 🔥 show crosshair
-        notifier.toggle(
+              /// 🔥 show crosshair
+              notifier.toggle(
 
-          Offset(
-            result.snappedX,
-            safeY,
-          ),
-        );
+                Offset(
+                  result.snappedX,
+                  safeY,
+                ),
+              );
 
-        /// 🔥 update snapped position
-        notifier.update(
+              /// 🔥 update snapped position
+              notifier.update(
 
-          position: Offset(
-            result.snappedX,
-            safeY,
-          ),
+                position: Offset(
+                  result.snappedX,
+                  safeY,
+                ),
 
-          candleIndex:
-          result.candleIndex,
-        );
-      },
+                candleIndex:
+                result.candleIndex,
+              );
+            },
 
-      onLongPressMoveUpdate: (details) {
-        final viewport =
-        ref.read(viewportProvider);
+            onLongPressMoveUpdate: (details) {
+              final viewport =
+              ref.read(viewportProvider);
 
-        final result =
-        CrosshairEngine.snapToCandle(
+              final result =
+              CrosshairEngine.snapToCandle(
 
-          localDx:
-          details.localPosition.dx,
+                localDx:
+                details.localPosition.dx,
 
-          scrollX:
-          viewport.scrollX,
+                scrollX:
+                viewport.scrollX,
 
-          candleWidth:
-          viewport.candleWidth,
+                candleWidth:
+                viewport.candleWidth,
 
-          candleCount:
-          widget.candles.length,
-        );
+                candleCount:
+                widget.candles.length,
+              );
 
-        final safeY =
-        details.localPosition.dy
-            .clamp(
-          8.0,
-          size.height - 8.0,
-        );
+              final safeY =
+              details.localPosition.dy
+                  .clamp(
+                8.0,
+                size.height - 8.0,
+              );
 
-        ref.read(crosshairProvider.notifier)
-            .update(position: Offset(
-              result.snappedX,
-              safeY
-          ),
-
-          candleIndex: result.candleIndex,
-        );
-      },
-
-      onScaleUpdate: (details) {
-        final notifier = ref.read(viewportProvider.notifier);
-
-        final viewport = ref.read(viewportProvider);
-
-        /// 🔥 PINCH ZOOM
-        /// 🔥 PINCH ZOOM
-        if (details.pointerCount == 2) {
-          final newZoom =
-          GestureEngine.calculateZoom(
-
-            startZoom: _startZoom,
-
-            scale: details.scale,
-          );
-
-          final newScroll =
-          GestureEngine
-              .calculateZoomScroll(
-
-            startScroll:
-            _startScroll,
-
-            startZoom:
-            _startZoom,
-
-            newZoom:
-            newZoom,
-
-            focalX:
-            _startFocal.dx,
-          );
-
-          notifier.setZoom(newZoom);
-
-          notifier.setScroll(
-
-            newScroll,
-
-            widget.candles.length,
-
-            MediaQuery
-                .of(context)
-                .size
-                .width,
-          );
-        }
-        /// 🔥 PAN
-        else if (details.pointerCount == 1) {
-          final newScroll =
-          GestureEngine.calculatePan(
-
-            currentScroll:
-            viewport.scrollX,
-
-            deltaX:
-            details.focalPointDelta.dx,
-          );
-
-          notifier.setScroll(
-
-            newScroll,
-
-            widget.candles.length,
-
-            MediaQuery
-                .of(context)
-                .size
-                .width,
-          );
-        }
-
-        final updatedViewport = ref.read(viewportProvider);
-
-        final visible =
-        VisibleCandleHelper.calculate(
-
-          scrollX:
-          updatedViewport.scrollX,
-
-          candleWidth:
-          updatedViewport.candleWidth,
-
-          screenWidth:
-          MediaQuery
-              .of(context)
-              .size
-              .width,
-
-          candleCount:
-          widget.candles.length,
-        );
-
-        notifier.updateVisibleIndexes(
-
-          start:
-          visible.startIndex,
-
-          end:
-          visible.endIndex,
-        );
-      },
-
-      onScaleEnd: (_) {
-        final viewport = ref.read(viewportProvider);
-
-        final startIndex = (viewport.scrollX / viewport.candleWidth).floor();
-
-        if (startIndex < 30) {
-          ref.read(candleProvider.notifier).loadMore();
-        }
-      },
-
-      child: Stack(
-        children: [
-
-          /// 🔥 background grid
-          RepaintBoundary(
-
-            child: CustomPaint(
-              size: Size.infinite,
-
-              painter: GridPainter(
-                  context: context
+              ref.read(crosshairProvider.notifier)
+                  .update(position: Offset(
+                  result.snappedX,
+                  safeY
               ),
-            ),
-          ),
 
-          RepaintBoundary(
-            child: CustomPaint(
-              size: Size.infinite,
+                candleIndex: result.candleIndex,
+              );
+            },
 
-              painter: CandlePainter(
-                candles: widget.candles,
-                viewport: viewport,
-              ),
+            onScaleUpdate: (details) {
+              final notifier = ref.read(viewportProvider.notifier);
+
+              final viewport = ref.read(viewportProvider);
+
+              /// 🔥 PINCH ZOOM
+              /// 🔥 PINCH ZOOM
+              if (details.pointerCount == 2) {
+                final newZoom =
+                GestureEngine.calculateZoom(
+
+                  startZoom: _startZoom,
+
+                  scale: details.scale,
+                );
+
+                final newScroll =
+                GestureEngine
+                    .calculateZoomScroll(
+
+                  startScroll:
+                  _startScroll,
+
+                  startZoom:
+                  _startZoom,
+
+                  newZoom:
+                  newZoom,
+
+                  focalX:
+                  _startFocal.dx,
+                );
+
+                notifier.setZoom(newZoom);
+
+                notifier.setScroll(
+
+                  newScroll,
+
+                  widget.candles.length,
+
+                  MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                );
+              }
+
+              /// 🔥 PAN
+              else if (details.pointerCount == 1) {
+                final newScroll =
+                GestureEngine.calculatePan(
+
+                  currentScroll:
+                  viewport.scrollX,
+
+                  deltaX:
+                  details.focalPointDelta.dx,
+                );
+
+                notifier.setScroll(
+
+                  newScroll,
+
+                  widget.candles.length,
+
+                  MediaQuery
+                      .of(context)
+                      .size
+                      .width,
+                );
+              }
+
+              final updatedViewport = ref.read(viewportProvider);
+
+              final visible =
+              VisibleCandleHelper.calculate(
+
+                scrollX:
+                updatedViewport.scrollX,
+
+                candleWidth:
+                updatedViewport.candleWidth,
+
+                screenWidth:
+                MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+
+                candleCount:
+                widget.candles.length,
+              );
+
+              notifier.updateVisibleIndexes(
+
+                start:
+                visible.startIndex,
+
+                end:
+                visible.endIndex,
+              );
+            },
+
+            onScaleEnd: (_) {
+              final viewport = ref.read(viewportProvider);
+
+              final startIndex = (viewport.scrollX / viewport.candleWidth)
+                  .floor();
+
+              if (startIndex < 30) {
+                ref.read(candleProvider.notifier).loadMore();
+              }
+            },
+
+            child: Stack(
+              children: [
+
+                /// 🔥 background grid
+                RepaintBoundary(
+                  child: CustomPaint(
+                    size: Size.infinite,
+                    painter: GridPainter(
+                        context: context
+                    ),
+                  ),
+                ),
+
+                RepaintBoundary(
+                  child: CustomPaint(
+                    size: Size.infinite,
+                    painter: CandlePainter(
+                      candles: widget.candles,
+                      viewport: viewport,
+                    ),
+                  ),
+                ),
+                CrosshairWidget(candles: widget.candles)
+              ],
             ),
-          ),
-          CrosshairWidget(candles: widget.candles)
-        ],
-      ),
+          );
+        }
     );
   }
 }

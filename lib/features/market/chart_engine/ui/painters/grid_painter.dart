@@ -1,4 +1,5 @@
 import 'package:crypto_app/core/utils/constants/app_colors.dart';
+import 'package:crypto_app/features/market/chart_engine/core/constants/chart_config.dart';
 import 'package:flutter/material.dart';
 
 class GridPainter extends CustomPainter {
@@ -14,7 +15,7 @@ class GridPainter extends CustomPainter {
       ..isAntiAlias = false;
 
     /// 🔥 3 inner horizontal lines
-    const horizontalLines = 2;
+    const horizontalLines = ChartConfig.horizontalGridCount;
 
     for (int i = 1; i <= horizontalLines; i++) {
       final y = (size.height / (horizontalLines + 1)) * i;
@@ -23,7 +24,7 @@ class GridPainter extends CustomPainter {
     }
 
     /// 🔥 3 inner vertical lines
-    const verticalLines = 2;
+    const verticalLines = ChartConfig.verticalGridCount;
 
     for (int i = 1; i <= verticalLines; i++) {
       final x = (size.width / (verticalLines + 1)) * i;
