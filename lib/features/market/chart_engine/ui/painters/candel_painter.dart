@@ -5,19 +5,16 @@ import 'package:flutter/material.dart';
 import '../../../../../core/utils/constants/app_colors.dart';
 import '../../core/models/candle_model.dart';
 import '../../core/models/viewport_model.dart';
-import '../../providers/crosshair_provider.dart';
+import '../../core/utils/price_converter.dart';
 
 class CandlePainter extends CustomPainter {
   final List<CandleModel> candles;
 
   final ChartViewport viewport;
 
-  final CrosshairState crosshair;
-
   CandlePainter({
     required this.candles,
     required this.viewport,
-    required this.crosshair,
   });
 
   @override
@@ -34,10 +31,7 @@ class CandlePainter extends CustomPainter {
       ..color = AppColors.red
       ..strokeWidth = 1;
 
-    final crossPaint = Paint()
-      ..isAntiAlias = false
-      ..color = Colors.white54
-      ..strokeWidth = 0.5;
+
 
     final startIndex = (viewport.scrollX / viewport.candleWidth).floor();
 
@@ -76,6 +70,7 @@ class CandlePainter extends CustomPainter {
       return;
     }
 
+
     /// 🔥 DRAW CANDLES
     for (int i = safeStart; i < safeEnd; i++) {
 
@@ -94,16 +89,6 @@ class CandlePainter extends CustomPainter {
       if (x > size.width) {
         break;
       }
-
-
-      /// 🔥 professional spacing
-      // final spacing =
-      //     viewport.candleWidth * 0.38;
-      //
-      // final bodyWidth =
-      //     (viewport.candleWidth - spacing).clamp(1.5, 12.0);
-
-      /// 🔥 professional adaptive spacing like BioFin
 
       double bodyWidth;
       double spacing;
@@ -133,30 +118,33 @@ class CandlePainter extends CustomPainter {
           (x + spacing / 2)
               .floorToDouble() + 0.5;
 
+      final openY = PriceConverter.priceToY(
+        price: candle.open,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        height: size.height,
+      );
 
-      final openY =
-          size.height *
-              (1 -
-                  ((candle.open - minPrice) /
-                      priceRange));
+      final closeY = PriceConverter.priceToY(
+        price: candle.close,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        height: size.height,
+      );
 
-      final closeY =
-          size.height *
-              (1 -
-                  ((candle.close - minPrice) /
-                      priceRange));
+      final highY = PriceConverter.priceToY(
+        price: candle.high,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        height: size.height,
+      );
 
-      final highY =
-          size.height *
-              (1 -
-                  ((candle.high - minPrice) /
-                      priceRange));
-
-      final lowY =
-          size.height *
-              (1 -
-                  ((candle.low - minPrice) /
-                      priceRange));
+      final lowY = PriceConverter.priceToY(
+        price: candle.low,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        height: size.height,
+      );
 
       final isBull =
           candle.close >= candle.open;
@@ -170,9 +158,7 @@ class CandlePainter extends CustomPainter {
       /// 🔥 centered wick
       final wickX =
           snappedX + bodyWidth / 2;
-      // final wickedPadding = viewport.candleWidth > 20
-      // ?2.0
-      // :1.0;
+
 
       final wickPadding =
       viewport.candleWidth > 18
@@ -216,30 +202,12 @@ class CandlePainter extends CustomPainter {
       );
     }
 
-    /// 🔥 CROSSHAIR
-    if (crosshair.visible && crosshair.position != null) {
-      final pos = crosshair.position!;
 
-      /// vertical
-      canvas.drawLine(
-        Offset(pos.dx, 0),
-        Offset(pos.dx, size.height),
-        crossPaint,
-      );
-
-      /// horizontal
-      canvas.drawLine(
-        Offset(0, pos.dy),
-        Offset(size.width, pos.dy),
-        crossPaint,
-      );
-    }
   }
 
   @override
   bool shouldRepaint(covariant CandlePainter old) {
     return old.viewport != viewport ||
-        old.crosshair != crosshair ||
         old.candles != candles;
   }
 }

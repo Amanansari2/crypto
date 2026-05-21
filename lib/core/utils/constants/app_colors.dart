@@ -47,4 +47,42 @@ class AppColors {
     begin: Alignment.bottomCenter,
     end: Alignment.topCenter,
   );
+
+  // static Color chartBackground(
+  //     BuildContext context,
+  //     ) {
+  //
+  //   return Theme.of(context)
+  //       .brightness ==
+  //       Brightness.dark
+  //       ? darkBg
+  //       : lightBg;
+  // }
+
+  static Color chartGrid(BuildContext context,) {
+    return Theme
+        .of(context)
+        .brightness ==
+        Brightness.dark
+        ? Colors.white10
+        : Colors.black12;
+  }
+
+  static Color chartCrosshair(BuildContext context,) {
+    return Theme
+        .of(context)
+        .brightness ==
+        Brightness.dark
+        ? Colors.white54
+        : Colors.black54;
+  }
+
+  static Color chartAxisText(BuildContext context,) {
+    return Theme
+        .of(context)
+        .brightness ==
+        Brightness.dark
+        ? Colors.white54
+        : Colors.black54;
+  }
 }

@@ -1,11 +1,17 @@
+import 'package:crypto_app/features/market/chart_engine/overlays/crosshair/crosshair_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/engine/crosshair_engine.dart';
+import '../../core/engine/gesture_engine.dart';
 import '../../core/models/candle_model.dart';
+import '../../core/utils/visible_candle_helper.dart';
 import '../../providers/candle_provider.dart';
 import '../../providers/crosshair_provider.dart';
 import '../../providers/viewport_provider.dart';
+import '../../providers/visible_price_provider.dart';
 import '../painters/candel_painter.dart';
+import '../painters/grid_painter.dart';
 
 class ChartCanvas extends ConsumerStatefulWidget {
   final List<CandleModel> candles;
@@ -25,6 +31,70 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
   @override
   Widget build(BuildContext context) {
     final viewport = ref.watch(viewportProvider);
+    final size = MediaQuery
+        .of(context)
+        .size;
+    final startIndex =
+    (viewport.scrollX /
+        viewport.candleWidth)
+        .floor();
+
+    final visibleCount =
+    (size.width /
+        viewport.candleWidth)
+        .ceil();
+
+    final endIndex =
+        startIndex + visibleCount + 2;
+
+    final safeStart =
+    startIndex.clamp(
+      0,
+      widget.candles.length,
+    );
+
+    final safeEnd =
+    endIndex.clamp(
+      0,
+      widget.candles.length,
+    );
+
+    if (safeStart < safeEnd) {
+      double maxPrice =
+          double.negativeInfinity;
+
+      double minPrice =
+          double.infinity;
+
+      for (
+      int i = safeStart;
+      i < safeEnd;
+      i++
+      ) {
+        final candle =
+        widget.candles[i];
+
+        if (candle.high > maxPrice) {
+          maxPrice = candle.high;
+        }
+
+        if (candle.low < minPrice) {
+          minPrice = candle.low;
+        }
+      }
+
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) {
+        ref
+            .read(
+            visiblePriceProvider.notifier)
+            .update(
+
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+        );
+      });
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_initialized) return;
@@ -58,7 +128,44 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
       },
 
       onLongPressMoveUpdate: (details) {
-        ref.read(crosshairProvider.notifier).update(details.localPosition);
+        final viewport =
+        ref.read(viewportProvider);
+
+        final result =
+        CrosshairEngine.snapToCandle(
+
+          localDx:
+          details.localPosition.dx,
+
+          scrollX:
+          viewport.scrollX,
+
+          candleWidth:
+          viewport.candleWidth,
+
+          candleCount:
+          widget.candles.length,
+        );
+
+        final safeY =
+        details.localPosition.dy
+            .clamp(
+          8.0,
+          size.height - 8.0,
+        );
+
+        ref
+            .read(crosshairProvider.notifier)
+            .update(
+
+          position: Offset(
+              result.snappedX,
+              safeY
+          ),
+
+          candleIndex:
+          result.candleIndex,
+        );
       },
 
       onScaleUpdate: (details) {
@@ -67,67 +174,101 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
         final viewport = ref.read(viewportProvider);
 
         /// 🔥 PINCH ZOOM
+        /// 🔥 PINCH ZOOM
         if (details.pointerCount == 2) {
-          // final newZoom = (_startZoom * details.scale).clamp(2.0, 150.0);
+          final newZoom =
+          GestureEngine.calculateZoom(
 
-          double newZoom = (_startZoom * details.scale).clamp(3.0, 28.0);
+            startZoom: _startZoom,
 
-          /// 🔥 smooth stable zoom
-          newZoom = (newZoom * 10).round() / 10;
+            scale: details.scale,
+          );
 
-          /// 🔥 stable focal point
-          final focalX = _startFocal.dx;
+          final newScroll =
+          GestureEngine
+              .calculateZoomScroll(
 
-          /// 🔥 freeze world position
-          final worldX = _startScroll + focalX;
+            startScroll:
+            _startScroll,
 
-          /// 🔥 calculate new scroll
-          final newScroll = (worldX * (newZoom / _startZoom)) - focalX;
+            startZoom:
+            _startZoom,
+
+            newZoom:
+            newZoom,
+
+            focalX:
+            _startFocal.dx,
+          );
 
           notifier.setZoom(newZoom);
 
           notifier.setScroll(
+
             newScroll,
+
             widget.candles.length,
-            MediaQuery.of(context).size.width,
+
+            MediaQuery
+                .of(context)
+                .size
+                .width,
           );
         }
         /// 🔥 PAN
         else if (details.pointerCount == 1) {
-          final newScroll = viewport.scrollX - details.focalPointDelta.dx;
+          final newScroll =
+          GestureEngine.calculatePan(
+
+            currentScroll:
+            viewport.scrollX,
+
+            deltaX:
+            details.focalPointDelta.dx,
+          );
 
           notifier.setScroll(
+
             newScroll,
+
             widget.candles.length,
-            MediaQuery.of(context).size.width,
+
+            MediaQuery
+                .of(context)
+                .size
+                .width,
           );
         }
 
         final updatedViewport = ref.read(viewportProvider);
 
-        final startIndex =
-            (updatedViewport.scrollX / updatedViewport.candleWidth)
-                .floor()
-                .clamp(0, widget.candles.length);
+        final visible =
+        VisibleCandleHelper.calculate(
 
-        final visibleCount =
-            (MediaQuery.of(context).size.width / updatedViewport.candleWidth)
-                .ceil();
+          scrollX:
+          updatedViewport.scrollX,
 
-        final endIndex = (startIndex + visibleCount).clamp(
-          0,
+          candleWidth:
+          updatedViewport.candleWidth,
+
+          screenWidth:
+          MediaQuery
+              .of(context)
+              .size
+              .width,
+
+          candleCount:
           widget.candles.length,
         );
 
-        notifier.updateVisibleIndexes(start: startIndex, end: endIndex);
+        notifier.updateVisibleIndexes(
 
-        /// 🔥 PRELOAD
-        //   if (startIndex < 30) {
-        //
-        //     ref
-        //         .read(candleProvider.notifier)
-        //         .loadMore();
-        //   }
+          start:
+          visible.startIndex,
+
+          end:
+          visible.endIndex,
+        );
       },
 
       onScaleEnd: (_) {
@@ -140,14 +281,33 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
         }
       },
 
-      child: CustomPaint(
-        size: Size.infinite,
+      child: Stack(
+        children: [
 
-        painter: CandlePainter(
-          candles: widget.candles,
-          viewport: viewport,
-          crosshair: ref.watch(crosshairProvider),
-        ),
+          /// 🔥 background grid
+          RepaintBoundary(
+
+            child: CustomPaint(
+              size: Size.infinite,
+
+              painter: GridPainter(
+                  context: context
+              ),
+            ),
+          ),
+
+          RepaintBoundary(
+            child: CustomPaint(
+              size: Size.infinite,
+
+              painter: CandlePainter(
+                candles: widget.candles,
+                viewport: viewport,
+              ),
+            ),
+          ),
+          CrosshairWidget(candles: widget.candles)
+        ],
       ),
     );
   }

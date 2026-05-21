@@ -101,7 +101,7 @@ class _MarketDetailScreenState extends ConsumerState<MarketDetailScreen> {
                     child: ChartScreen(symbol: widget.symbol, dark: isDark,)),
 
                 Expanded(
-                  child: CustomChartScreen(),
+                  child: CustomChartScreen(dark: isDark,),
                 ),
 
               ],
