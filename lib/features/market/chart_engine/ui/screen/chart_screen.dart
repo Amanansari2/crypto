@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/utils/constants/app_colors.dart';
 import '../../overlays/crosshair/crosshair_widget.dart';
+import '../../overlays/price_labels/time_label.dart';
 import '../../providers/candle_provider.dart';
 import '../widgets/chart_canvas.dart';
 
@@ -22,11 +23,15 @@ class CustomChartScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context,
       WidgetRef ref,) {
+    const axisWidth = 40.0;
+
+    const timeAxisHeight = 14.0;
     final candlesAsync =
     ref.watch(candleProvider);
 
     return
       Container(
+        clipBehavior: Clip.none,
         padding: EdgeInsets.all(2),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18.r),
@@ -65,9 +70,7 @@ class CustomChartScreen extends ConsumerWidget {
 
           data: (candles) {
             return Column(
-
               children: [
-
                 /// 🔥 CHART + PRICE AXIS
                 Expanded(
 
@@ -92,9 +95,7 @@ class CustomChartScreen extends ConsumerWidget {
                             ),
 
                             Positioned.fill(
-
-                              right: 40,
-
+                              right: axisWidth,
                               child: CrosshairWidget(
                                 candles: candles,
                               ),
@@ -103,16 +104,32 @@ class CustomChartScreen extends ConsumerWidget {
                             AxisPriceLabel(
                               candles: candles,
                               chartHeight: constraints.maxHeight,
-                              chartWidth: constraints.maxWidth - 40,
-                            )
+                              chartWidth: constraints.maxWidth - axisWidth,
+                            ),
+
+                            // TimeLabel(
+                            //   candles: candles,
+                            //   chartWidth: constraints.maxWidth - 40,
+                            // ),
+                            TimeLabel(
+                              candles: candles,
+                              chartWidth: constraints.maxWidth - axisWidth,
+                            ),
+
                           ],
                         );
                       }
                   ),
                 ),
                 TimeAxis(
-                    candles: candles,
-                    viewport: ref.watch(viewportProvider))
+
+                  candles: candles,
+
+                  viewport:
+                  ref.watch(
+                    viewportProvider,
+                  ),
+                ),
               ],
             );
           },

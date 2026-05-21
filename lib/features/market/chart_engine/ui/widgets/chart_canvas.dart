@@ -123,8 +123,62 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
         _startFocal = details.localFocalPoint;
       },
 
+      // onTapDown: (details) {
+      //   ref.read(crosshairProvider.notifier).toggle(details.localPosition);
+      // },
+
       onTapDown: (details) {
-        ref.read(crosshairProvider.notifier).toggle(details.localPosition);
+        final viewport =
+        ref.read(viewportProvider);
+
+        final result =
+        CrosshairEngine.snapToCandle(
+
+          localDx:
+          details.localPosition.dx,
+
+          scrollX:
+          viewport.scrollX,
+
+          candleWidth:
+          viewport.candleWidth,
+
+          candleCount:
+          widget.candles.length,
+        );
+
+        final safeY =
+        details.localPosition.dy
+            .clamp(
+          8.0,
+          size.height - 8.0,
+        );
+
+        final notifier =
+        ref.read(
+          crosshairProvider.notifier,
+        );
+
+        /// 🔥 show crosshair
+        notifier.toggle(
+
+          Offset(
+            result.snappedX,
+            safeY,
+          ),
+        );
+
+        /// 🔥 update snapped position
+        notifier.update(
+
+          position: Offset(
+            result.snappedX,
+            safeY,
+          ),
+
+          candleIndex:
+          result.candleIndex,
+        );
       },
 
       onLongPressMoveUpdate: (details) {
@@ -154,17 +208,13 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
           size.height - 8.0,
         );
 
-        ref
-            .read(crosshairProvider.notifier)
-            .update(
-
-          position: Offset(
+        ref.read(crosshairProvider.notifier)
+            .update(position: Offset(
               result.snappedX,
               safeY
           ),
 
-          candleIndex:
-          result.candleIndex,
+          candleIndex: result.candleIndex,
         );
       },
 
