@@ -146,7 +146,7 @@ class CandleNotifier extends AsyncNotifier<List<CandleModel>> {
       _isLoadingMore = false;
       ref
           .read(candleLoadingMoreProvider.notifier)
-          .state = true;
+          .state = false;
     }
   }
 
