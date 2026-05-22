@@ -129,15 +129,15 @@ class AxisPainter extends CustomPainter {
       return;
     }
 
-    final padding =
-        range * 0.08;
-
-    maxPrice += padding;
-
-    minPrice -= padding;
-
-    range =
-        maxPrice - minPrice;
+    // final padding =
+    //     range * 0.08;
+    //
+    // maxPrice += padding;
+    //
+    // minPrice -= padding;
+    //
+    // range =
+    //     maxPrice - minPrice;
 
     /// 🔥 adaptive formatter
     String formatPrice(double price, double range) {

@@ -50,12 +50,12 @@ class CurrentPriceLabel extends StatelessWidget {
     final isBull = lastCandle.close >= lastCandle.open;
 
     return Positioned(
-      right: 0,
+      right: -1,
 
-      top: (y - 12).clamp(4.0, chartHeight - 28),
+      top: (y - 13).clamp(4.0, chartHeight - 28),
 
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
 
         decoration: BoxDecoration(
           color: isBull ? AppColors.green : AppColors.red,
@@ -67,11 +67,11 @@ class CurrentPriceLabel extends StatelessWidget {
           currentPrice.toStringAsFixed(2),
 
           style: const TextStyle(
-            color: Colors.white,
+            color: AppColors.white,
 
-            fontSize: 10,
+            fontSize: 8,
 
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),

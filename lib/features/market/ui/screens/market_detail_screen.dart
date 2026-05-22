@@ -1,4 +1,3 @@
-import 'package:crypto_app/features/market/ui/widgets/market_detail_widget/chart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -97,8 +96,8 @@ class _MarketDetailScreenState extends ConsumerState<MarketDetailScreen> {
                       : AppColors.black,
                 ),
 
-                Expanded(
-                    child: ChartScreen(symbol: widget.symbol, dark: isDark,)),
+                // Expanded(
+                //     child: ChartScreen(symbol: widget.symbol, dark: isDark,)),
 
                 Expanded(
                   child: CustomChartScreen(
