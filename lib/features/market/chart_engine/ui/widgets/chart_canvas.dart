@@ -6,6 +6,7 @@ import '../../core/engine/crosshair_engine.dart';
 import '../../core/engine/gesture_engine.dart';
 import '../../core/models/candle_model.dart';
 import '../../core/utils/visible_candle_helper.dart';
+import '../../overlays/high_low/high_low_overlay.dart';
 import '../../providers/candle_provider.dart';
 import '../../providers/crosshair_provider.dart';
 import '../../providers/viewport_provider.dart';
@@ -224,17 +225,6 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
             );
           },
 
-          // onScaleEnd: (_) {
-          //   final viewport = ref.read(viewportProvider);
-          //
-          //   final startIndex = (viewport.scrollX / viewport.candleWidth)
-          //       .floor();
-          //
-          //   if (startIndex < 30) {
-          //     ref.read(candleProvider.notifier).loadMore();
-          //   }
-          // },
-
           onScaleEnd: (_) async {
             final viewport =
             ref.read(viewportProvider);
@@ -301,6 +291,7 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
                   ),
                 ),
               ),
+              HighLowOverlay(candles: widget.candles,),
               CrosshairWidget(candles: widget.candles),
 
               if (isLoadingMore)
