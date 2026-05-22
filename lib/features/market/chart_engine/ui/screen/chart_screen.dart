@@ -15,17 +15,49 @@ import '../../providers/candle_provider.dart';
 import '../../providers/visible_price_provider.dart';
 import '../widgets/chart_canvas.dart';
 
-class CustomChartScreen extends ConsumerWidget {
+class CustomChartScreen extends ConsumerStatefulWidget {
   final bool dark;
+  final String symbol;
 
   const CustomChartScreen({
     super.key,
-    required this.dark
+    required this.dark,
+    required this.symbol
   });
 
   @override
-  Widget build(BuildContext context,
-      WidgetRef ref,) {
+  ConsumerState<CustomChartScreen>
+  createState() =>
+      _CustomChartScreenState();
+}
+
+class _CustomChartScreenState extends ConsumerState<CustomChartScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) {
+      ref
+          .read(candleProvider.notifier)
+          .changeSymbol(widget.symbol);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomChartScreen oldWidget,) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.symbol != widget.symbol) {
+      ref
+          .read(candleProvider.notifier)
+          .changeSymbol(widget.symbol);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context,) {
 
     final candlesAsync =
     ref.watch(candleProvider);
@@ -37,12 +69,12 @@ class CustomChartScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(ChartConfig.chartRadius),
 
-          color: dark
+          color: widget.dark
               ? AppColors.blue.withOpacity(0.08)
               : AppColors.white,
 
           border: Border.all(
-            color: dark
+            color: widget.dark
                 ? AppColors.blue.withOpacity(0.4)
                 : Colors.grey.withOpacity(0.4),
           ),

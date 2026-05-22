@@ -31,6 +31,8 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
   @override
   Widget build(BuildContext context) {
     final viewport = ref.watch(viewportProvider);
+    final visiblePrice =
+    ref.watch(visiblePriceProvider);
     final size = MediaQuery
         .of(context)
         .size;
@@ -356,6 +358,8 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
                     painter: CandlePainter(
                       candles: widget.candles,
                       viewport: viewport,
+                        minPrice: visiblePrice.minPrice,
+                        maxPrice: visiblePrice.maxPrice
                     ),
                   ),
                 ),

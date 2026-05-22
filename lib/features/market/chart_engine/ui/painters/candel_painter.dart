@@ -10,10 +10,14 @@ class CandlePainter extends CustomPainter {
   final List<CandleModel> candles;
 
   final ChartViewport viewport;
+  final double minPrice;
+  final double maxPrice;
 
   CandlePainter({
     required this.candles,
     required this.viewport,
+    required this.minPrice,
+    required this.maxPrice,
   });
 
   @override
@@ -47,21 +51,21 @@ class CandlePainter extends CustomPainter {
     }
 
     /// 🔥 FAST min/max calculation
-    double maxPrice = double.negativeInfinity;
-
-    double minPrice = double.infinity;
-
-    for (int i = safeStart; i < safeEnd; i++) {
-      final candle = candles[i];
-
-      if (candle.high > maxPrice) {
-        maxPrice = candle.high;
-      }
-
-      if (candle.low < minPrice) {
-        minPrice = candle.low;
-      }
-    }
+    // double maxPrice = double.negativeInfinity;
+    //
+    // double minPrice = double.infinity;
+    //
+    // for (int i = safeStart; i < safeEnd; i++) {
+    //   final candle = candles[i];
+    //
+    //   if (candle.high > maxPrice) {
+    //     maxPrice = candle.high;
+    //   }
+    //
+    //   if (candle.low < minPrice) {
+    //     minPrice = candle.low;
+    //   }
+    // }
 
     final priceRange = (maxPrice - minPrice).abs();
 
@@ -245,6 +249,8 @@ class CandlePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CandlePainter old) {
     return old.viewport != viewport ||
-        old.candles != candles;
+        old.candles != candles ||
+        old.minPrice != minPrice ||
+        old.maxPrice != maxPrice;
   }
 }

@@ -47,6 +47,28 @@ class CandleNotifier extends AsyncNotifier<List<CandleModel>> {
     return result.$1;
   }
 
+  Future<void> changeSymbol(String symbol,) async {
+    state = const AsyncLoading();
+
+    try {
+      _symbol = symbol;
+
+      _nextEndTime = null;
+
+      final candles =
+      await loadInitial(
+        symbol: symbol,
+      );
+
+      state =
+          AsyncData(candles);
+    } catch (e, st) {
+      state =
+          AsyncError(e, st);
+    }
+  }
+
+
   Future<void> loadMore() async {
     if (_isLoadingMore) return;
 
@@ -82,6 +104,7 @@ class CandleNotifier extends AsyncNotifier<List<CandleModel>> {
 
     try {
       _interval = interval;
+      _nextEndTime = null;
 
       final candles = await loadInitial(interval: interval);
 

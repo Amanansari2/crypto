@@ -35,20 +35,14 @@ class CurrentPriceLine extends StatelessWidget {
 
     final currentPrice = lastCandle.close;
 
-    final range = maxPrice - minPrice;
 
-    final padding = range * 0.08;
-
-    final paddedMax = maxPrice + padding;
-
-    final paddedMin = minPrice - padding;
 
     final y = ChartMath.priceToY(
       price: currentPrice,
 
-      minPrice: paddedMin,
+      minPrice: minPrice,
 
-      maxPrice: paddedMax,
+      maxPrice: maxPrice,
 
       height: chartHeight,
     );
