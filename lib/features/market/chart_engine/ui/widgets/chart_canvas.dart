@@ -1,5 +1,6 @@
 import 'package:crypto_app/features/market/chart_engine/overlays/crosshair/crosshair_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/engine/crosshair_engine.dart';
@@ -28,6 +29,7 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
   double _startScroll = 0;
   Offset _startFocal = Offset.zero;
   bool _initialized = false;
+  int? _lastHapticIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +140,7 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
 
               candleIndex: result.candleIndex,
             );
+            HapticFeedback.vibrate();
           },
 
           onLongPressMoveUpdate: (details) {
@@ -165,9 +168,14 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
 
               candleIndex: result.candleIndex,
             );
+            if (_lastHapticIndex != result.candleIndex) {
+              _lastHapticIndex = result.candleIndex;
+              HapticFeedback.vibrate();
+            }
           },
 
           onScaleUpdate: (details) {
+            ref.read(crosshairProvider.notifier,).hide();
             final notifier = ref.read(viewportProvider.notifier);
 
             final viewport = ref.read(viewportProvider);
