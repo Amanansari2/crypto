@@ -168,7 +168,7 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
 
               candleIndex: result.candleIndex,
             );
-            if (_lastHapticIndex != result.candleIndex) {
+            if(_lastHapticIndex != result.candleIndex){
               _lastHapticIndex = result.candleIndex;
               HapticFeedback.vibrate();
             }
