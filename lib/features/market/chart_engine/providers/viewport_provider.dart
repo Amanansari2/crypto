@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/constants/chart_config.dart';
 import '../core/models/viewport_model.dart';
 
 final viewportProvider = NotifierProvider<ViewportNotifier, ChartViewport>(
@@ -21,7 +22,11 @@ class ViewportNotifier extends Notifier<ChartViewport> {
   }
 
   void setScroll(double scrollX, int totalCandles, double screenWidth) {
-    final maxScroll = (totalCandles * state.candleWidth) - screenWidth;
+    // final maxScroll = (totalCandles * state.candleWidth) - screenWidth;
+    final maxScroll =
+        ((totalCandles + ChartConfig.rightSideExtraCandles) *
+            state.candleWidth) -
+        screenWidth;
 
     final safeScroll = scrollX
         .clamp(0, maxScroll < 0 ? 0 : maxScroll)

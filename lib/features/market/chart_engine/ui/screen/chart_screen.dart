@@ -157,6 +157,7 @@ class _CustomChartScreenState extends ConsumerState<CustomChartScreen> {
                               ),
                             ),
 
+
                             Positioned(
 
                               right: 0,

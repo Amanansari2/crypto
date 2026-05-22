@@ -44,6 +44,7 @@ class ChartConfig {
 
   //extraVisible Candels
   static const int extraVisibleCandles = 2;
+  static const int rightSideExtraCandles = 9;
 
   //marker width
   static const int markerWidth = 28;
