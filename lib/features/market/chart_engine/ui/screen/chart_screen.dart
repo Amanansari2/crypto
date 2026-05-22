@@ -8,8 +8,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/utils/constants/app_colors.dart';
 import '../../overlays/crosshair/crosshair_widget.dart';
+import '../../overlays/current_price/current_price_label.dart';
+import '../../overlays/current_price/current_price_line.dart';
 import '../../overlays/price_labels/time_label.dart';
 import '../../providers/candle_provider.dart';
+import '../../providers/visible_price_provider.dart';
 import '../widgets/chart_canvas.dart';
 
 class CustomChartScreen extends ConsumerWidget {
@@ -93,10 +96,60 @@ class CustomChartScreen extends ConsumerWidget {
                               ],
                             ),
 
+                            CurrentPriceLine(
+
+                              candles: candles,
+
+                              chartHeight:
+                              constraints.maxHeight,
+
+                              minPrice:
+                              ref
+                                  .watch(
+                                visiblePriceProvider,
+                              )
+                                  .minPrice,
+
+                              maxPrice:
+                              ref
+                                  .watch(
+                                visiblePriceProvider,
+                              )
+                                  .maxPrice,
+                            ),
+
                             Positioned.fill(
                               right: ChartConfig.axisWidth,
                               child: CrosshairWidget(
                                 candles: candles,
+                              ),
+                            ),
+
+                            Positioned(
+
+                              right: 0,
+
+                              child:
+                              CurrentPriceLabel(
+
+                                candles: candles,
+
+                                chartHeight:
+                                constraints.maxHeight,
+
+                                minPrice:
+                                ref
+                                    .watch(
+                                  visiblePriceProvider,
+                                )
+                                    .minPrice,
+
+                                maxPrice:
+                                ref
+                                    .watch(
+                                  visiblePriceProvider,
+                                )
+                                    .maxPrice,
                               ),
                             ),
 
