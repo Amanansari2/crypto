@@ -39,13 +39,12 @@ class CrosshairNotifier extends Notifier<CrosshairState> {
     state =
         CrosshairState(visible: true, position: position, candleIndex: null);
   }
-    );
+
+  void hide() {() {
+    state = CrosshairState(visible: false, position: null, candleIndex: null);
   }
 
-  void hide() {
-    state = CrosshairState(visible: false, position: null, candleIndex: null)void update({
-
-    required Offset position,
+  void updaterequired Offset position,
 
     required int candleIndex,
 
