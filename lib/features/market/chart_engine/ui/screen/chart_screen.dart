@@ -11,6 +11,7 @@ import '../../overlays/crosshair/crosshair_widget.dart';
 import '../../overlays/current_price/current_price_label.dart';
 import '../../overlays/current_price/current_price_line.dart';
 import '../../overlays/price_labels/time_label.dart';
+import '../../overlays/tooltip/chart_tooltip.dart';
 import '../../providers/candle_provider.dart';
 import '../../providers/visible_price_provider.dart';
 import '../widgets/chart_canvas.dart';
@@ -149,7 +150,9 @@ class _CustomChartScreenState extends ConsumerState<CustomChartScreen> {
                               )
                                   .maxPrice,
                             ),
-
+                            ChartTooltip(
+                              candles: candles,
+                            ),
                             Positioned.fill(
                               right: ChartConfig.axisWidth,
                               child: CrosshairWidget(

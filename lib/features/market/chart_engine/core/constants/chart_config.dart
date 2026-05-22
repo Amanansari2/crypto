@@ -46,6 +46,12 @@ class ChartConfig {
   static const int extraVisibleCandles = 2;
   static const int rightSideExtraCandles = 9;
 
-  //marker width
+  //marker
   static const int markerWidth = 28;
+
+  //tooltip
+  static const int tooltipWidth = 120;
+  static const int tooltipHeight = 120;
+  static const int tooltipKeyWidth = 40;
+  static const int tooltipValueWidth = 80;
 }
