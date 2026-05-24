@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/chart_config.dart';
+import '../core/engine/viewport_engine.dart';
 import '../core/models/viewport_model.dart';
 
 final viewportProvider = NotifierProvider<ViewportNotifier, ChartViewport>(
@@ -24,15 +25,28 @@ class ViewportNotifier extends Notifier<ChartViewport> {
 
   void setScroll(double scrollX, int totalCandles, double screenWidth) {
     // final maxScroll = (totalCandles * state.candleWidth) - screenWidth;
+    // final maxScroll =
+    //     ((totalCandles + ChartConfig.rightSideExtraCandles) *
+    //         state.candleWidth) -
+    //     screenWidth;
+
     final maxScroll =
-        ((totalCandles + ChartConfig.rightSideExtraCandles) *
-            state.candleWidth) -
-        screenWidth;
+
+    ViewportEngine.calculateMaxScroll(
+      totalCandles: totalCandles,
+      candleWidth: state.candleWidth,
+      screenWidth: screenWidth,
+    );
 
     final safeScroll = scrollX
         .clamp(0, maxScroll < 0 ? 0 : maxScroll)
         .toDouble();
-    final isAtLatest = (maxScroll - safeScroll) < (state.candleWidth *3);
+    // final isAtLatest = (maxScroll - safeScroll) < (state.candleWidth *3);
+
+    final isAtLatest = ViewportEngine.isAtLatest(
+      scrollX: safeScroll,
+      maxScroll: maxScroll,
+      candleWidth: state.candleWidth,);
 
     state = state.copyWith(scrollX: safeScroll, isAtLatest:  isAtLatest);
   }

@@ -161,32 +161,26 @@ class _CustomChartScreenState extends ConsumerState<CustomChartScreen> {
                             ),
 
 
-                            Positioned(
+                            CurrentPriceLabel(
 
-                              right: 0,
+                              candles: candles,
 
-                              child:
-                              CurrentPriceLabel(
+                              chartHeight:
+                              constraints.maxHeight,
 
-                                candles: candles,
+                              minPrice:
+                              ref
+                                  .watch(
+                                visiblePriceProvider,
+                              )
+                                  .minPrice,
 
-                                chartHeight:
-                                constraints.maxHeight,
-
-                                minPrice:
-                                ref
-                                    .watch(
-                                  visiblePriceProvider,
-                                )
-                                    .minPrice,
-
-                                maxPrice:
-                                ref
-                                    .watch(
-                                  visiblePriceProvider,
-                                )
-                                    .maxPrice,
-                              ),
+                              maxPrice:
+                              ref
+                                  .watch(
+                                visiblePriceProvider,
+                              )
+                                  .maxPrice,
                             ),
 
                             AxisPriceLabel(
