@@ -18,6 +18,7 @@ class ViewportNotifier extends Notifier<ChartViewport> {
       visibleStartIndex: 0,
 
       visibleEndIndex: 0,
+      isAtLatest: true
     );
   }
 
@@ -31,8 +32,9 @@ class ViewportNotifier extends Notifier<ChartViewport> {
     final safeScroll = scrollX
         .clamp(0, maxScroll < 0 ? 0 : maxScroll)
         .toDouble();
+    final isAtLatest = (maxScroll - safeScroll) < (state.candleWidth *3);
 
-    state = state.copyWith(scrollX: safeScroll);
+    state = state.copyWith(scrollX: safeScroll, isAtLatest:  isAtLatest);
   }
 
   void setZoom(double candleWidth) {

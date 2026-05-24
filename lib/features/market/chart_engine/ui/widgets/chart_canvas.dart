@@ -1,4 +1,5 @@
 import 'package:crypto_app/features/market/chart_engine/overlays/crosshair/crosshair_widget.dart';
+import 'package:crypto_app/features/market/chart_engine/providers/chart_width_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,6 +42,11 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
       builder: (context, constraints) {
         final chartWidth = constraints.maxWidth;
         final chartHeight = constraints.maxHeight;
+
+        WidgetsBinding.instance.addPostFrameCallback((_){
+          ref.read(chartWidthProvider.notifier).update(chartWidth);
+        });
+
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_initialized) return;

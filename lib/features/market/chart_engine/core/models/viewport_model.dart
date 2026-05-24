@@ -6,7 +6,7 @@ class ChartViewport {
   final int visibleStartIndex;
 
   final int visibleEndIndex;
-
+  final bool isAtLatest;
   const ChartViewport({
     required this.scrollX,
 
@@ -15,6 +15,7 @@ class ChartViewport {
     required this.visibleStartIndex,
 
     required this.visibleEndIndex,
+    required this.isAtLatest
   });
 
   ChartViewport copyWith({
@@ -25,6 +26,7 @@ class ChartViewport {
     int? visibleStartIndex,
 
     int? visibleEndIndex,
+    bool? isAtLatest
   }) {
     return ChartViewport(
       scrollX: scrollX ?? this.scrollX,
@@ -34,6 +36,7 @@ class ChartViewport {
       visibleStartIndex: visibleStartIndex ?? this.visibleStartIndex,
 
       visibleEndIndex: visibleEndIndex ?? this.visibleEndIndex,
+      isAtLatest: isAtLatest ?? this.isAtLatest,
     );
   }
 }

@@ -1,7 +1,10 @@
+import 'package:crypto_app/features/market/chart_engine/providers/viewport_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/models/candle_model.dart';
+import '../data/datasource/candel_websocket_source.dart';
 import '../data/datasource/candle_rest_source.dart';
+import 'chart_width_provider.dart';
 
 final candleProvider = AsyncNotifierProvider<CandleNotifier, List<CandleModel>>(
   CandleNotifier.new,
@@ -22,6 +25,7 @@ class CandleLoadingMore extends Notifier<bool> {
 
 class CandleNotifier extends AsyncNotifier<List<CandleModel>> {
   late final CandleRestSource _source;
+  late final CandleWebsocketSource _socket;
 
   String _symbol = "BTCUSDT";
 
@@ -36,8 +40,13 @@ class CandleNotifier extends AsyncNotifier<List<CandleModel>> {
   @override
   Future<List<CandleModel>> build() async {
     _source = CandleRestSource();
-
+    _socket = CandleWebsocketSource();
+    ref.onDispose((){
+      _socket.dispose();
+    });
+    _socket.stream.listen(addLiveCandle);
     return await loadInitial();
+
   }
 
   Future<List<CandleModel>> loadInitial({
@@ -58,6 +67,7 @@ class CandleNotifier extends AsyncNotifier<List<CandleModel>> {
     );
 
     _nextEndTime = result.$2;
+    _socket.connect(symbol: _symbol, interval: _interval);
 
     return result.$1;
   }
@@ -171,14 +181,34 @@ class CandleNotifier extends AsyncNotifier<List<CandleModel>> {
     if (candles.isEmpty) return;
 
     final last = candles.last;
+    final viewport = ref.read(viewportProvider);
+    final wasAtLatest = viewport.isAtLatest;
+    bool isNewCandle = false;
 
     /// same candle update
     if (last.time == candle.time) {
       candles[candles.length - 1] = candle;
     } else {
       candles.add(candle);
+      isNewCandle = true;
     }
 
     state = AsyncData(candles);
+    
+    if(isNewCandle){
+
+      if(wasAtLatest){
+        Future.microtask((){
+          final chartWidth = ref.read(chartWidthProvider);
+          
+          ref.read(viewportProvider.notifier).setScroll(
+              candles.length * viewport.candleWidth,
+              candles.length,
+              chartWidth);
+        });
+      }
+    }
   }
+
+
 }
