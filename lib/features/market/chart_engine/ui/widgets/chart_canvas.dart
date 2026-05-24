@@ -140,7 +140,7 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
 
               candleIndex: result.candleIndex,
             );
-            HapticFeedback.vibrate();
+            HapticFeedback.mediumImpact();
           },
 
           onLongPressMoveUpdate: (details) {
