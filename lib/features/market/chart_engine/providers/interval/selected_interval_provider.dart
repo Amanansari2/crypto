@@ -1,26 +1,34 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/models/interval_model.dart';
+
 final selectedIntervalProvider =
 
 NotifierProvider<
     SelectedIntervalNotifier,
-    String
+    IntervalModel
 >(
 
   SelectedIntervalNotifier.new,
 );
 
 class SelectedIntervalNotifier
-    extends Notifier<String> {
+
+    extends Notifier<IntervalModel> {
 
   @override
-  String build() {
+  IntervalModel build() {
 
-    return '1m';
+    return const IntervalModel(
+
+      label: '15m',
+
+      value: '15m',
+    );
   }
 
   void change(
-      String interval,
+      IntervalModel interval,
       ) {
 
     state = interval;

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/home/ui/screens/home_screen.dart';
+import '../../features/market/chart_engine/ui/widgets/interval/custom_inetrval.dart';
 import '../../features/navigation/ui/screens/bottom_nav_screen.dart';
 import '../../features/onboarding/ui/screen/onboarding_screen.dart';
 import 'route_names.dart';
@@ -115,13 +116,24 @@ final routerProvider = Provider<GoRouter>((ref) {
                       builder: (context, state) {
                         final symbol = state.pathParameters['symbol']!;
                         return MarketDetailScreen(symbol: symbol);
-                      }
+                      },
+
                   )
                 ],
               ),
             ],
           ),
         ],
+      ),
+
+      GoRoute(
+
+        path: RouteNames.customInterval,
+        name: RouteNames.customIntervalName,
+
+        builder: (context, state) {
+          return  CustomIntervalScreen();
+        },
       ),
 
       /// PLAYER (root level)

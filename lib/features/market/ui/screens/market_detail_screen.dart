@@ -1,3 +1,4 @@
+import 'package:crypto_app/features/market/chart_engine/ui/widgets/interval/interval_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,9 +23,7 @@ class _MarketDetailScreenState extends ConsumerState<MarketDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final tickerAsync = ref.watch(tickerProvider(widget.symbol));
-    final isDark = Theme
-        .of(context)
-        .brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
 
 
@@ -99,6 +98,9 @@ class _MarketDetailScreenState extends ConsumerState<MarketDetailScreen> {
 
                 Expanded(
                     child: ChartScreen(symbol: widget.symbol, dark: isDark,)),
+
+                IntervalBar(),
+                const SizedBox(height: 6,),
 
                 Expanded(
                   child: CustomChartScreen(

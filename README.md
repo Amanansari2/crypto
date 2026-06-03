@@ -1,5 +1,10 @@
 # crypto_app
 
+# Theme selection
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+
+
 A new Flutter project.
 
 ## Getting Started
