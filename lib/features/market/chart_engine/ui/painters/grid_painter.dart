@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class GridPainter extends CustomPainter {
   final BuildContext context;
+  final bool drawVertical;
 
-  GridPainter({required this.context});
+  GridPainter({required this.context,  this.drawVertical = true});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -25,12 +26,13 @@ class GridPainter extends CustomPainter {
 
     /// 🔥 3 inner vertical lines
     const verticalLines = ChartConfig.verticalGridCount;
-
+if(drawVertical){
     for (int i = 1; i <= verticalLines; i++) {
       final x = (size.width / (verticalLines + 1)) * i;
 
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }
+}
   }
 
   @override

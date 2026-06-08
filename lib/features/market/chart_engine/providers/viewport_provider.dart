@@ -24,11 +24,7 @@ class ViewportNotifier extends Notifier<ChartViewport> {
   }
 
   void setScroll(double scrollX, int totalCandles, double screenWidth) {
-    // final maxScroll = (totalCandles * state.candleWidth) - screenWidth;
-    // final maxScroll =
-    //     ((totalCandles + ChartConfig.rightSideExtraCandles) *
-    //         state.candleWidth) -
-    //     screenWidth;
+
 
     final maxScroll =
 

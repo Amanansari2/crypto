@@ -1,10 +1,12 @@
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/interval/interval_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/utils/constants/app_colors.dart';
 import '../../chart_engine/ui/screen/chart_screen.dart';
+import '../../chart_engine/ui/widgets/settings/chart_settings_sheet.dart';
 import '../../provider/binance/ticker_provider.dart';
 import '../widgets/market_detail_widget/chart_widget.dart';
 import '../widgets/market_detail_widget/price_section.dart';
@@ -46,13 +48,13 @@ class _MarketDetailScreenState extends ConsumerState<MarketDetailScreen> {
 
 
 
-          return Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
 
-                Row(
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
@@ -90,26 +92,78 @@ class _MarketDetailScreenState extends ConsumerState<MarketDetailScreen> {
 
                   ],
                 ),
-                Divider(
-                  color: isDark
-                      ? AppColors.blue
-                      : AppColors.black,
+              ),
+              Divider(
+                color: isDark
+                    ? AppColors.blue
+                    : AppColors.black,
+              ),
+
+              // Expanded(
+              //     child: ChartScreen(symbol: widget.symbol, dark: isDark,)),
+
+
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2.0, right: 4),
+                    child: Row(
+                      children: [
+                        Expanded(child: IntervalBar()),
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) => const ChartSettingsSheet(),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.blue.withOpacity(0.08)
+                                  : AppColors.white,
+                              borderRadius: BorderRadius.circular(8.r),
+                              border: Border.all(
+                                color: isDark
+                                    ? AppColors.blue.withOpacity(0.4)
+                                    : Colors.grey.withOpacity(0.4),
+                              ),
+                              boxShadow: isDark
+                                  ? []
+                                  : [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 8,
+                                  spreadRadius: 2,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                            CupertinoIcons.slider_horizontal_3,
+                            size: 14,
+                            color: isDark ? AppColors.white : AppColors.black,
+                          ),
+                        ),
+                        )
+                      ],
+                    ),
+                  ),
+
+
+
+
+
+              const SizedBox(height: 8,),
+
+              Expanded(
+                child: CustomChartScreen(
+                  symbol: widget.symbol,
                 ),
+              ),
 
-                Expanded(
-                    child: ChartScreen(symbol: widget.symbol, dark: isDark,)),
-
-                IntervalBar(),
-                const SizedBox(height: 6,),
-
-                Expanded(
-                  child: CustomChartScreen(
-                    symbol: widget.symbol,
-                    dark: isDark,),
-                ),
-
-              ],
-            ),
+            ],
           );
         },
       ),

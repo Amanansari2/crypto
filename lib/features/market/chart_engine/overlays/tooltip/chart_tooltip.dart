@@ -47,19 +47,20 @@ class ChartTooltip extends ConsumerWidget {
 
     double left = position.dx + 12;
 
-    double top = position.dy - tooltipHeight - 12;
+    // double top = position.dy - tooltipHeight - 12;
+    const double top = 8;
 
     if (left + tooltipWidth > MediaQuery.of(context).size.width) {
       left = position.dx - tooltipWidth - 12;
     }
-
-    if (top < 8) {
-      top = position.dy + 12;
-    }
+    //
+    // if (top < 8) {
+    //   top = position.dy + 12;
+    // }
 
     return Positioned(
       left: left,
-      top: top,
+      top: 8,
 
       child: IgnorePointer(
         child: Container(

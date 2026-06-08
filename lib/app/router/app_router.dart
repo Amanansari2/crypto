@@ -1,3 +1,4 @@
+import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicator_settings_sheet.dart';
 import 'package:crypto_app/features/market/ui/screens/market_detail_screen.dart';
 import 'package:crypto_app/features/market/ui/screens/market_screen.dart';
 import 'package:crypto_app/placeholder_screen.dart';
@@ -136,14 +137,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      /// PLAYER (root level)
-      // GoRoute(
-      //   parentNavigatorKey: AppRouter.rootNavigatorKey,
-      //   path: RouteNames.player,
-      //   name: "Player",
-      //   builder: (context, state) =>
-      //       PlayerView(key: state.pageKey),
-      // ),
+      GoRoute(
+
+        path: RouteNames.customIndicator,
+        name: RouteNames.customIndicatorName,
+
+        builder: (context, state) {
+          return  IndicatorSettingsSheet();
+        },
+      ),
+
+
     ],
   );
 });

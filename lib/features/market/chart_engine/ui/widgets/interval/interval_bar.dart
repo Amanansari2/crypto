@@ -22,14 +22,14 @@ class IntervalBar extends ConsumerWidget {
     return Container(
       height: 26,
 
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 6),
 
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
 
         itemCount: intervals.length + 1,
 
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) => const SizedBox(width: 4),
 
         itemBuilder: (context, index) {
           /// 🔥 MORE
@@ -53,7 +53,7 @@ class IntervalBar extends ConsumerWidget {
 
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12, ),
+                  horizontal: 6, ),
 
                 decoration: BoxDecoration(
                   color: dark
@@ -86,7 +86,7 @@ class IntervalBar extends ConsumerWidget {
                             ? 'More'
                             : selected.label,
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 8,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -116,7 +116,7 @@ class IntervalBar extends ConsumerWidget {
             },
 
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12,),
+              padding: const EdgeInsets.symmetric(horizontal: 8,),
 
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
@@ -146,7 +146,7 @@ class IntervalBar extends ConsumerWidget {
                         : (isSelected
                         ? AppColors.white
                         : AppColors.black),
-                    fontSize: 10,
+                    fontSize: 8,
 
                     fontWeight: FontWeight.w600,
                   ),

@@ -13,6 +13,8 @@ class RouteNames {
   static const String marketDetail = "detail/:symbol";
   static const customInterval = '/custom-interval';
   static const customIntervalName = 'CustomInterval';
+  static const customIndicator = '/custom-indicator';
+  static const customIndicatorName = 'CustomIndicator';
 
   //routeNames
   static const String marketDetailName = "MarketDetail";

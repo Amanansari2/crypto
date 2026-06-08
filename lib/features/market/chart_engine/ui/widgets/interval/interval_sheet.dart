@@ -38,10 +38,8 @@ class IntervalSheet
       const EdgeInsets.all(16),
 
       decoration:
-       BoxDecoration(
-
+      BoxDecoration(
         color: dark? AppColors.darkBg : AppColors.white,
-
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(
             18,

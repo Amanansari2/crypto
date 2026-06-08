@@ -7,7 +7,7 @@ class ChartConfig {
 
   /// 🔥 AXIS
   static const double axisWidth = 40.0;
-  static const double timeAxisHeight = 14;
+  static const double timeAxisHeight = 28;
 
   /// 🔥 ZOOM
   static const double minZoom = 5;
@@ -42,7 +42,7 @@ class ChartConfig {
   //Preload Count
   static const int preloadTriggerCount = 30;
 
-  //extraVisible Candels
+  //extraVisible Candles
   static const int extraVisibleCandles = 2;
   static const int rightSideExtraCandles = 9;
 
@@ -50,8 +50,11 @@ class ChartConfig {
   static const int markerWidth = 28;
 
   //tooltip
-  static const int tooltipWidth = 120;
+  static const int tooltipWidth = 200;
   static const int tooltipHeight = 120;
   static const int tooltipKeyWidth = 40;
   static const int tooltipValueWidth = 80;
+
+  //chartPanelHeight
+  static const double chartPanelHeight = 120;
 }
