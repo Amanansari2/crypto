@@ -190,6 +190,7 @@ class _RsiSettingsSheetState extends ConsumerState<RsiSettingsSheet> {
                         Expanded(
                           flex: 2,
                           child: Container(
+                            padding: EdgeInsets.all(2),
                             height: 44,
                             decoration: BoxDecoration(
                               color: dark
@@ -242,6 +243,8 @@ class _RsiSettingsSheetState extends ConsumerState<RsiSettingsSheet> {
                                   ),
                                   cursorColor: dark ? AppColors.white : AppColors.black,
                                   decoration: const InputDecoration(
+                                    filled: false,
+                                    fillColor: Colors.transparent,
                                     border: InputBorder.none,
                                     enabledBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,

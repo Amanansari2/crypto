@@ -1,8 +1,8 @@
+import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/macd_setting_sheet.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/rsi_setting_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../../core/utils/constants/app_colors.dart';
 
 class IndicatorSettingsSheet extends StatelessWidget {
   const IndicatorSettingsSheet({
@@ -71,7 +71,14 @@ class IndicatorSettingsSheet extends StatelessWidget {
 
           _IndicatorTile(
             title: 'MACD',
-            onTap: () {},
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const MacdSettingsSheet(),
+              );
+            },
           ),
 
           _IndicatorTile(

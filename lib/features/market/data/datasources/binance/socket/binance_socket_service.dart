@@ -9,6 +9,8 @@ class BinanceSocketService {
   final Map<String, WebSocketChannel> _channels = {};
   final Map<String, StreamSubscription> _subscriptions = {};
   final Set<String> _reconnectingStreams = {};
+  final Map<String, Timer> _reconnectTimers = {};
+  final Set<String> _manuallyDisconnected = {};
 
   /// 🔌 CONNECT
   void connect({
@@ -16,6 +18,10 @@ class BinanceSocketService {
     required Function(Map<String, dynamic>) onData,
     bool isFutures = false
   }) {
+
+    _manuallyDisconnected.remove(stream);
+    _reconnectingStreams.remove(stream);
+
     /// already connected
     if (_channels[stream] != null) return;
     final baseUrl = isFutures
@@ -23,6 +29,19 @@ class BinanceSocketService {
         : "wss://stream.binance.com:9443/ws/";
 
     final url = "$baseUrl$stream";
+
+    LogHelper.log(
+      "STREAM => [$stream]",
+    );
+
+    LogHelper.log(
+      "BASE URL => [$baseUrl]",
+    );
+
+    LogHelper.log(
+      "FINAL URL => [$url]",
+    );
+
 
     try {
       final channel = WebSocketChannel.connect(Uri.parse(url));
@@ -47,9 +66,17 @@ class BinanceSocketService {
         },
 
         onError: (e) {
+          LogHelper.log(
+            "❌ SOCKET ERROR: $e",
+          );
+
+          LogHelper.log(
+            "❌ STREAM: [$stream]",
+          );
           LogHelper.log("❌ Socket error ($stream): $e");
           _reconnect(stream, onData, isFutures);
         },
+        cancelOnError: true,
 
         onDone: () {
           LogHelper.log("⚠️ Socket closed ($stream)");
@@ -61,39 +88,81 @@ class BinanceSocketService {
     }
   }
 
-  void _reconnect(String stream, Function(Map<String, dynamic>) onData,
-      bool isFutures) {
-    if (_reconnectingStreams.contains(stream)) return;
+  void _reconnect(
+      String stream,
+      Function(Map<String, dynamic>) onData,
+      bool isFutures,
+      ) {
+
+    if (_manuallyDisconnected.contains(stream)) {
+      return;
+    }
+
+    if (_reconnectingStreams.contains(stream)) {
+      return;
+    }
 
     _reconnectingStreams.add(stream);
 
     _cleanup(stream);
 
-    Future.delayed(const Duration(seconds: 2), () {
-      LogHelper.log("🔄 Reconnecting $stream...");
-      _reconnectingStreams.remove(stream);
-      connect(stream: stream, onData: onData, isFutures: isFutures);
-    });
+    _reconnectTimers[stream]?.cancel();
+
+    _reconnectTimers[stream] = Timer(
+      const Duration(seconds: 2),
+          () {
+
+        _reconnectingStreams.remove(stream);
+
+        if (
+        _manuallyDisconnected.contains(stream)
+        ) {
+          return;
+        }
+
+        LogHelper.log(
+          "🔄 Reconnecting $stream...",
+        );
+
+        connect(
+          stream: stream,
+          onData: onData,
+          isFutures: isFutures,
+        );
+      },
+    );
   }
 
   /// ❌ DISCONNECT (single stream)
   void disconnect(String stream) {
+    _manuallyDisconnected.add(stream);
+    _reconnectTimers[stream]?.cancel();
     _cleanup(stream);
     LogHelper.log("🔌 Disconnected $stream");
   }
 
   /// 🔥 CLEANUP helper
   void _cleanup(String stream) {
+
     _subscriptions[stream]?.cancel();
+
     _channels[stream]?.sink.close();
 
     _subscriptions.remove(stream);
+
     _channels.remove(stream);
+
+    _reconnectingStreams.remove(stream);
+    _reconnectTimers[stream]?.cancel();
+    _reconnectTimers.remove(stream);
   }
 
   /// ❌ optional: disconnect all
   void disconnectAll() {
     for (final stream in _channels.keys.toList()) {
+      _manuallyDisconnected.add(stream);
+
+      _reconnectTimers[stream]?.cancel();
       _cleanup(stream);
     }
     LogHelper.log("🔌 Disconnected all streams");

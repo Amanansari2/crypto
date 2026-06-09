@@ -22,81 +22,128 @@ class CandleWebsocketSource {
   String? _symbol;
 
   String? _interval;
+  bool _reconnecting = false;
+
+  StreamSubscription? _subscription;
+
+  Timer? _reconnectTimer;
+
+  bool _manuallyDisconnected = false;
 
   /// CONNECT
   void connect({
-
     required String symbol,
-
     required String interval,
   }) {
 
     _symbol = symbol;
-
     _interval = interval;
 
-    disconnect();
+    /// reconnect ke time allow karo
+    _manuallyDisconnected = false;
 
-    final url =
+    /// old connection cleanup
+    _reconnectTimer?.cancel();
 
-        'wss://stream.binance.com:9443/ws/'
-        '${symbol.toLowerCase()}@kline_$interval';
+    _subscription?.cancel();
 
-    _channel =
-        WebSocketChannel.connect(
-          Uri.parse(url),
-        );
+    _channel?.sink.close();
 
-    _channel!.stream.listen(
+    _subscription = null;
+    _channel = null;
 
-          (event) {
+    if (_disposed) {
+      return;
+    }
 
-        if (_disposed) {
-          return;
-        }
+    try {
 
-        final data =
-        jsonDecode(event);
+      final url =
+          'wss://stream.binance.com:9443/ws/'
+          '${symbol.toLowerCase()}@kline_$interval';
 
-        final k =
-        data['k'];
+      _channel = WebSocketChannel.connect(
+        Uri.parse(url),
+      );
 
-        final candle =
-        CandleModel(
+      _subscription =
+          _channel!.stream.listen(
 
-          time:
-          DateTime
-              .fromMillisecondsSinceEpoch(
-            k['t'],
-          ),
+                (event) {
 
-          open:
-          double.parse(k['o']),
+              if (_disposed) {
+                return;
+              }
 
-          high:
-          double.parse(k['h']),
+              final data =
+              jsonDecode(event);
 
-          low:
-          double.parse(k['l']),
+              final k =
+              data['k'];
 
-          close:
-          double.parse(k['c']),
+              final candle =
+              CandleModel(
 
-          volume:
-          double.parse(k['v']),
-        );
+                time:
+                DateTime.fromMillisecondsSinceEpoch(
+                  k['t'],
+                ),
 
-        _controller.add(candle);
-      },
+                open:
+                double.parse(k['o']),
 
-      onError: (_) {
-        reconnect();
-      },
+                high:
+                double.parse(k['h']),
 
-      onDone: () {
-        reconnect();
-      },
-    );
+                low:
+                double.parse(k['l']),
+
+                close:
+                double.parse(k['c']),
+
+                volume:
+                double.parse(k['v']),
+              );
+
+              if (!_controller.isClosed) {
+                _controller.add(
+                  candle,
+                );
+              }
+            },
+
+            onError: (error) {
+
+              if (_disposed ||
+                  _manuallyDisconnected) {
+                return;
+              }
+
+              reconnect();
+            },
+
+            onDone: () {
+
+              if (_disposed ||
+                  _manuallyDisconnected) {
+                return;
+              }
+
+              reconnect();
+            },
+
+            cancelOnError: true,
+          );
+
+    } catch (_) {
+
+      if (_disposed ||
+          _manuallyDisconnected) {
+        return;
+      }
+
+      reconnect();
+    }
   }
 
   /// RECONNECT
@@ -106,27 +153,36 @@ class CandleWebsocketSource {
       return;
     }
 
-    if (
-    _symbol == null ||
-        _interval == null
-    ) {
-
+    if (_manuallyDisconnected) {
       return;
     }
 
-    Future.delayed(
-      const Duration(seconds: 2),
+    if (_reconnecting) {
+      return;
+    }
 
+    if (_symbol == null ||
+        _interval == null) {
+      return;
+    }
+
+    _reconnecting = true;
+
+    _reconnectTimer?.cancel();
+
+    _reconnectTimer = Timer(
+      const Duration(seconds: 2),
           () {
 
-        if (_disposed) {
+        _reconnecting = false;
+
+        if (_disposed ||
+            _manuallyDisconnected) {
           return;
         }
 
         connect(
-
           symbol: _symbol!,
-
           interval: _interval!,
         );
       },
@@ -134,20 +190,37 @@ class CandleWebsocketSource {
   }
 
   /// DISCONNECT
-  void disconnect() {
+  void disconnect(
+  {  bool manual = true,}
+      ) {
+
+    _manuallyDisconnected = manual;
+    _reconnecting = false;
+
+    _reconnectTimer?.cancel();
+
+    _subscription?.cancel();
 
     _channel?.sink.close();
 
+    _subscription = null;
+
     _channel = null;
   }
-
   /// DISPOSE
   void dispose() {
 
     _disposed = true;
+    _reconnecting = false;
 
-    disconnect();
+    _reconnectTimer?.cancel();
+
+    _subscription?.cancel();
+
+    _channel?.sink.close();
 
     _controller.close();
+    _subscription = null;
+    _channel = null;
   }
 }

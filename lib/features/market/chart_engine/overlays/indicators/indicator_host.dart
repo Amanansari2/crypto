@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/indicators/indicator_type.dart';
 import '../../providers/indicators/active_indicators_provider.dart';
+import 'macd/macd_widget.dart';
 
 class IndicatorHost extends ConsumerWidget {
   const IndicatorHost({
@@ -57,11 +58,19 @@ class IndicatorHost extends ConsumerWidget {
 
 
           case IndicatorType.macd:
-            return const SizedBox(
+            return Container(
               height: panelHeight,
-              child: Center(
-                child: Text('MACD'),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.grey.withOpacity(0.25),
+                  ),
+                  bottom: BorderSide(
+                    color: Colors.grey.withOpacity(0.25),
+                  ),
+                ),
               ),
+              child: const MacdWidget(),
             );
 
           case IndicatorType.kdj:
