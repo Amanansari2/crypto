@@ -22,7 +22,7 @@ class IndicatorTextField extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Container(
-      height: 44,
+      height: 40,
       decoration: BoxDecoration(
         color: dark
             ? AppColors.blue.withOpacity(0.08)

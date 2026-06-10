@@ -1,10 +1,13 @@
-import 'package:crypto_app/features/market/chart_engine/overlays/indicators/volume/volume_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../providers/candle_provider.dart';
+import '../../../providers/viewport_provider.dart';
+import '../../../providers/indicators/volume/volume_provider.dart';
+import 'volume_painter.dart';
 
 class VolumeWidget extends ConsumerWidget {
+
   const VolumeWidget({
     super.key,
   });
@@ -14,14 +17,35 @@ class VolumeWidget extends ConsumerWidget {
       BuildContext context,
       WidgetRef ref,
       ) {
-    final candles =
-        ref.watch(candleProvider).value ?? [];
 
-    return CustomPaint(
-      size: Size.infinite,
-      painter: VolumePainter(
-        candles: candles,
-      ),
+    final candlesAsync =
+    ref.watch(candleProvider);
+
+    final viewport =
+    ref.watch(viewportProvider);
+
+    final settings =
+    ref.watch(volumeProvider);
+
+    return candlesAsync.when(
+
+      loading: () =>
+      const SizedBox(),
+
+      error: (_, __) =>
+      const SizedBox(),
+
+      data: (candles) {
+
+        return CustomPaint(
+          painter: VolumePainter(
+            candles: candles,
+            viewport: viewport,
+            settings: settings,
+          ),
+          size: Size.infinite,
+        );
+      },
     );
   }
 }

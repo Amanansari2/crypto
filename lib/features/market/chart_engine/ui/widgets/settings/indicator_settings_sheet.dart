@@ -1,5 +1,6 @@
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/macd_setting_sheet.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/rsi_setting_sheet.dart';
+import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/volume_setting_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -66,7 +67,14 @@ class IndicatorSettingsSheet extends StatelessWidget {
 
           _IndicatorTile(
             title: 'VOL',
-            onTap: () {},
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const VolumeSettingSheet(),
+              );
+            },
           ),
 
           _IndicatorTile(

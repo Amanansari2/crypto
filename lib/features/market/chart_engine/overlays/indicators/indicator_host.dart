@@ -1,5 +1,6 @@
 import 'package:crypto_app/features/market/chart_engine/core/constants/chart_config.dart';
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/rsi/rsi_widget.dart';
+import 'package:crypto_app/features/market/chart_engine/overlays/indicators/volume/volume_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/indicators/indicator_type.dart';
@@ -31,11 +32,19 @@ class IndicatorHost extends ConsumerWidget {
         switch (type) {
 
           case IndicatorType.vol:
-            return const SizedBox(
+            return Container(
               height: panelHeight,
-              child: Center(
-                child: Text('VOL'),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.grey.withOpacity(0.25),
+                  ),
+                  bottom: BorderSide(
+                    color: Colors.grey.withOpacity(0.25),
+                  ),
+                ),
               ),
+              child: const VolumeWidget(),
             );
 
 
