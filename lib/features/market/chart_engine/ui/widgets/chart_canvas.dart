@@ -1,11 +1,12 @@
-import 'package:crypto_app/features/market/chart_engine/overlays/crosshair/crosshair_widget.dart';
 import 'package:crypto_app/features/market/chart_engine/providers/chart_width_provider.dart';
+import 'package:crypto_app/features/market/chart_engine/providers/indicators/ema/ema_data_provider.dart';
+import 'package:crypto_app/features/market/chart_engine/providers/indicators/ema/ema_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/models/candle_model.dart';
 import '../../overlays/high_low/high_low_overlay.dart';
+import '../../overlays/indicators/ema/ema_painter.dart';
 import '../../providers/candle_provider.dart';
 import '../../providers/viewport_provider.dart';
 import '../../providers/visible_price_provider.dart';
@@ -23,17 +24,14 @@ class ChartCanvas extends ConsumerStatefulWidget {
 
 class _ChartCanvasState extends ConsumerState<ChartCanvas> {
 
-  // double _startZoom = 1;
-  // double _startScroll = 0;
-  // Offset _startFocal = Offset.zero;
-  // bool _initialized = false;
-  // int? _lastHapticIndex;
 
   @override
   Widget build(BuildContext context) {
     final viewport = ref.watch(viewportProvider);
     final visiblePrice = ref.watch(visiblePriceProvider);
     final isLoadingMore = ref.watch(candleLoadingMoreProvider,);
+    final emaData = ref.watch(emaDataProvider);
+    final emaSettings = ref.watch(emaProvider);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -44,24 +42,6 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
           ref.read(chartWidthProvider.notifier).update(chartWidth);
         });
 
-
-        // WidgetsBinding.instance.addPostFrameCallback((_) {
-        //   if (_initialized) return;
-        //
-        //   final screenWidth = chartWidth;
-        //
-        //   final totalWidth = widget.candles.length * viewport.candleWidth;
-        //
-        //   final initialScroll = (totalWidth - screenWidth)
-        //       .clamp(0, double.infinity)
-        //       .toDouble();
-        //
-        //   ref
-        //       .read(viewportProvider.notifier)
-        //       .setScroll(initialScroll, widget.candles.length, screenWidth);
-        //
-        //   _initialized = true;
-        // });
 
         final startIndex = (viewport.scrollX / viewport.candleWidth).floor();
 
@@ -87,6 +67,43 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
 
             if (candle.low < minPrice) {
               minPrice = candle.low;
+            }
+          }
+
+          for (final config in emaSettings) {
+
+            if (!config.enabled) {
+              continue;
+            }
+
+            final values =
+            emaData.getPeriod(
+              config.period,
+            );
+
+            if (values == null) {
+              continue;
+            }
+
+            for (
+            int i = safeStart;
+            i < safeEnd && i < values.length;
+            i++
+            ) {
+
+              final value = values[i];
+
+              if (value == null) {
+                continue;
+              }
+
+              if (value > maxPrice) {
+                maxPrice = value;
+              }
+
+              if (value < minPrice) {
+                minPrice = value;
+              }
             }
           }
 
@@ -121,6 +138,20 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
                 painter: CandlePainter(
                   candles: widget.candles,
                   viewport: viewport,
+                  minPrice: visiblePrice.minPrice,
+                  maxPrice: visiblePrice.maxPrice,
+                ),
+              ),
+            ),
+
+            RepaintBoundary(
+              child: CustomPaint(
+                size: Size.infinite,
+                painter: EmaPainter(
+                  candles: widget.candles,
+                  emaData: emaData,
+                  viewport: viewport,
+                  settings: emaSettings,
                   minPrice: visiblePrice.minPrice,
                   maxPrice: visiblePrice.maxPrice,
                 ),
