@@ -3,6 +3,7 @@ import 'package:crypto_app/features/market/chart_engine/providers/indicators/ema
 import 'package:crypto_app/features/market/chart_engine/providers/indicators/ema/ema_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:crypto_app/features/market/chart_engine/core/models/indicators/indicator_type.dart';
 
 import '../../core/models/candle_model.dart';
 import '../../overlays/high_low/high_low_overlay.dart';
@@ -11,6 +12,7 @@ import '../../overlays/indicators/ema/ema_painter.dart';
 import '../../providers/candle_provider.dart';
 import '../../providers/indicators/boll/boll_data_provider.dart';
 import '../../providers/indicators/boll/boll_provider.dart';
+import '../../providers/indicators/overlay_indicator_provider.dart';
 import '../../providers/viewport_provider.dart';
 import '../../providers/visible_price_provider.dart';
 import '../painters/candel_painter.dart';
@@ -33,6 +35,7 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
     final viewport = ref.watch(viewportProvider);
     final visiblePrice = ref.watch(visiblePriceProvider);
     final isLoadingMore = ref.watch(candleLoadingMoreProvider,);
+    final overlayIndicator = ref.watch(overlayIndicatorProvider,);
     final emaData = ref.watch(emaDataProvider);
     final emaSettings = ref.watch(emaProvider);
     final bollData =ref.watch(bollDataProvider);
@@ -75,117 +78,113 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
             }
           }
 
-          for (final config in emaSettings) {
+         if(overlayIndicator == IndicatorType.ema) {
+           for (final config in emaSettings) {
+             if (!config.enabled) {
+               continue;
+             }
 
-            if (!config.enabled) {
-              continue;
-            }
+             final values =
+             emaData.getPeriod(
+               config.period,
+             );
 
-            final values =
-            emaData.getPeriod(
-              config.period,
-            );
+             if (values == null) {
+               continue;
+             }
 
-            if (values == null) {
-              continue;
-            }
+             for (
+             int i = safeStart;
+             i < safeEnd && i < values.length;
+             i++
+             ) {
+               final value = values[i];
 
-            for (
-            int i = safeStart;
-            i < safeEnd && i < values.length;
-            i++
-            ) {
+               if (value == null) {
+                 continue;
+               }
 
-              final value = values[i];
+               if (value > maxPrice) {
+                 maxPrice = value;
+               }
 
-              if (value == null) {
-                continue;
-              }
+               if (value < minPrice) {
+                 minPrice = value;
+               }
+             }
+           }
+         }
 
-              if (value > maxPrice) {
-                maxPrice = value;
-              }
+         if(overlayIndicator == IndicatorType.boll) {
+           if (bollSettings.showUpper) {
+             for (
+             int i = safeStart;
+             i < safeEnd &&
+                 i < bollData.upper.length;
+             i++
+             ) {
+               final value = bollData.upper[i];
 
-              if (value < minPrice) {
-                minPrice = value;
-              }
-            }
-          }
+               if (value == null) {
+                 continue;
+               }
 
-          if (bollSettings.showUpper) {
+               if (value > maxPrice) {
+                 maxPrice = value;
+               }
 
-            for (
-            int i = safeStart;
-            i < safeEnd &&
-                i < bollData.upper.length;
-            i++
-            ) {
+               if (value < minPrice) {
+                 minPrice = value;
+               }
+             }
+           }
 
-              final value = bollData.upper[i];
+           if (bollSettings.showMiddle) {
+             for (
+             int i = safeStart;
+             i < safeEnd &&
+                 i < bollData.middle.length;
+             i++
+             ) {
+               final value = bollData.middle[i];
 
-              if (value == null) {
-                continue;
-              }
+               if (value == null) {
+                 continue;
+               }
 
-              if (value > maxPrice) {
-                maxPrice = value;
-              }
+               if (value > maxPrice) {
+                 maxPrice = value;
+               }
 
-              if (value < minPrice) {
-                minPrice = value;
-              }
-            }
-          }
+               if (value < minPrice) {
+                 minPrice = value;
+               }
+             }
+           }
 
-          if (bollSettings.showMiddle) {
+           if (bollSettings.showLower) {
+             for (
+             int i = safeStart;
+             i < safeEnd &&
+                 i < bollData.lower.length;
+             i++
+             ) {
+               final value = bollData.lower[i];
 
-            for (
-            int i = safeStart;
-            i < safeEnd &&
-                i < bollData.middle.length;
-            i++
-            ) {
+               if (value == null) {
+                 continue;
+               }
 
-              final value = bollData.middle[i];
+               if (value > maxPrice) {
+                 maxPrice = value;
+               }
 
-              if (value == null) {
-                continue;
-              }
-
-              if (value > maxPrice) {
-                maxPrice = value;
-              }
-
-              if (value < minPrice) {
-                minPrice = value;
-              }
-            }
-          }
-
-          if (bollSettings.showLower) {
-
-            for (
-            int i = safeStart;
-            i < safeEnd &&
-                i < bollData.lower.length;
-            i++
-            ) {
-
-              final value = bollData.lower[i];
-
-              if (value == null) {
-                continue;
-              }
-
-              if (value > maxPrice) {
-                maxPrice = value;
-              }
-
-              if (value < minPrice) {
-                minPrice = value;
-              }
-            }
-          }
+               if (value < minPrice) {
+                 minPrice = value;
+               }
+             }
+           }
+         }
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
             final range = maxPrice - minPrice;
@@ -224,20 +223,22 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
               ),
             ),
 
-            // RepaintBoundary(
-            //   child: CustomPaint(
-            //     size: Size.infinite,
-            //     painter: EmaPainter(
-            //       candles: widget.candles,
-            //       emaData: emaData,
-            //       viewport: viewport,
-            //       settings: emaSettings,
-            //       minPrice: visiblePrice.minPrice,
-            //       maxPrice: visiblePrice.maxPrice,
-            //     ),
-            //   ),
-            // ),
+            if(overlayIndicator == IndicatorType.ema)
+            RepaintBoundary(
+              child: CustomPaint(
+                size: Size.infinite,
+                painter: EmaPainter(
+                  candles: widget.candles,
+                  emaData: emaData,
+                  viewport: viewport,
+                  settings: emaSettings,
+                  minPrice: visiblePrice.minPrice,
+                  maxPrice: visiblePrice.maxPrice,
+                ),
+              ),
+            ),
 
+            if(overlayIndicator == IndicatorType.boll)
             RepaintBoundary(
               child: CustomPaint(
                 size: Size.infinite,

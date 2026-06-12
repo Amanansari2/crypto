@@ -103,8 +103,9 @@ class _CustomChartScreenState extends ConsumerState<CustomChartScreen> {
               child: Column(
                 children: [
                   /// 🔥 CHART + PRICE AXIS
-                  Expanded(
-              
+                  SizedBox(
+                    height: ChartConfig.mainChartHeight,
+
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border(
@@ -212,15 +213,15 @@ class _CustomChartScreenState extends ConsumerState<CustomChartScreen> {
                     ),
                   ),
                   TimeAxis(
-              
+
                     candles: candles,
-              
+
                     viewport:
                     ref.watch(
                       viewportProvider,
                     ),
                   ),
-              
+
                   const IndicatorHost()
                 ],
               ),

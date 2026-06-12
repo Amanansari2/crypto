@@ -57,4 +57,5 @@ class ChartConfig {
 
   //chartPanelHeight
   static const double chartPanelHeight = 120;
+  static const double mainChartHeight = 300;
 }

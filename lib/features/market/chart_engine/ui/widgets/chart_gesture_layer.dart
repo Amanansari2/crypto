@@ -137,13 +137,8 @@ class _ChartGestureLayerState extends ConsumerState<ChartGestureLayer> {
           });
         }
 
-        final indicatorCount =
-            ref.watch(activeIndicatorsProvider).length;
+        final mainChartHeight = ChartConfig.mainChartHeight;
 
-        final mainChartHeight =
-            chartHeight -
-                ChartConfig.timeAxisHeight -
-                (indicatorCount * ChartConfig.chartPanelHeight);
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onScaleStart: (details) {
