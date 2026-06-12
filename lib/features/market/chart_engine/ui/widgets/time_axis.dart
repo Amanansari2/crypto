@@ -1,3 +1,4 @@
+import 'package:crypto_app/core/utils/constants/app_colors.dart';
 import 'package:crypto_app/features/market/chart_engine/core/constants/chart_config.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,8 @@ class TimeAxis extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
     return SizedBox(
       height: ChartConfig.timeAxisHeight,
 
@@ -21,7 +24,7 @@ class TimeAxis extends StatelessWidget {
         child: CustomPaint(
           size: Size.infinite,
 
-          painter: TimeAxisPainter(candles: candles, viewport: viewport),
+          painter: TimeAxisPainter(candles: candles, viewport: viewport, textColor: dark ? AppColors.white : Colors.black54),
         ),
       ),
     );

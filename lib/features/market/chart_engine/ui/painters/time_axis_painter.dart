@@ -11,8 +11,9 @@ class TimeAxisPainter extends CustomPainter {
   final List<CandleModel> candles;
 
   final ChartViewport viewport;
+  final Color textColor;
 
-  TimeAxisPainter({required this.candles, required this.viewport});
+  TimeAxisPainter({required this.candles, required this.viewport, required this.textColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -20,8 +21,8 @@ class TimeAxisPainter extends CustomPainter {
       return;
     }
 
-    final textStyle = const TextStyle(
-      color: AppColors.white,
+    final textStyle =  TextStyle(
+      color: textColor,
       fontSize: 8,
       fontWeight: FontWeight.bold,
     );

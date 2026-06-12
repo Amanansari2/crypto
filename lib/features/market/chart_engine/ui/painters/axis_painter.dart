@@ -12,11 +12,13 @@ class AxisPainter extends CustomPainter {
 
   final ChartViewport viewport;
   final double chartWidth;
+  final Color textColor;
 
   AxisPainter({
     required this.chartWidth,
     required this.candles,
     required this.viewport,
+    required this.textColor
   });
 
   @override
@@ -25,25 +27,13 @@ class AxisPainter extends CustomPainter {
       return;
     }
 
-    final textStyle = const TextStyle(
-      color: AppColors.white,
+    final textStyle =  TextStyle(
+      color: textColor,
       fontSize: 8,
       fontWeight: FontWeight.bold,
     );
 
     /// 🔥 visible candles
-    // final startIndex = (viewport.scrollX / viewport.candleWidth).floor().clamp(
-    //   0,
-    //   candles.length,
-    // );
-    //
-    // final visibleCount = (chartWidth / viewport.candleWidth).ceil();
-    //
-    // final endIndex = (startIndex + visibleCount).clamp(0, candles.length);
-    //
-    // if (startIndex >= endIndex) {
-    //   return;
-    // }
 
     final startIndex =
     (
@@ -78,33 +68,6 @@ class AxisPainter extends CustomPainter {
     }
 
     /// 🔥 visible range
-    // double maxPrice = double.negativeInfinity;
-    //
-    // double minPrice = double.infinity;
-    //
-    // for (int i = startIndex; i < endIndex; i++) {
-    //   final candle = candles[i];
-    //
-    //   if (candle.high > maxPrice) {
-    //     maxPrice = candle.high;
-    //   }
-    //
-    //   if (candle.low < minPrice) {
-    //     minPrice = candle.low;
-    //   }
-    // }
-    //
-    // double range = maxPrice - minPrice;
-    // if (range <= 0) {
-    //   return;
-    // }
-    //
-    // final padding = range * 0.08;
-    //
-    // maxPrice += padding;
-    // minPrice -= padding;
-
-    // range = maxPrice - minPrice;
 
     final visiblePrice =
     VisiblePriceHelper.calculate(
@@ -129,15 +92,6 @@ class AxisPainter extends CustomPainter {
       return;
     }
 
-    // final padding =
-    //     range * 0.08;
-    //
-    // maxPrice += padding;
-    //
-    // minPrice -= padding;
-    //
-    // range =
-    //     maxPrice - minPrice;
 
     /// 🔥 adaptive formatter
     String formatPrice(double price, double range) {
@@ -158,53 +112,6 @@ class AxisPainter extends CustomPainter {
 
     /// 🔥 grid synced labels
 
-    // final labels = [
-    //   (
-    //     price: maxPrice,
-    //
-    //     y: ChartMath.priceToY(
-    //       price: maxPrice,
-    //       minPrice: minPrice,
-    //       maxPrice: maxPrice,
-    //       height: size.height,
-    //     ),
-    //   ),
-    //
-    //   (
-    //     price: maxPrice - (range * 0.33),
-    //
-    //     y: ChartMath.priceToY(
-    //       price: maxPrice - (range * 0.33),
-    //
-    //       minPrice: minPrice,
-    //       maxPrice: maxPrice,
-    //       height: size.height,
-    //     ),
-    //   ),
-    //
-    //   (
-    //     price: maxPrice - (range * 0.66),
-    //
-    //     y: ChartMath.priceToY(
-    //       price: maxPrice - (range * 0.66),
-    //
-    //       minPrice: minPrice,
-    //       maxPrice: maxPrice,
-    //       height: size.height,
-    //     ),
-    //   ),
-    //
-    //   (
-    //     price: minPrice,
-    //
-    //     y: ChartMath.priceToY(
-    //       price: minPrice,
-    //       minPrice: minPrice,
-    //       maxPrice: maxPrice,
-    //       height: size.height,
-    //     ),
-    //   ),
-    // ];
 
     final labels = List.generate(
 

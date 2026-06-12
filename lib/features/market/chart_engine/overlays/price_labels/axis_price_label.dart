@@ -21,6 +21,9 @@ class AxisPriceLabel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
     final crosshair = ref.watch(crosshairProvider);
 
     final visibleRange = ref.watch(visiblePriceProvider);
@@ -62,17 +65,25 @@ class AxisPriceLabel extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
 
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: dark
+                ? AppColors.darkCard
+                : AppColors.white,
+
 
             borderRadius: BorderRadius.circular(4),
 
-            border: Border.all(color: Colors.white24),
+            border: Border.all(
+              color: dark
+                  ? Colors.white24
+                  : Colors.black12,
+            ),
           ),
 
           child: Text(
             price.toStringAsFixed(2),
 
-            style: const TextStyle(color: AppColors.white, fontSize: 10),
+            style:  TextStyle(
+                color: dark ? AppColors.white : AppColors.black , fontSize: 10),
           ),
         ),
       ),
