@@ -57,6 +57,7 @@ class _IndicatorEnableDisableState
         type == IndicatorType.ma ||
         type == IndicatorType.ema ||
         type == IndicatorType.boll;
+    final dark = Theme.of(context).brightness == Brightness.dark;
 
     final overlayIndicator = ref.watch(overlayIndicatorProvider);
 
@@ -76,7 +77,7 @@ class _IndicatorEnableDisableState
       },
 
       child: Container(
-        margin: EdgeInsets.only(right: 14.w),
+        margin: EdgeInsets.symmetric(horizontal: 6.w),
 
         alignment: Alignment.center,
 
@@ -85,9 +86,11 @@ class _IndicatorEnableDisableState
 
           style: TextStyle(
             fontSize: 11.sp,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.bold,
 
-            color: selected ? AppColors.green : Colors.grey,
+            color:
+            selected ? Colors.blue : Colors.grey
+
           ),
         ),
       ),

@@ -1,17 +1,20 @@
+import 'package:crypto_app/features/market/chart_engine/core/models/indicators/indicator_type.dart';
 import 'package:crypto_app/features/market/chart_engine/providers/chart_width_provider.dart';
 import 'package:crypto_app/features/market/chart_engine/providers/indicators/ema/ema_data_provider.dart';
 import 'package:crypto_app/features/market/chart_engine/providers/indicators/ema/ema_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:crypto_app/features/market/chart_engine/core/models/indicators/indicator_type.dart';
 
 import '../../core/models/candle_model.dart';
 import '../../overlays/high_low/high_low_overlay.dart';
 import '../../overlays/indicators/boll/boll_painter.dart';
 import '../../overlays/indicators/ema/ema_painter.dart';
+import '../../overlays/indicators/ma/ma_painter.dart';
 import '../../providers/candle_provider.dart';
 import '../../providers/indicators/boll/boll_data_provider.dart';
 import '../../providers/indicators/boll/boll_provider.dart';
+import '../../providers/indicators/ma/ma_data_provider.dart';
+import '../../providers/indicators/ma/ma_provider.dart';
 import '../../providers/indicators/overlay_indicator_provider.dart';
 import '../../providers/viewport_provider.dart';
 import '../../providers/visible_price_provider.dart';
@@ -28,28 +31,26 @@ class ChartCanvas extends ConsumerStatefulWidget {
 }
 
 class _ChartCanvasState extends ConsumerState<ChartCanvas> {
-
-
   @override
   Widget build(BuildContext context) {
     final viewport = ref.watch(viewportProvider);
     final visiblePrice = ref.watch(visiblePriceProvider);
-    final isLoadingMore = ref.watch(candleLoadingMoreProvider,);
-    final overlayIndicator = ref.watch(overlayIndicatorProvider,);
+    final isLoadingMore = ref.watch(candleLoadingMoreProvider);
+    final overlayIndicator = ref.watch(overlayIndicatorProvider);
     final emaData = ref.watch(emaDataProvider);
     final emaSettings = ref.watch(emaProvider);
-    final bollData =ref.watch(bollDataProvider);
+    final bollData = ref.watch(bollDataProvider);
     final bollSettings = ref.watch(bollProvider);
+    final maData = ref.watch(maDataProvider);
+    final maSettings = ref.watch(maProvider);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final chartWidth = constraints.maxWidth;
-        final chartHeight = constraints.maxHeight;
 
-        WidgetsBinding.instance.addPostFrameCallback((_){
+        WidgetsBinding.instance.addPostFrameCallback((_) {
           ref.read(chartWidthProvider.notifier).update(chartWidth);
         });
-
 
         final startIndex = (viewport.scrollX / viewport.candleWidth).floor();
 
@@ -78,113 +79,133 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
             }
           }
 
-         if(overlayIndicator == IndicatorType.ema) {
-           for (final config in emaSettings) {
-             if (!config.enabled) {
-               continue;
-             }
+          if (overlayIndicator == IndicatorType.ema) {
+            for (final config in emaSettings) {
+              if (!config.enabled) {
+                continue;
+              }
 
-             final values =
-             emaData.getPeriod(
-               config.period,
-             );
+              final values = emaData.getPeriod(config.period);
 
-             if (values == null) {
-               continue;
-             }
+              if (values == null) {
+                continue;
+              }
 
-             for (
-             int i = safeStart;
-             i < safeEnd && i < values.length;
-             i++
-             ) {
-               final value = values[i];
+              for (int i = safeStart; i < safeEnd && i < values.length; i++) {
+                final value = values[i];
 
-               if (value == null) {
-                 continue;
-               }
+                if (value == null) {
+                  continue;
+                }
 
-               if (value > maxPrice) {
-                 maxPrice = value;
-               }
+                if (value > maxPrice) {
+                  maxPrice = value;
+                }
 
-               if (value < minPrice) {
-                 minPrice = value;
-               }
-             }
-           }
-         }
+                if (value < minPrice) {
+                  minPrice = value;
+                }
+              }
+            }
+          }
 
-         if(overlayIndicator == IndicatorType.boll) {
-           if (bollSettings.showUpper) {
-             for (
-             int i = safeStart;
-             i < safeEnd &&
-                 i < bollData.upper.length;
-             i++
-             ) {
-               final value = bollData.upper[i];
+          if (overlayIndicator == IndicatorType.boll) {
+            if (bollSettings.showUpper) {
+              for (
+                int i = safeStart;
+                i < safeEnd && i < bollData.upper.length;
+                i++
+              ) {
+                final value = bollData.upper[i];
 
-               if (value == null) {
-                 continue;
-               }
+                if (value == null) {
+                  continue;
+                }
 
-               if (value > maxPrice) {
-                 maxPrice = value;
-               }
+                if (value > maxPrice) {
+                  maxPrice = value;
+                }
 
-               if (value < minPrice) {
-                 minPrice = value;
-               }
-             }
-           }
+                if (value < minPrice) {
+                  minPrice = value;
+                }
+              }
+            }
 
-           if (bollSettings.showMiddle) {
-             for (
-             int i = safeStart;
-             i < safeEnd &&
-                 i < bollData.middle.length;
-             i++
-             ) {
-               final value = bollData.middle[i];
+            if (bollSettings.showMiddle) {
+              for (
+                int i = safeStart;
+                i < safeEnd && i < bollData.middle.length;
+                i++
+              ) {
+                final value = bollData.middle[i];
 
-               if (value == null) {
-                 continue;
-               }
+                if (value == null) {
+                  continue;
+                }
 
-               if (value > maxPrice) {
-                 maxPrice = value;
-               }
+                if (value > maxPrice) {
+                  maxPrice = value;
+                }
 
-               if (value < minPrice) {
-                 minPrice = value;
-               }
-             }
-           }
+                if (value < minPrice) {
+                  minPrice = value;
+                }
+              }
+            }
 
-           if (bollSettings.showLower) {
-             for (
-             int i = safeStart;
-             i < safeEnd &&
-                 i < bollData.lower.length;
-             i++
-             ) {
-               final value = bollData.lower[i];
+            if (bollSettings.showLower) {
+              for (
+                int i = safeStart;
+                i < safeEnd && i < bollData.lower.length;
+                i++
+              ) {
+                final value = bollData.lower[i];
 
-               if (value == null) {
-                 continue;
-               }
+                if (value == null) {
+                  continue;
+                }
 
-               if (value > maxPrice) {
-                 maxPrice = value;
-               }
+                if (value > maxPrice) {
+                  maxPrice = value;
+                }
 
-               if (value < minPrice) {
-                 minPrice = value;
-               }
-             }
-           }
-         }
+                if (value < minPrice) {
+                  minPrice = value;
+                }
+              }
+            }
+          }
+
+          if (overlayIndicator == IndicatorType.ma) {
+            for (final config in maSettings) {
+              if (!config.enabled) {
+                continue;
+              }
+
+              final values = maData.getPeriod(config.period);
+
+              if (values == null) {
+                continue;
+              }
+
+              for (int i = safeStart; i < safeEnd && i < values.length; i++) {
+                final value = values[i];
+
+                if (value == null) {
+                  continue;
+                }
+
+                if (value > maxPrice) {
+                  maxPrice = value;
+                }
+
+                if (value < minPrice) {
+                  minPrice = value;
+                }
+              }
+            }
+          }
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
             final range = maxPrice - minPrice;
@@ -194,10 +215,10 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
             ref
                 .read(visiblePriceProvider.notifier)
                 .update(
-              minPrice: minPrice - padding,
+                  minPrice: minPrice - padding,
 
-              maxPrice: maxPrice + padding,
-            );
+                  maxPrice: maxPrice + padding,
+                );
           });
         }
 
@@ -223,45 +244,57 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
               ),
             ),
 
-            if(overlayIndicator == IndicatorType.ema)
-            RepaintBoundary(
-              child: CustomPaint(
-                size: Size.infinite,
-                painter: EmaPainter(
-                  candles: widget.candles,
-                  emaData: emaData,
-                  viewport: viewport,
-                  settings: emaSettings,
-                  minPrice: visiblePrice.minPrice,
-                  maxPrice: visiblePrice.maxPrice,
+            if (overlayIndicator == IndicatorType.ema)
+              RepaintBoundary(
+                child: CustomPaint(
+                  size: Size.infinite,
+                  painter: EmaPainter(
+                    candles: widget.candles,
+                    emaData: emaData,
+                    viewport: viewport,
+                    settings: emaSettings,
+                    minPrice: visiblePrice.minPrice,
+                    maxPrice: visiblePrice.maxPrice,
+                  ),
                 ),
               ),
-            ),
 
-            if(overlayIndicator == IndicatorType.boll)
-            RepaintBoundary(
-              child: CustomPaint(
-                size: Size.infinite,
-                painter: BollPainter(
-                  candles: widget.candles,
+            if (overlayIndicator == IndicatorType.boll)
+              RepaintBoundary(
+                child: CustomPaint(
+                  size: Size.infinite,
+                  painter: BollPainter(
+                    candles: widget.candles,
 
-                  bollData: bollData,
+                    bollData: bollData,
 
-                  viewport: viewport,
+                    viewport: viewport,
 
-                  settings: bollSettings,
+                    settings: bollSettings,
 
-                  minPrice:
-                  visiblePrice.minPrice,
+                    minPrice: visiblePrice.minPrice,
 
-                  maxPrice:
-                  visiblePrice.maxPrice,
+                    maxPrice: visiblePrice.maxPrice,
+                  ),
                 ),
               ),
-            ),
 
-            HighLowOverlay(candles: widget.candles,),
+            if (overlayIndicator == IndicatorType.ma)
+              RepaintBoundary(
+                child: CustomPaint(
+                  size: Size.infinite,
+                  painter: MaPainter(
+                    candles: widget.candles,
+                    maData: maData,
+                    viewport: viewport,
+                    settings: maSettings,
+                    minPrice: visiblePrice.minPrice,
+                    maxPrice: visiblePrice.maxPrice,
+                  ),
+                ),
+              ),
 
+            HighLowOverlay(candles: widget.candles),
 
             if (isLoadingMore)
               Positioned(
@@ -277,9 +310,7 @@ class _ChartCanvasState extends ConsumerState<ChartCanvas> {
                   child: const SizedBox(
                     width: 16,
                     height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   ),
                 ),
               ),

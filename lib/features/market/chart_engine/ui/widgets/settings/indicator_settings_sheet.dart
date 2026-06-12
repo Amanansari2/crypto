@@ -6,6 +6,8 @@ import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indi
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'indicators/ma_setting_sheet.dart';
+
 
 class IndicatorSettingsSheet extends StatelessWidget {
   const IndicatorSettingsSheet({
@@ -41,7 +43,14 @@ class IndicatorSettingsSheet extends StatelessWidget {
 
           _IndicatorTile(
             title: 'MA',
-            onTap: () {},
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const MaSettingSheet(),
+              );
+            },
           ),
 
           _IndicatorTile(

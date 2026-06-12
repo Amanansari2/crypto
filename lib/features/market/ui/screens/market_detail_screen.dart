@@ -115,7 +115,10 @@ final chartHeight = ChartConfig.mainChartHeight
                       padding: const EdgeInsets.only(left: 2.0, right: 4),
                       child: Row(
                         children: [
-                          Expanded(child: IntervalBar()),
+                          Expanded(
+                              child: IntervalBar()
+                          ),
+
                           GestureDetector(
                             onTap: () {
                               showModalBottomSheet(
@@ -172,11 +175,9 @@ final chartHeight = ChartConfig.mainChartHeight
                   ),
                 ),
 
-                const SizedBox(height: 8,),
+                const SizedBox(height: 2,),
 
-                Padding(padding: const EdgeInsets.symmetric(horizontal: 6,),
-                child: IndicatorEnableDisable(),
-                )
+                IndicatorEnableDisable()
 
               ],
             ),
