@@ -234,6 +234,7 @@ class _RsiSettingsSheetState extends ConsumerState<RsiSettingsSheet> {
                                 child: TextFormField(
                                   controller: periodControllers[index],
                                   textAlign: TextAlign.center,
+                                  textAlignVertical: TextAlignVertical.top,
                                   keyboardType: TextInputType.number,
                                   style: TextStyle(
                                     color: dark
@@ -249,8 +250,8 @@ class _RsiSettingsSheetState extends ConsumerState<RsiSettingsSheet> {
                                     enabledBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
                                     disabledBorder: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      vertical: 10,
+                                    contentPadding: EdgeInsets.only(
+                                      bottom: 8,
                                     ),
                                   ),
                                   onChanged: (value) {

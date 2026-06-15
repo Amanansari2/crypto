@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'indicators/ma_setting_sheet.dart';
+import 'indicators/wr_setting_sheet.dart';
 
 
 class IndicatorSettingsSheet extends StatelessWidget {
@@ -146,7 +147,14 @@ class IndicatorSettingsSheet extends StatelessWidget {
 
           _IndicatorTile(
             title: 'WR',
-            onTap: () {},
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const WrSettingSheet(),
+              );
+            },
           ),
 
           _IndicatorTile(

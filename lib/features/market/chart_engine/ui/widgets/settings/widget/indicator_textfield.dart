@@ -74,12 +74,14 @@ class IndicatorTextField extends StatelessWidget {
             keyboardType:
             TextInputType.number,
             textAlign: TextAlign.center,
+            textAlignVertical: TextAlignVertical.top,
 
             style: TextStyle(
               color: dark
                   ? AppColors.white
                   : AppColors.black,
               fontSize: 16,
+              height: 1.0
             ),
 
             decoration:
@@ -93,11 +95,9 @@ class IndicatorTextField extends StatelessWidget {
               InputBorder.none,
               disabledBorder:
               InputBorder.none,
+              contentPadding: EdgeInsets.only(bottom: 8)
 
-              contentPadding:
-              EdgeInsets.symmetric(
-                vertical: 10,
-              ),
+
             ),
 
             onChanged: onChanged,

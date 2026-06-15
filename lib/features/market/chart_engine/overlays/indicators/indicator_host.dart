@@ -2,6 +2,7 @@ import 'package:crypto_app/features/market/chart_engine/core/constants/chart_con
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/kdj/kdj_widget.dart';
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/rsi/rsi_widget.dart';
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/volume/volume_widget.dart';
+import 'package:crypto_app/features/market/chart_engine/overlays/indicators/wr/wr_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/indicators/indicator_type.dart';
@@ -100,11 +101,19 @@ class IndicatorHost extends ConsumerWidget {
             );
 
           case IndicatorType.wr:
-            return const SizedBox(
+            return Container(
               height: panelHeight,
-              child: Center(
-                child: Text('WR'),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.grey.withOpacity(0.25),
+                  ),
+                  bottom: BorderSide(
+                    color: Colors.grey.withOpacity(0.25),
+                  ),
+                ),
               ),
+              child: const WrWidget(),
             );
 
           case IndicatorType.obv:
