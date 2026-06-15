@@ -1,4 +1,5 @@
 import 'package:crypto_app/features/market/chart_engine/core/constants/chart_config.dart';
+import 'package:crypto_app/features/market/chart_engine/overlays/indicators/kdj/kdj_widget.dart';
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/rsi/rsi_widget.dart';
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/volume/volume_widget.dart';
 import 'package:flutter/material.dart';
@@ -83,11 +84,19 @@ class IndicatorHost extends ConsumerWidget {
             );
 
           case IndicatorType.kdj:
-            return const SizedBox(
+            return Container(
               height: panelHeight,
-              child: Center(
-                child: Text('KDJ'),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.grey.withOpacity(0.25),
+                  ),
+                  bottom: BorderSide(
+                    color: Colors.grey.withOpacity(0.25),
+                  ),
+                ),
               ),
+              child: const KdjWidget(),
             );
 
           case IndicatorType.wr:

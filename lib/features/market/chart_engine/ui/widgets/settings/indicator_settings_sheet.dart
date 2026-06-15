@@ -1,5 +1,6 @@
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/boll_setting_sheet.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/ema_setting_sheet.dart';
+import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/kdj_setting_sheet.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/macd_setting_sheet.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/rsi_setting_sheet.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/volume_setting_sheet.dart';
@@ -116,7 +117,14 @@ class IndicatorSettingsSheet extends StatelessWidget {
 
           _IndicatorTile(
             title: 'KDJ',
-            onTap: () {},
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const KdjSettingSheet(),
+              );
+            },
           ),
 
           _IndicatorTile(
