@@ -19,6 +19,7 @@ class _IndicatorEnableDisableState
     extends ConsumerState<IndicatorEnableDisable> {
   @override
   Widget build(BuildContext context) {
+
      return SizedBox(
       height: 34.h,
 
@@ -34,6 +35,16 @@ class _IndicatorEnableDisableState
 
           _indicatorButton("BOLL", IndicatorType.boll),
 
+          Padding(padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Text(
+            "|",
+            style: TextStyle(
+              fontSize: 22,
+              color: Colors.grey,
+            ),
+          ),
+          ),
+
           _indicatorButton("VOL", IndicatorType.vol),
 
           _indicatorButton("MACD", IndicatorType.macd),
@@ -47,6 +58,8 @@ class _IndicatorEnableDisableState
           _indicatorButton("WR", IndicatorType.wr),
 
           _indicatorButton("OBV", IndicatorType.obv),
+
+          _indicatorButton("StochRSI", IndicatorType.stoch),
         ],
       ),
     );
@@ -57,7 +70,6 @@ class _IndicatorEnableDisableState
         type == IndicatorType.ma ||
         type == IndicatorType.ema ||
         type == IndicatorType.boll;
-    final dark = Theme.of(context).brightness == Brightness.dark;
 
     final overlayIndicator = ref.watch(overlayIndicatorProvider);
 

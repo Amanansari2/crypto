@@ -19,4 +19,6 @@ enum IndicatorType {
   wr,
 
   obv,
+
+  stoch,
 }

@@ -3,6 +3,7 @@ import 'package:crypto_app/features/market/chart_engine/overlays/indicators/kdj/
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/obv/obv_widget.dart';
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/roc/roc_widget.dart';
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/rsi/rsi_widget.dart';
+import 'package:crypto_app/features/market/chart_engine/overlays/indicators/stoch/stoch_rsi_widget.dart';
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/volume/volume_widget.dart';
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/wr/wr_widget.dart';
 import 'package:flutter/material.dart';
@@ -148,6 +149,22 @@ class IndicatorHost extends ConsumerWidget {
                 ),
               ),
               child: const RocWidget(),
+            );
+
+          case IndicatorType.stoch:
+            return Container(
+              height: panelHeight,
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.grey.withOpacity(0.25),
+                  ),
+                  bottom: BorderSide(
+                    color: Colors.grey.withOpacity(0.25),
+                  ),
+                ),
+              ),
+              child: const StochRsiWidget(),
             );
 
           case IndicatorType.ma:

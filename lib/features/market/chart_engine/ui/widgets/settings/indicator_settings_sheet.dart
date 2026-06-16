@@ -5,6 +5,7 @@ import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indi
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/obv_setting_sheet.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/roc_setting_sheet.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/rsi_setting_sheet.dart';
+import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/stoch_rsi_setting_sheet.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicators/volume_setting_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -180,7 +181,14 @@ class IndicatorSettingsSheet extends StatelessWidget {
 
           _IndicatorTile(
             title: 'StochRSI',
-            onTap: () {},
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const StochRsiSettingsSheet(),
+              );
+            },
           ),
 
           const SizedBox(height: 20),

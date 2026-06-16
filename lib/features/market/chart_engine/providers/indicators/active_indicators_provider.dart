@@ -16,7 +16,7 @@ class ActiveIndicatorsNotifier extends Notifier<List<IndicatorType>> {
   List<IndicatorType> build() {
 
     return const [
-      IndicatorType.vol
+      IndicatorType.stoch
     ];
   }
 
