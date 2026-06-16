@@ -11,7 +11,6 @@ import '../../../../core/utils/constants/app_colors.dart';
 import '../../chart_engine/ui/screen/chart_screen.dart';
 import '../../chart_engine/ui/widgets/settings/chart_settings_sheet.dart';
 import '../../provider/binance/ticker_provider.dart';
-import '../widgets/market_detail_widget/chart_widget.dart';
 import '../widgets/market_detail_widget/price_section.dart';
 import '../widgets/market_detail_widget/stats_section.dart';
 
@@ -107,8 +106,6 @@ final chartHeight = ChartConfig.mainChartHeight
                       : AppColors.black,
                 ),
 
-                // Expanded(
-                //     child: ChartScreen(symbol: widget.symbol, dark: isDark,)),
 
 
                     Padding(

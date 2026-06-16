@@ -40,8 +40,6 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
   Widget build(BuildContext context) {
     final selectedTab = ref.watch(marketTabProvider);
 
-    // final trending = ref.watch(trendingCoinsProvider);
-    // final pairAsync = ref.watch(binancePairsProvider);
     final combined = ref.watch(combinedMarketProvider);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
