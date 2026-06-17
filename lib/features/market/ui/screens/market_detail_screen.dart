@@ -2,8 +2,11 @@ import 'package:crypto_app/features/market/chart_engine/core/constants/chart_con
 import 'package:crypto_app/features/market/chart_engine/providers/indicators/active_indicators_provider.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/interval/interval_bar.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicator_enable_disable.dart';
+import 'package:crypto_app/features/market/ui/widgets/market_detail_widget/last_section/depth/depth_tab.dart';
+import 'package:crypto_app/features/market/ui/widgets/market_detail_widget/last_section/info_tab.dart';
 import 'package:crypto_app/features/market/ui/widgets/market_detail_widget/last_section/market_details_tabs.dart';
 import 'package:crypto_app/features/market/ui/widgets/market_detail_widget/last_section/order_book_tab.dart';
+import 'package:crypto_app/features/market/ui/widgets/market_detail_widget/last_section/trades_tab.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -227,9 +230,9 @@ final chartHeight = ChartConfig.mainChartHeight
 
                     children: [
                     OrderBookTab(symbol: widget.symbol),
-                     Container(child: Text("Depth", style: TextStyle(fontSize: 20, ),),),
-                     Container(child: Text("trades", style: TextStyle(fontSize: 20, ),),),
-                     Container(child: Text("info", style: TextStyle(fontSize: 20, ),),)
+                     DepthTab(symbol: widget.symbol),
+                     TradeTab(symbol: widget.symbol),
+                    InfoTab(symbol: widget.symbol)
                     ],
                   ),
                 ),

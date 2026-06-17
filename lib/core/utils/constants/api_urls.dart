@@ -15,4 +15,5 @@ class ApiUrls {
   static const getPairs = "/binance/pairs";
   static const getCandles = "/binance/candles";
   static const getOrderBook = "/binance/order-book";
+  static const getContractInfo = "/binance/contract-info";
 }

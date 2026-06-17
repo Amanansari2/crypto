@@ -37,6 +37,7 @@ StreamProvider.family<OrderBookModel, String>(
 
     OrderBookModel buildBook() {
 
+
       final bids =
       bidsMap.entries
           .map(
@@ -65,6 +66,8 @@ StreamProvider.family<OrderBookModel, String>(
               a.price.compareTo(b.price),
         );
 
+
+
       return OrderBookModel(
         lastUpdateId:
         snapshot.lastUpdateId,
@@ -87,6 +90,8 @@ StreamProvider.family<OrderBookModel, String>(
 
         final update =
         OrderBookModel.fromJson(data);
+
+
 
         for (final bid in update.bids) {
 
@@ -115,6 +120,8 @@ StreamProvider.family<OrderBookModel, String>(
         controller.add(
           buildBook(),
         );
+
+
       },
     );
 
