@@ -2,6 +2,8 @@ import 'package:crypto_app/features/market/chart_engine/core/constants/chart_con
 import 'package:crypto_app/features/market/chart_engine/providers/indicators/active_indicators_provider.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/interval/interval_bar.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicator_enable_disable.dart';
+import 'package:crypto_app/features/market/ui/widgets/market_detail_widget/last_section/market_details_tabs.dart';
+import 'package:crypto_app/features/market/ui/widgets/market_detail_widget/last_section/order_book_tab.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +13,7 @@ import '../../../../core/utils/constants/app_colors.dart';
 import '../../chart_engine/ui/screen/chart_screen.dart';
 import '../../chart_engine/ui/widgets/settings/chart_settings_sheet.dart';
 import '../../provider/binance/ticker_provider.dart';
+import '../widgets/market_detail_widget/last_section/provider/tab_provider.dart';
 import '../widgets/market_detail_widget/price_section.dart';
 import '../widgets/market_detail_widget/stats_section.dart';
 
@@ -24,12 +27,24 @@ class MarketDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _MarketDetailScreenState extends ConsumerState<MarketDetailScreen> {
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final tickerAsync = ref.watch(tickerProvider(widget.symbol));
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-
+    final selectedTab = ref.watch(marketDetailsTabProvider);
 
 
 
@@ -174,7 +189,51 @@ final chartHeight = ChartConfig.mainChartHeight
 
                 const SizedBox(height: 2,),
 
-                IndicatorEnableDisable()
+                IndicatorEnableDisable(),
+                const SizedBox(height: 8,),
+
+
+
+
+
+
+                MarketDetailsTabs(
+                  selectedIndex: selectedTab,
+                  onTap: (i) {
+                    ref.read(marketDetailsTabProvider.notifier).setTab(i);
+                    _pageController.animateToPage(
+                      i,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                ),
+                Divider(
+                  color: isDark
+                      ? AppColors.blue
+                      : AppColors.black,
+                ),
+
+
+                SizedBox(
+                  height: 650,
+                  child: PageView(
+                    physics: BouncingScrollPhysics(),
+                    allowImplicitScrolling: false,
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      ref.read(marketDetailsTabProvider.notifier).setTab(index);
+                    },
+
+                    children: [
+                    OrderBookTab(symbol: widget.symbol),
+                     Container(child: Text("Depth", style: TextStyle(fontSize: 20, ),),),
+                     Container(child: Text("trades", style: TextStyle(fontSize: 20, ),),),
+                     Container(child: Text("info", style: TextStyle(fontSize: 20, ),),)
+                    ],
+                  ),
+                ),
+
 
               ],
             ),

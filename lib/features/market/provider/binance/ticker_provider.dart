@@ -20,6 +20,7 @@ class TickerNotifier extends StreamNotifier<BinanceTickerModel> {
 
   @override
   Stream<BinanceTickerModel> build() {
+    LogHelper.log("🚀 TICKER BUILD CALLED");
     _socket = BinanceSocketService();
 
     final controller = StreamController<BinanceTickerModel>();
