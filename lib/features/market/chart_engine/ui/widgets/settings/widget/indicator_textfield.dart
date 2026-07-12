@@ -84,8 +84,7 @@ class IndicatorTextField extends StatelessWidget {
               height: 1.0
             ),
 
-            decoration:
-            const InputDecoration(
+            decoration: const InputDecoration(
               fillColor: Colors.transparent,
               filled: false,
               border: InputBorder.none,

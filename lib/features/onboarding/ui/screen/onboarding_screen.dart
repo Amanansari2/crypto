@@ -46,7 +46,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingScreen> {
         bottomButtonColor: CupertinoColors.activeBlue,
         bottomButtonChild: Text('Continue'),
         onPressedOnLastPage: () {
-          context.go(RouteNames.home);
+          context.go(RouteNames.trade);
         },
         pages: [
           _buildFirstPage(),

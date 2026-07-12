@@ -3,7 +3,7 @@ class RouteNames {
 
   static const String onboarding = "/";
 
-  static const String home = "/home";
+  static const String trade = "/trade";
   static const String settings = "/settings";
   static const String market = "/market";
 
@@ -18,5 +18,5 @@ class RouteNames {
 
   //routeNames
   static const String marketDetailName = "MarketDetail";
-  static const String homeName = "Home";
+  static const String tradeName = "Trade";
 }

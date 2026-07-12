@@ -1,6 +1,9 @@
 class ApiUrls {
 
-  static const String baseUrl = "http://192.168.1.72:5001/api";
+  // static const String baseUrl = "http://www.tradingfloors.in/api";
+  static const String baseUrl = "http://192.168.1.72:5001//api";
+
+  // https://www.tradingfloors.in/api
 
   static const allCoins = "/market/all";
   static const gainers = "/market/gainers";

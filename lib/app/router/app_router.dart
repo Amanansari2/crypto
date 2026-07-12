@@ -1,12 +1,12 @@
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicator_settings_sheet.dart';
 import 'package:crypto_app/features/market/ui/screens/market_detail_screen.dart';
 import 'package:crypto_app/features/market/ui/screens/market_screen.dart';
+import 'package:crypto_app/features/trade/ui/screen/trade_screen.dart';
 import 'package:crypto_app/placeholder_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/home/ui/screens/home_screen.dart';
 import '../../features/market/chart_engine/ui/widgets/interval/custom_inetrval.dart';
 import '../../features/navigation/ui/screens/bottom_nav_screen.dart';
 import '../../features/onboarding/ui/screen/onboarding_screen.dart';
@@ -53,10 +53,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             navigatorKey: AppRouter.homeNavigatorKey,
             routes: [
               GoRoute(
-                path: RouteNames.home,
-                name: RouteNames.homeName,
+                path: RouteNames.trade,
+                name: RouteNames.tradeName,
                 builder: (context, state) =>
-                const HomeScreen(),
+                const TradeScreen(),
 
                 routes: [
                   GoRoute(
