@@ -1,7 +1,7 @@
 import 'package:crypto_app/app/router/route_names.dart';
 import 'package:crypto_app/core/utils/constants/app_colors.dart';
 import 'package:crypto_app/core/utils/constants/app_strings.dart';
-import 'package:crypto_app/features/market/provider/combined_market_provider.dart';
+import 'package:crypto_app/features/market/provider/trending_provider.dart';
 import 'package:crypto_app/features/market/ui/shimmers/trending_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +12,6 @@ import '../../provider/market_provider.dart';
 import '../../provider/tab_notifier.dart';
 import '../widgets/coin_view.dart';
 import '../widgets/market_tabs.dart';
-import '../widgets/sparkline_chart.dart';
 
 class MarketScreen extends ConsumerStatefulWidget {
   const MarketScreen({super.key});
@@ -40,8 +39,8 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
   Widget build(BuildContext context) {
     final selectedTab = ref.watch(marketTabProvider);
 
-    final combined = ref.watch(combinedMarketProvider);
-
+    // final combined = ref.watch(combinedMarketProvider);
+    final trending = ref.watch(trendingProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -59,11 +58,11 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
             SizedBox(height: 4.h),
 
             SizedBox(
-              height: 130.h,
-              child: combined.when(
+              height: 150.h,
+              child: trending.when(
                 data: (data) {
                   final coins = data.coins;
-                  final pairs = data.pairs;
+                  // final pairs = data.pairs;
                   if (coins.isEmpty) {
                     return const Center(child: Text(AppStrings.noTrending));
                   }
@@ -73,28 +72,28 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                     itemCount: coins.length,
                     itemBuilder: (_, i) {
                       final coin = coins[i];
-                      final change = coin.change24h;
+                      final change = coin.priceChangePercentage24h;
                       final symbol = coin.symbol.toUpperCase() + "USDT";
 
-                      final isAvailable =
-                      pairs.any((p) => p.symbol == symbol);
+                      // final isAvailable =
+                      // pairs.any((p) => p.symbol == symbol);
 
+                      const isAvailable = true;
                       return GestureDetector(
                         onTap: isAvailable
                             ? () {
-                          context.pushNamed(
-                              RouteNames.marketDetailName,
-                              pathParameters: {
-                                "symbol": symbol
+                                context.pushNamed(
+                                  RouteNames.marketDetailName,
+                                  pathParameters: {"symbol": symbol},
+                                );
                               }
-                          );
-                        } : null,
+                            : null,
                         child: Stack(
                           children: [
                             Opacity(
                               opacity: isAvailable ? 1 : 0.5,
                               child: Container(
-                                width: 140.w,
+                                width: 160.w,
                                 margin: EdgeInsets.symmetric(
                                   horizontal: 4.w,
                                   vertical: 2.h,
@@ -115,121 +114,224 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                                   boxShadow: isDark
                                       ? []
                                       : [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 8,
-                                      spreadRadius: 2,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.05,
+                                            ),
+                                            blurRadius: 8,
+                                            spreadRadius: 2,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .spaceBetween,
                                   children: [
-
                                     /// 🔝 Top Row (Image + Rank)
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment
-                                          .start,
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Image.network(coin.image, height: 25.h),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment
-                                              .center,
-                                          children: [
-                                            if(!isAvailable)...[
-                                              Icon(
-                                                Icons.block,
-                                                size: 12.sp,
-                                                color: AppColors.red,
-                                              ),
-                                              SizedBox(height: 4.h)
-                                            ],
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 8.w,
-                                                vertical: 2.h,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: isDark
-                                                    ? AppColors.blue
-                                                    .withOpacity(0.15)
-                                                    : Colors.blue.shade50,
-                                                borderRadius: BorderRadius
-                                                    .circular(
-                                                  6.r,
+                                        SizedBox(width: 10.w),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                coin.name,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12.sp,
                                                 ),
+                                              ),
 
-                                                border: Border.all(
-                                                  color: isDark
-                                                      ? AppColors.blue
-                                                      .withOpacity(0.4)
-                                                      : Colors.blue.shade100,
+                                              Text(
+                                                coin.symbol,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 8.sp,
                                                 ),
                                               ),
-                                              child: Text(
-                                                "#${coin.rank}",
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 6.h),
+
+                                    Text(
+                                      "\$ ${coin.currentPrice.toStringAsFixed(2)}",
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+
+                                    Divider(thickness: 0.2),
+
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Icon(Icons.bar_chart_outlined),
+
+                                        Expanded(
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "24h Volume",
                                                 style: TextStyle(
                                                   fontSize: 8.sp,
+                                                  color: isDark
+                                                      ? AppColors.white
+                                                      : AppColors.black,
+                                                ),
+                                              ),
+
+                                              SizedBox(height: 2.h),
+
+                                              Text(
+                                                coin.quoteVolume,
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: isDark
+                                                      ? AppColors.white
+                                                      : AppColors.black,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                            ),
-                                            SizedBox(height: 4.h),
+                                            ],
+                                          ),
+                                        ),
 
-                                            Text(
-                                              coin.symbol,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 8.sp,
+                                        Expanded(
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "(24h)",
+                                                style: TextStyle(
+                                                  color: isDark
+                                                      ? AppColors.white
+                                                      : AppColors.black,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 8.sp,
+                                                ),
                                               ),
-                                            ),
-                                          ],
+
+                                              SizedBox(height: 2.h),
+
+                                              Text(
+                                                "${change.toStringAsFixed(3)}%",
+                                                style: TextStyle(
+                                                  color: change >= 0
+                                                      ? AppColors.green
+                                                      : AppColors.red,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 10.sp,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
 
-                                    Text(
-                                      coin.name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 10.sp,
-                                      ),
-                                    ),
-
-                                    SparklineChart(
-                                      data: coin.sparklines,
-                                      isPositive: coin.change24h >= 0,
-                                      change: coin.change24h,
-                                    ),
+                                    Divider(thickness: 0.2),
 
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .spaceBetween,
                                       children: [
+                                        Expanded(
+                                          flex: 2,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "(24 high)",
+                                                style: TextStyle(
+                                                  fontSize: 8,
+                                                  color: isDark
+                                                      ? AppColors.white
+                                                      : AppColors.black,
+                                                ),
+                                              ),
 
-                                        /// 💰 Price
-                                        Text(
-                                          "\$ ${coin.price.toStringAsFixed(2)}",
-                                          style: TextStyle(
-                                            fontSize: 10.sp,
-                                            fontWeight: FontWeight.bold,
+                                              SizedBox(height: 2.h),
+
+                                              Text(
+                                                coin.highPrice.toStringAsFixed(
+                                                  2,
+                                                ),
+                                                style: TextStyle(
+                                                  fontSize: 8,
+                                                  color: isDark
+                                                      ? AppColors.white
+                                                      : AppColors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
 
-                                        /// 📊 Change %
-                                        Text(
-                                          "${change.toStringAsFixed(2)}%",
-                                          style: TextStyle(
-                                            color: change >= 0
-                                                ? AppColors.green
-                                                : AppColors.red,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 10.sp,
+                                        Expanded(
+                                          flex: 2,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "(24 low)",
+                                                style: TextStyle(
+                                                  fontSize: 8,
+                                                  color: isDark
+                                                      ? AppColors.white
+                                                      : AppColors.black,
+                                                ),
+                                              ),
+                                              SizedBox(height: 2.h),
+
+                                              Text(
+                                                coin.lowPrice.toStringAsFixed(
+                                                  2,
+                                                ),
+                                                style: TextStyle(
+                                                  fontSize: 8,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isDark
+                                                      ? AppColors.white
+                                                      : AppColors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        Expanded(
+                                          flex: 2,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "Open Price",
+                                                style: TextStyle(
+                                                  fontSize: 8,
+                                                  color: isDark
+                                                      ? AppColors.white
+                                                      : AppColors.black,
+                                                ),
+                                              ),
+                                              SizedBox(height: 2.h),
+                                              Text(
+                                                coin.openPrice.toStringAsFixed(
+                                                  2,
+                                                ),
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 8,
+                                                  color: isDark
+                                                      ? AppColors.white
+                                                      : AppColors.black,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
@@ -271,10 +373,12 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
 
             MarketTabs(
               selectedIndex: selectedTab,
-              onTap: (i) {
-                ref.read(marketTabProvider.notifier).setTab(i);
+              onTap: (index) {
+                ref.read(marketTabProvider.notifier).setTab(index);
+
+
                 _pageController.animateToPage(
-                  i,
+                  index,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 );
@@ -291,14 +395,27 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                 controller: _pageController,
                 onPageChanged: (index) {
                   ref.read(marketTabProvider.notifier).setTab(index);
+
+                  final notifier = ref.read(marketProvider.notifier);
+
+                  switch (index) {
+                    case 0:
+                      notifier.loadAll();
+                      break;
+                    case 1:
+                      notifier.loadGainers();
+                      break;
+                    case 2:
+                      notifier.loadLosers();
+                      break;
+                    case 3:
+                      notifier.loadNewCoins();
+                      break;
+                  }
                 },
 
-                children: [
-                  _allCoinsView(isDark),
-                  _gainersView(isDark),
-                  _losersView(isDark),
-                  _newCoinsView(isDark),
-                ],
+                children: List.generate(4, (_) => _coinsView(isDark)),
+                // ],
               ),
             ),
           ],
@@ -307,70 +424,24 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
     );
   }
 
-  Widget _allCoinsView(bool isDark) {
-    final state = ref.watch(allCoinsProvider);
+  Widget _coinsView(bool isDark) {
+    final state = ref.watch(marketProvider);
+    final selectedTab = ref.watch(marketTabProvider);
 
     return AsyncCoinsView(
       isDark: isDark,
       state: state,
-      enablePagination: true,
+      enablePagination: selectedTab == 0,
       onLoadMore: () {
-        ref.read(allCoinsProvider.notifier).loadMore();
+        ref.read(marketProvider.notifier).loadMore();
       },
-      onRetry: () {
-        ref.read(allCoinsProvider.notifier).refresh();
-      },
-    );
-  }
+      onRetry: () async {
+        ref.invalidate(trendingProvider);
 
-  Widget _gainersView(bool isDark) {
-    final tabNotifier = ref.watch(marketTabProvider.notifier);
-
-    if (!tabNotifier.isLoaded(1)) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    final state = ref.watch(gainersProvider);
-
-    return AsyncCoinsView(
-      isDark: isDark,
-      state: state,
-      onRetry: () {
-        ref.invalidate(gainersProvider);
-      },
-    );
-  }
-
-  Widget _losersView(bool isDark) {
-    final tabNotifier = ref.watch(marketTabProvider.notifier);
-
-    if (!tabNotifier.isLoaded(2)) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    final state = ref.watch(losersProvider);
-
-    return AsyncCoinsView(
-      isDark: isDark,
-      state: state,
-      onRetry: () {
-        ref.invalidate(losersProvider);
-      },
-    );
-  }
-
-  Widget _newCoinsView(bool isDark) {
-    final tabNotifier = ref.watch(marketTabProvider.notifier);
-
-    if (!tabNotifier.isLoaded(3)) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    final state = ref.watch(newCoinProvider);
-
-    return AsyncCoinsView(
-      isDark: isDark,
-      state: state,
-      onRetry: () {
-        ref.invalidate(newCoinProvider);
+        await Future.wait([
+          ref.read(marketProvider.notifier).refresh(),
+          ref.read(trendingProvider.future),
+        ]);
       },
     );
   }

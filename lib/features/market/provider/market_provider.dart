@@ -1,29 +1,127 @@
-import 'package:crypto_app/features/market/domain/entities/market_entity.dart';
+import 'package:crypto_app/core/utils/helpers/logger_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'all_coin_notifier.dart';
-import 'gainers_notifier.dart';
-import 'loser_notifier.dart';
-import 'market_usecase.dart';
-import 'new_coin_notifier.dart';
+import '../data/models/market_response_model.dart';
+import '../data/repositories/market_repository.dart';
+import '../enum/market_type.dart';
 
-final trendingCoinsProvider = FutureProvider<MarketEntity>((ref) async {
-  final usecase = ref.read(getTrendingCoinsProvider);
-  return usecase();
-});
-
-final allCoinsProvider = AsyncNotifierProvider<CoinsNotifier, MarketEntity>(
-  CoinsNotifier.new,
+final marketRepositoryProvider = Provider<MarketRepository>(
+      (ref) => MarketRepository(),
 );
 
-final gainersProvider = AsyncNotifierProvider<GainersNotifier, MarketEntity>(
-  GainersNotifier.new,
+final marketProvider =
+AsyncNotifierProvider<MarketNotifier, MarketResponseModel>(
+  MarketNotifier.new,
 );
 
-final losersProvider = AsyncNotifierProvider<LosersNotifier, MarketEntity>(
-  LosersNotifier.new,
-);
+class MarketNotifier extends AsyncNotifier<MarketResponseModel> {
+  late final MarketRepository _repository;
 
-final newCoinProvider = AsyncNotifierProvider<NewCoinsNotifier, MarketEntity>(
-  NewCoinsNotifier.new,
-);
+  MarketType _currentType = MarketType.all;
+  bool _isLoadingMore = false;
+
+  @override
+  Future<MarketResponseModel> build() async {
+    _repository = ref.read(marketRepositoryProvider);
+    _currentType = MarketType.all;
+    return _repository.getAllCoins();
+  }
+
+  Future<void> loadAll() async {
+    _currentType = MarketType.all;
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(
+          () => _repository.getAllCoins(),
+    );
+  }
+
+  // Future<void> loadTrending() async {
+  //   _currentType = MarketType.trending;
+  //   state = const AsyncLoading();
+  //
+  //   state = await AsyncValue.guard(
+  //         () => _repository.getTrendingCoins(),
+  //   );
+  // }
+
+  Future<void> loadGainers() async {
+    LogHelper.log("Load gainers");
+    _currentType = MarketType.gainers;
+
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(
+          () => _repository.getGainersCoins(),
+    );
+  }
+
+  Future<void> loadLosers() async {
+    _currentType = MarketType.losers;
+
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(
+          () => _repository.getLosersCoins(),
+    );
+  }
+
+  Future<void> loadNewCoins() async {
+    _currentType = MarketType.newCoins;
+
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(
+          () => _repository.getNewCoins(),
+    );
+  }
+
+  Future<void> refresh() async {
+    switch (_currentType) {
+      case MarketType.all:
+        return loadAll();
+
+      case MarketType.gainers:
+        return loadGainers();
+
+      case MarketType.losers:
+        return loadLosers();
+
+      case MarketType.newCoins:
+        return loadNewCoins();
+    // case MarketType.trending:
+    //   return;
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (_currentType != MarketType.all) return;
+    if (_isLoadingMore) return;
+
+    final current = state.value;
+
+    if (current == null) return;
+    if (!current.hasMore) return;
+
+    _isLoadingMore = true;
+
+    try {
+      final response = await _repository.getAllCoins(
+        page: current.currentPage + 1,
+      );
+
+      state = AsyncData(
+        current.copyWith(
+          coins: [
+            ...current.coins,
+            ...response.coins,
+          ],
+          currentPage: response.currentPage,
+          hasMore: response.hasMore,
+        ),
+      );
+    } finally {
+      _isLoadingMore = false;
+    }
+  }
+}

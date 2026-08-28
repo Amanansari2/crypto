@@ -1,68 +1,54 @@
-import '../../domain/entities/coin_entity.dart';
+
+
+
 
 class CoinModel {
-  final String id;
-  final String name;
+  final int id;
   final String symbol;
+  final String name;
   final String image;
-  final double price;
-  final double change24h;
-  final String marketCap;
-  final String volume;
-  final int rank;
-  final List<double> sparklines;
 
-  CoinModel({
+  final double currentPrice;
+  final double priceChangePercentage24h;
+  final double highPrice;
+  final double lowPrice;
+
+  final String quoteVolume;
+  final double quoteVolumeRaw;
+
+  final double openPrice;
+  final double weightedAvgPrice;
+
+  const CoinModel({
     required this.id,
-    required this.name,
     required this.symbol,
+    required this.name,
     required this.image,
-    required this.price,
-    required this.change24h,
-    required this.marketCap,
-    required this.volume,
-    required this.rank,
-    required this.sparklines,
+    required this.currentPrice,
+    required this.priceChangePercentage24h,
+    required this.highPrice,
+    required this.lowPrice,
+    required this.quoteVolume,
+    required this.quoteVolumeRaw,
+    required this.openPrice,
+    required this.weightedAvgPrice,
   });
 
   factory CoinModel.fromJson(Map<String, dynamic> json) {
-    double parseDouble(dynamic val) {
-      if (val == null) return 0;
-      if (val is int) return val.toDouble();
-      if (val is double) return val;
-      return double.tryParse(val.toString()) ?? 0;
-    }
-
     return CoinModel(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
+      id: json['id'] ?? 0,
       symbol: json['symbol'] ?? '',
+      name: json['name'] ?? '',
       image: json['image'] ?? '',
-      price: parseDouble(json['currentPrice']),
-      change24h: parseDouble(json['priceChangePercentage24h']),
-      marketCap: json['marketCap']?.toString() ?? '0',
-      volume: json['volume']?.toString() ?? '0',
-      rank: json['marketCapRank'] ?? '0',
-      sparklines:
-          (json['sparkline'] as List?)?.map((e) => parseDouble(e)).toList() ??
-          [],
-    );
-  }
-}
-
-extension CoinMapper on CoinModel {
-  CoinEntity toEntity() {
-    return CoinEntity(
-      id: id,
-      name: name,
-      symbol: symbol,
-      image: image,
-      price: price,
-      change24h: change24h,
-      marketCap: marketCap,
-      volume: volume,
-      rank: rank,
-      sparklines: sparklines,
+      currentPrice: (json['currentPrice'] ?? 0).toDouble(),
+      priceChangePercentage24h:
+      (json['priceChangePercentage24h'] ?? 0).toDouble(),
+      highPrice: (json['highPrice'] ?? 0).toDouble(),
+      lowPrice: (json['lowPrice'] ?? 0).toDouble(),
+      quoteVolume: json['quoteVolume'] ?? '',
+      quoteVolumeRaw: (json['quoteVolumeRaw'] ?? 0).toDouble(),
+      openPrice: (json['openPrice'] ?? 0).toDouble(),
+      weightedAvgPrice: (json['weightedAvgPrice'] ?? 0).toDouble(),
     );
   }
 }

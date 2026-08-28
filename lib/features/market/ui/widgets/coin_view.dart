@@ -1,5 +1,6 @@
+import 'package:crypto_app/core/utils/helpers/logger_helper.dart';
+import 'package:crypto_app/features/market/data/models/market_response_model.dart';
 import 'package:crypto_app/features/market/ui/shimmers/coin_view_shimmer.dart';
-import 'package:crypto_app/features/market/ui/widgets/sparkline_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,13 +8,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../core/utils/constants/app_colors.dart';
-import '../../domain/entities/market_entity.dart';
-import '../../provider/binance/pair_provider.dart';
 import '../shimmers/pagination_coin_view_shimmer.dart';
 
 class AsyncCoinsView extends StatelessWidget {
-  final AsyncValue<MarketEntity> state;
-  final VoidCallback? onRetry;
+  final AsyncValue<MarketResponseModel> state;
+  // final VoidCallback? onRetry;
+  final Future<void> Function()? onRetry;
   final ScrollController? controller;
   final bool enablePagination;
   final VoidCallback? onLoadMore;
@@ -21,7 +21,7 @@ class AsyncCoinsView extends StatelessWidget {
 
   const AsyncCoinsView({
     super.key,
-    required this.state,
+     required this.state,
     this.onRetry,
     this.controller,
     this.enablePagination = false,
@@ -65,9 +65,10 @@ class AsyncCoinsView extends StatelessWidget {
             backgroundColor: isDark
                 ? AppColors.blue.withOpacity(0.8)
                 : AppColors.white.withOpacity(0.8),
-            onRefresh: () async {
-              onRetry?.call();
-              await Future.delayed(const Duration(milliseconds: 200));
+            onRefresh: ()async{
+              if(onRetry !=  null){
+                await onRetry!();
+              }
             },
             child: ListView.builder(
               key: PageStorageKey("coins_list"),
@@ -77,6 +78,7 @@ class AsyncCoinsView extends StatelessWidget {
                 if (i == data.coins.length) {
                   return PaginationCoinViewShimmer(isDark: isDark);
                 }
+
 
                 final coin = data.coins[i];
 
@@ -90,222 +92,619 @@ class AsyncCoinsView extends StatelessWidget {
   }
 }
 
+// class PremiumCoinCard extends ConsumerWidget {
+//   final dynamic coin;
+//
+//   const PremiumCoinCard({super.key, required this.coin});
+//
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final isDark = Theme.of(context).brightness == Brightness.dark;
+//     final change = coin.priceChangePercentage24h;
+//
+//
+//     final symbol = "${coin.symbol.toUpperCase()}USDT";
+//
+//
+//     const isAvailable = true;
+//
+//     return GestureDetector(
+//       onTap: isAvailable
+//           ? () {
+//         context.pushNamed(
+//             RouteNames.marketDetailName,
+//             pathParameters: {
+//               "symbol": symbol
+//             }
+//         );
+//       } : null,
+//       child: Stack(
+//         children: [
+//           if(!isAvailable)
+//             Positioned(
+//               top: 8,
+//               right: 15,
+//               child: Icon(
+//                 Icons.block,
+//                 size: 12.sp,
+//                 color: AppColors.red,
+//               ),),
+//           Opacity(
+//               opacity: isAvailable ? 1 : 0.5,
+//               child: IgnorePointer(
+//                 ignoring: !isAvailable,
+//                 child: Container(
+//                   margin: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+//                   padding: EdgeInsets.all(12.w),
+//                   decoration: BoxDecoration(
+//                     borderRadius: BorderRadius.circular(18.r),
+//
+//                     /// 🔥 background
+//                     color: isDark ? AppColors.blue.withOpacity(0.08) : Colors
+//                         .white,
+//
+//                     border: Border.all(
+//                       color: isDark
+//                           ? AppColors.blue.withOpacity(0.4)
+//                           : Colors.grey.withOpacity(0.4),
+//                     ),
+//
+//                     boxShadow: isDark
+//                         ? []
+//                         : [
+//                       BoxShadow(
+//                         color: Colors.black.withOpacity(0.05),
+//                         blurRadius: 8,
+//                         spreadRadius: 2,
+//                         offset: const Offset(0, 4),
+//                       ),
+//                     ],
+//                   ),
+//
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//
+//                       /// 🔝 Top Row
+//                       Row(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           ClipRRect(
+//                             borderRadius: BorderRadius.circular(20),
+//                             child: Image.network(
+//                               coin.image,
+//                               height: 26.h,
+//                               width: 26.h,
+//                               fit: BoxFit.cover,
+//                             ),
+//                           ),
+//
+//                           SizedBox(width: 10.w),
+//
+//                           Expanded(
+//                             flex: 1,
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Text(
+//                                   coin.name,
+//                                   overflow: TextOverflow.ellipsis,
+//                                   maxLines: 1,
+//                                   style: TextStyle(
+//                                     fontSize: 10.sp,
+//                                     fontWeight: FontWeight.w400,
+//                                   ),
+//                                 ),
+//                                 SizedBox(height: 2.h),
+//
+//                                 Text(
+//                                   "\$${_formatPrice(coin.currentPrice)}",
+//                                   style: TextStyle(
+//                                     fontSize: 8.sp,
+//                                     fontWeight: FontWeight.bold,
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//
+//                           SizedBox(width: 5.w),
+//
+//                           // Expanded(
+//                           //   flex: 4,
+//                           //   child: SizedBox(
+//                           //     height: 30.h,
+//                           //     child: SparklineChart(
+//                           //       data: coin.sparklines,
+//                           //       isPositive: change >= 0,
+//                           //       change: change,
+//                           //     ),
+//                           //   ),
+//                           // ),
+//                           SizedBox(width: 10.w),
+//
+//                           Column(
+//                             children: [
+//                               Text(
+//                                 coin.symbol,
+//                                 style: TextStyle(
+//                                     fontSize: 8.sp, color: Colors.grey),
+//                               ),
+//                               SizedBox(height: 2.h),
+//                               Container(
+//                                 padding: EdgeInsets.symmetric(
+//                                   horizontal: 4.w,
+//                                   vertical: 2.h,
+//                                 ),
+//                                 decoration: BoxDecoration(
+//                                   color: change >= 0
+//                                       ? AppColors.green.withOpacity(0.08)
+//                                       : AppColors.red.withOpacity(0.08),
+//                                   borderRadius: BorderRadius.circular(6.r),
+//                                   border: Border.all(
+//                                     color: change >= 0
+//                                         ? AppColors.green.withOpacity(0.3)
+//                                         : AppColors.red.withOpacity(0.3),
+//                                   ),
+//                                 ),
+//                                 child: Text(
+//                                   "${change.toStringAsFixed(3)}%",
+//                                   style: TextStyle(
+//                                     color: change >= 0
+//                                         ? AppColors.green
+//                                         : AppColors.red,
+//                                     fontWeight: FontWeight.bold,
+//                                     fontSize: 6.sp,
+//                                   ),
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//
+//
+//                         ],
+//                       ),
+//
+//                       /// 📊 Market Data
+//                       Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           _info("MCap", "coin.marketCap"),
+//                           _info("Vol", coin.quoteVolume),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               )
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+//
+//   /// 🔥 Helper widget
+//   Widget _info(String title, String value) {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Text(
+//           title,
+//           style: TextStyle(fontSize: 8.sp, color: Colors.grey),
+//         ),
+//         Text(
+//           value,
+//           style: TextStyle(fontSize: 8.sp, fontWeight: FontWeight.w600),
+//         ),
+//       ],
+//     );
+//   }
+//
+//   /// 💰 Format price
+//   String _formatPrice(num price) {
+//     return price
+//         .toStringAsFixed(0)
+//         .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => ',');
+//   }
+// }
+
 class PremiumCoinCard extends ConsumerWidget {
   final dynamic coin;
 
-  const PremiumCoinCard({super.key, required this.coin});
+  const PremiumCoinCard({
+    super.key,
+    required this.coin,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final change = coin.change24h;
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark;
 
-    final pairAsync = ref.watch(binancePairsProvider);
+    final change = coin.priceChangePercentage24h;
+    final symbol = coin.symbol.toString().toUpperCase();
+    final tradingSymbol = "${symbol}USDT";
 
-    final symbol = "${coin.symbol.toUpperCase()}USDT";
-
-    final isAvailable = pairAsync.when(
-      data: (pairs) => pairs.any((p) => p.symbol == symbol),
-      loading: () => false,
-      error: (_, __) => false,
-    );
+    const isAvailable = true;
 
     return GestureDetector(
       onTap: isAvailable
           ? () {
         context.pushNamed(
-            RouteNames.marketDetailName,
-            pathParameters: {
-              "symbol": symbol
-            }
+          RouteNames.marketDetailName,
+          pathParameters: {
+            "symbol": tradingSymbol,
+          },
         );
-      } : null,
-      child: Stack(
-        children: [
-          if(!isAvailable)
-            Positioned(
-              top: 8,
-              right: 15,
-              child: Icon(
-                Icons.block,
-                size: 12.sp,
-                color: AppColors.red,
-              ),),
-          Opacity(
-              opacity: isAvailable ? 1 : 0.5,
-              child: IgnorePointer(
-                ignoring: !isAvailable,
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
-                  padding: EdgeInsets.all(12.w),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18.r),
+      }
+          : null,
+      child: Opacity(
+        opacity: isAvailable ? 1 : 0.5,
+        child: Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: 6.w,
+            vertical: 4.h,
+          ),
+          padding: EdgeInsets.all(4.w),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18.r),
 
-                    /// 🔥 background
-                    color: isDark ? AppColors.blue.withOpacity(0.08) : Colors
-                        .white,
+            // KEEP YOUR EXISTING COLORS
+            color: isDark
+                ? AppColors.blue.withOpacity(0.08)
+                : Colors.white,
 
-                    border: Border.all(
-                      color: isDark
-                          ? AppColors.blue.withOpacity(0.4)
-                          : Colors.grey.withOpacity(0.4),
-                    ),
+            border: Border.all(
+              color: isDark
+                  ? AppColors.blue.withOpacity(0.4)
+                  : Colors.grey.withOpacity(0.4),
+            ),
+          ),
 
-                    boxShadow: isDark
-                        ? []
-                        : [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 4),
+          child: Column(
+            children: [
+              /// =========================
+              /// TOP SECTION
+              /// =========================
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  /// COIN IMAGE
+                  Container(
+                    width: 40.w,
+                    height: 40.w,
+                    padding: EdgeInsets.all(2.w),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.blue.withOpacity(0.6),
+                        width: 1.2,
                       ),
-                    ],
+                    ),
+                    child: ClipOval(
+                      child: Image.network(
+                        coin.image,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (context, error, stackTrace) {
+                          return Icon(
+                            Icons.currency_bitcoin,
+                            size: 25.sp,
+                          );
+                        },
+                      ),
+                    ),
                   ),
 
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                  SizedBox(width: 10.w),
 
-                      /// 🔝 Top Row
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.network(
-                              coin.image,
-                              height: 26.h,
-                              width: 26.h,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-
-                          SizedBox(width: 10.w),
-
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  coin.name,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                SizedBox(height: 2.h),
-
-                                Text(
-                                  "\$${_formatPrice(coin.price)}",
-                                  style: TextStyle(
-                                    fontSize: 8.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(width: 5.w),
-
-                          Expanded(
-                            flex: 4,
-                            child: SizedBox(
-                              height: 30.h,
-                              child: SparklineChart(
-                                data: coin.sparklines,
-                                isPositive: change >= 0,
-                                change: change,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 10.w),
-
-                          Column(
-                            children: [
-                              Text(
-                                coin.symbol,
+                  /// NAME + PRICE
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                      children: [
+                        /// NAME + SYMBOL
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                coin.name,
+                                maxLines: 1,
+                                overflow:
+                                TextOverflow.ellipsis,
                                 style: TextStyle(
-                                    fontSize: 8.sp, color: Colors.grey),
-                              ),
-                              SizedBox(height: 2.h),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 4.w,
-                                  vertical: 2.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: change >= 0
-                                      ? AppColors.green.withOpacity(0.08)
-                                      : AppColors.red.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(6.r),
-                                  border: Border.all(
-                                    color: change >= 0
-                                        ? AppColors.green.withOpacity(0.3)
-                                        : AppColors.red.withOpacity(0.3),
-                                  ),
-                                ),
-                                child: Text(
-                                  "${change.toStringAsFixed(2)}%",
-                                  style: TextStyle(
-                                    color: change >= 0
-                                        ? AppColors.green
-                                        : AppColors.red,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 6.sp,
-                                  ),
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                            ],
+                            ),
+
+                            SizedBox(width: 7.w),
+
+                            Container(
+                              padding:
+                              EdgeInsets.symmetric(
+                                horizontal: 7.w,
+                                vertical: 2.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.blue
+                                    .withOpacity(0.08),
+                                borderRadius:
+                                BorderRadius.circular(8.r),
+                                border: Border.all(
+                                  color:  isDark ? AppColors.blue :  AppColors.blue
+                                      .withOpacity(0.25),
+                                ),
+                              ),
+                              child: Text(
+                                symbol,
+                                style: TextStyle(
+                                  fontSize: 8.sp,
+                                  fontWeight:
+                                  FontWeight.w600,
+                                  color: isDark ? AppColors.white : AppColors.black,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 5.h),
+
+                        /// PRICE
+                        Text(
+                          "\$${_formatPrice(coin.currentPrice)}",
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.bold,
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
 
+                  SizedBox(width: 5.w),
 
-                        ],
+                  /// CHANGE
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 7.w,
+                      vertical: 4.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: change >= 0
+                          ? AppColors.green.withOpacity(0.08)
+                          : AppColors.red.withOpacity(0.08),
+                      borderRadius:
+                      BorderRadius.circular(7.r),
+                      border: Border.all(
+                        color: change >= 0
+                            ? AppColors.green.withOpacity(0.3)
+                            : AppColors.red.withOpacity(0.3),
                       ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          change >= 0
+                              ? Icons.arrow_drop_up
+                              : Icons.arrow_drop_down,
+                          size: 14.sp,
+                          color: change >= 0
+                              ? AppColors.green
+                              : AppColors.red,
+                        ),
+                        Text(
+                          "${change.abs().toStringAsFixed(3)}%",
+                          style: TextStyle(
+                            color: change >= 0
+                                ? AppColors.green
+                                : AppColors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 8.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
 
-                      /// 📊 Market Data
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _info("MCap", coin.marketCap),
-                          _info("Vol", coin.volume),
-                        ],
-                      ),
-                    ],
+              SizedBox(height: 6.h),
+
+              /// =========================
+              /// MARKET DATA
+              /// =========================
+              Container(
+                height: 38.h,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 3.w,
+                  vertical: 5.h,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.blue.withOpacity(0.05)
+                      : Colors.grey.withOpacity(0.05),
+                  borderRadius:
+                  BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: isDark
+                        ? AppColors.blue.withOpacity(0.25)
+                        : Colors.grey.withOpacity(0.25),
                   ),
                 ),
-              )
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _marketInfo(
+                        "High",
+                        _formatPrice(
+                          _safeNum(
+                                () => coin.highPrice,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    _divider(),
+
+                    Expanded(
+                      child: _marketInfo(
+                        "Low",
+                        _formatPrice(
+                          _safeNum(
+                                () => coin.lowPrice,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    _divider(),
+
+                    Expanded(
+                      child: _marketInfo(
+                        "Open",
+                        _formatPrice(
+                          _safeNum(
+                                () => coin.openPrice,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    _divider(),
+
+                    Expanded(
+                      child: _marketInfo(
+                        "Avg Price",
+                        _formatPrice(
+                          _safeNum(
+                                () => coin.avgPrice,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    _divider(),
+
+                    Expanded(
+                      child: _marketInfo(
+                        "Volume (24H)",
+                        _formatVolume(
+                          _safeNum(
+                                () => coin.quoteVolume,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  /// 🔥 Helper widget
-  Widget _info(String title, String value) {
+  /// =========================
+  /// INFO
+  /// =========================
+  Widget _marketInfo(
+      String title,
+      String value,
+      ) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           title,
-          style: TextStyle(fontSize: 8.sp, color: Colors.grey),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 8.sp,
+            color: Colors.grey,
+          ),
         ),
+
+        SizedBox(height: 4.h),
+
         Text(
           value,
-          style: TextStyle(fontSize: 8.sp, fontWeight: FontWeight.w600),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 9.sp,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );
   }
 
-  /// 💰 Format price
+  /// =========================
+  /// DIVIDER
+  /// =========================
+  Widget _divider() {
+    return Container(
+      width: 1,
+      height: 30.h,
+      color: Colors.grey.withOpacity(0.15),
+    );
+  }
+
+  /// =========================
+  /// SAFE NUMBER
+  /// =========================
+  num _safeNum(
+      num Function() getter,
+      ) {
+    try {
+      return getter();
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  /// =========================
+  /// PRICE
+  /// =========================
   String _formatPrice(num price) {
-    return price
-        .toStringAsFixed(0)
-        .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => ',');
+    if (price >= 1000) {
+      return price
+          .toStringAsFixed(2)
+          .replaceAllMapped(
+        RegExp(r'\B(?=(\d{3})+(?!\d))'),
+            (match) => ',',
+      );
+    }
+
+    if (price >= 1) {
+      return price.toStringAsFixed(5);
+    }
+
+    return price.toStringAsFixed(5);
+  }
+
+  /// =========================
+  /// VOLUME
+  /// =========================
+  String _formatVolume(num value) {
+    if (value >= 1000000000) {
+      return "${(value / 1000000000).toStringAsFixed(2)}B";
+    }
+
+    if (value >= 1000000) {
+      return "${(value / 1000000).toStringAsFixed(2)}M";
+    }
+
+    if (value >= 1000) {
+      return "${(value / 1000).toStringAsFixed(2)}K";
+    }
+
+    return value.toStringAsFixed(2);
   }
 }
