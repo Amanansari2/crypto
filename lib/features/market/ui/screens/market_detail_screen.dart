@@ -36,7 +36,16 @@ class _MarketDetailScreenState extends ConsumerState<MarketDetailScreen> {
   void initState() {
     super.initState();
     _pageController = PageController();
-  }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      ref
+          .read(marketDetailsTabProvider.notifier)
+          .setTab(0);
+    });
+
+     }
 
   @override
   void dispose() {

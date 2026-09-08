@@ -1,7 +1,7 @@
+import 'package:crypto_app/features/market/provider/binance/orderbook/order_book_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../provider/binance/depth_provider.dart';
 import 'depth_painter.dart';
 import 'depth_point.dart';
 
@@ -17,7 +17,7 @@ class DepthTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     final depthAsync =
-    ref.watch(depthProvider(symbol));
+    ref.watch(orderBookProvider(symbol));
 
     return depthAsync.when(
 
@@ -39,33 +39,163 @@ class DepthTab extends ConsumerWidget {
         final asks =
         book.asks.toList();
 
-        double bidCum = 0;
 
-        final bidPoints =
-        bids.reversed.map((e) {
+        // double bidCum = 0;
+        //
+        // final bidPoints = <DepthPoint>[];
+        //
+        // if (bids.isNotEmpty) {
+        //   // Center point = 0 volume
+        //   bidPoints.add(
+        //     DepthPoint(
+        //       price: bids.first.price,
+        //       volume: 0,
+        //     ),
+        //   );
+        //
+        //   for (int i = 1; i < bids.length; i++) {
+        //     bidCum += bids[i - 1].quantity;
+        //
+        //     bidPoints.add(
+        //       DepthPoint(
+        //         price: bids[i].price,
+        //         volume: bidCum,
+        //       ),
+        //     );
+        //   }
+        // }
+        //
+        // double askCum = 0;
+        //
+        // final askPoints = <DepthPoint>[];
+        //
+        // if (asks.isNotEmpty) {
+        //   // Center point = 0 volume
+        //   askPoints.add(
+        //     DepthPoint(
+        //       price: asks.first.price,
+        //       volume: 0,
+        //     ),
+        //   );
+        //
+        //   for (int i = 1; i < asks.length; i++) {
+        //     askCum += asks[i - 1].quantity;
+        //
+        //     askPoints.add(
+        //       DepthPoint(
+        //         price: asks[i].price,
+        //         volume: askCum,
+        //       ),
+        //     );
+        //   }
+        // }
 
-          bidCum += e.quantity;
+        const bucketCount = 24;
 
-          return DepthPoint(
-            price: e.price,
-            volume: bidCum,
-          );
+        final bidPoints = <DepthPoint>[];
+        final askPoints = <DepthPoint>[];
 
-        }).toList();
+        if (bids.isNotEmpty) {
+          final bestBid = bids.first.price;
+          final lowestBid = bids.last.price;
 
-        double askCum = 0;
+          final bidRange = bestBid - lowestBid;
 
-        final askPoints =
-        asks.map((e) {
+          if (bidRange > 0) {
+            final bucketSize = bidRange / bucketCount;
 
-          askCum += e.quantity;
+            final bucketVolumes =
+            List<double>.filled(bucketCount, 0);
 
-          return DepthPoint(
-            price: e.price,
-            volume: askCum,
-          );
+            for (final entry in bids) {
+              final distance = bestBid - entry.price;
 
-        }).toList();
+              int bucket =
+              (distance / bucketSize).floor();
+
+              if (bucket >= bucketCount) {
+                bucket = bucketCount - 1;
+              }
+
+              bucketVolumes[bucket] += entry.quantity;
+            }
+
+            double cumulative = 0;
+
+            // Center = zero
+            bidPoints.add(
+              DepthPoint(
+                price: bestBid,
+                volume: 0,
+              ),
+            );
+
+            for (int i = 0; i < bucketCount; i++) {
+              cumulative += bucketVolumes[i];
+
+              final price =
+                  bestBid - ((i + 1) * bucketSize);
+
+              bidPoints.add(
+                DepthPoint(
+                  price: price,
+                  volume: cumulative,
+                ),
+              );
+            }
+          }
+        }
+
+        if (asks.isNotEmpty) {
+          final bestAsk = asks.first.price;
+          final highestAsk = asks.last.price;
+
+          final askRange = highestAsk - bestAsk;
+
+          if (askRange > 0) {
+            final bucketSize = askRange / bucketCount;
+
+            final bucketVolumes =
+            List<double>.filled(bucketCount, 0);
+
+            for (final entry in asks) {
+              final distance = entry.price - bestAsk;
+
+              int bucket =
+              (distance / bucketSize).floor();
+
+              if (bucket >= bucketCount) {
+                bucket = bucketCount - 1;
+              }
+
+              bucketVolumes[bucket] += entry.quantity;
+            }
+
+            double cumulative = 0;
+
+            // Center = zero
+            askPoints.add(
+              DepthPoint(
+                price: bestAsk,
+                volume: 0,
+              ),
+            );
+
+            for (int i = 0; i < bucketCount; i++) {
+              cumulative += bucketVolumes[i];
+
+              final price =
+                  bestAsk + ((i + 1) * bucketSize);
+
+              askPoints.add(
+                DepthPoint(
+                  price: price,
+                  volume: cumulative,
+                ),
+              );
+            }
+          }
+        }
 
 
 
