@@ -15,14 +15,13 @@ class TradeModel {
       Map<String, dynamic> json,
       ) {
     return TradeModel(
-      price: double.parse(
-        json["p"],
-      ),
-      quantity: double.parse(
-        json["q"],
-      ),
-      isSell: json["m"] ?? false,
-      time: json["T"] ?? 0,
+      price: (json["price"] as num).toDouble(),
+
+      quantity: (json["quantity"] as num).toDouble(),
+
+      isSell: json["isBuyerMaker"] ?? false,
+
+      time: (json["transactionTime"] as num?)?.toInt() ?? 0,
     );
   }
 }

@@ -2,17 +2,17 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/datasources/binance/socket/binance_socket_service.dart';
+import '../../../../core/network/websocket/trading_backend_socket_service.dart';
 import '../../data/models/binance/trade_model.dart';
 
 final tradeProvider =
-StreamProvider.family<
+StreamProvider.autoDispose.family<
     List<TradeModel>,
     String>(
       (ref, symbol) async* {
 
     final socket =
-    BinanceSocketService();
+    TradingBackendSocketService();
 
     final controller =
     StreamController<
@@ -21,14 +21,25 @@ StreamProvider.family<
     final trades =
     <TradeModel>[];
 
-    socket.connect(
-      stream:
-      "${symbol.toLowerCase()}@aggTrade",
-      onData: (data) {
+    socket.subscribeTrades(
+      symbol,
+    );
+
+    final subscription =
+    socket.messages
+        .where(
+          (message) =>
+      message['type'] == 'TRADE' &&
+          message['data'] != null &&
+          message['data']['symbol'] ==
+              symbol.toUpperCase(),
+    )
+        .listen(
+          (message) {
 
         final trade =
         TradeModel.fromJson(
-          data,
+          message['data'],
         );
 
         trades.insert(
@@ -52,8 +63,10 @@ StreamProvider.family<
 
     ref.onDispose(() {
 
-      socket.disconnect(
-        "${symbol.toLowerCase()}@aggTrade",
+      subscription.cancel();
+
+      socket.unsubscribeTrades(
+        symbol,
       );
 
       controller.close();
