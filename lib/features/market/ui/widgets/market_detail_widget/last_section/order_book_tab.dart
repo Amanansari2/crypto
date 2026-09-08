@@ -2,6 +2,7 @@
 import 'dart:math' as math;
 
 import 'package:crypto_app/core/utils/constants/app_colors.dart';
+import 'package:crypto_app/core/utils/helpers/logger_helper.dart';
 import 'package:crypto_app/features/market/provider/binance/orderbook/order_book_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -56,12 +57,15 @@ class OrderBookTab extends ConsumerWidget {
         final bids = aggregateLevels(
           data.bids.take(sourceCount).toList(),
           step,
+          true,
         ).take(visibleRows).toList();
 
         final asks = aggregateLevels(
           data.asks.take(sourceCount).toList(),
           step,
+          false
         ).take(visibleRows).toList();
+        
 
         final cumulativeBids = <double>[];
         double bidRunning = 0;
@@ -80,11 +84,16 @@ class OrderBookTab extends ConsumerWidget {
           askRunning += ask.quantity;
           cumulativeAsks.add(askRunning);
         }
-       final maxBidDepth =
-        cumulativeBids.reduce(math.max);
 
-        final maxAskDepth =
-        cumulativeAsks.reduce(math.max);
+        final maxBidDepth = cumulativeBids.isEmpty
+            ? 1.0
+            : cumulativeBids.reduce(math.max);
+
+        final maxAskDepth = cumulativeAsks.isEmpty
+            ? 1.0
+            : cumulativeAsks.reduce(math.max);
+
+
 
         return Column(
           children: [
@@ -230,18 +239,11 @@ class OrderBookTab extends ConsumerWidget {
                 itemBuilder: (_, index) {
 
                 final bid = bids[index];
-                  final ask = asks[index];
+                final ask = asks[index];
 
-
-
-                  final bidDepth =
-                  cumulativeBids[ index];
-
+                  final bidDepth = cumulativeBids[ index];
                   final askDepth = cumulativeAsks[ index];
-                  final globalMaxDepth =
-                  maxBidDepth > maxAskDepth
-                      ? maxBidDepth
-                      : maxAskDepth;
+
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -250,21 +252,65 @@ class OrderBookTab extends ConsumerWidget {
                       child: Stack(
                         children: [
 
+                          // Align(
+                          //   alignment: Alignment.centerLeft,
+                          //   child: SizedBox(
+                          //     width: MediaQuery.of(context).size.width * 0.47,
+                          //     child: Align(
+                          //       alignment: Alignment.centerRight,
+                          //       child: FractionallySizedBox(
+                          //         widthFactor:
+                          //
+                          //             math.sqrt(
+                          //               askDepth / globalMaxDepth,
+                          //         ).clamp(0.0, 1.0),
+                          //         child: Container(
+                          //           color: AppColors.green.withOpacity(
+                          //             dark ? 0.4 : 0.12,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+                          // Align(
+                          //   alignment: Alignment.centerRight,
+                          //   child: SizedBox(
+                          //     width: MediaQuery.of(context).size.width * 0.47,
+                          //     child: Align(
+                          //       alignment: Alignment.centerLeft,
+                          //       child: FractionallySizedBox(
+                          //         widthFactor:
+                          //         math.sqrt(
+                          //           bidDepth / globalMaxDepth,
+                          //         ).clamp(0.0, 1.0),
+                          //         child: Container(
+                          //           color: AppColors.red.withOpacity(
+                          //             dark ? 0.12 : 0.12,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+
+                          // GREEN BID DEPTH
                           Align(
                             alignment: Alignment.centerLeft,
                             child: SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.47,
+                              width: (MediaQuery.of(context).size.width - 24) / 2,
+                              height: double.infinity,
                               child: Align(
                                 alignment: Alignment.centerRight,
                                 child: FractionallySizedBox(
-                                  widthFactor:
-
-                                      math.sqrt(
-                                        askDepth / globalMaxDepth,
-                                  ).clamp(0.0, 1.0),
+                                  widthFactor: depthWidth(
+                                    index,
+                                    bids.length,
+                                  ),
+                                  heightFactor: 1,
                                   child: Container(
                                     color: AppColors.green.withOpacity(
-                                      dark ? 0.4 : 0.12,
+                                      dark ? 0.30 : 0.12,
                                     ),
                                   ),
                                 ),
@@ -272,27 +318,30 @@ class OrderBookTab extends ConsumerWidget {
                             ),
                           ),
 
-
+// RED ASK DEPTH
                           Align(
                             alignment: Alignment.centerRight,
                             child: SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.47,
+                              width: (MediaQuery.of(context).size.width -24) / 2,
+                              height: double.infinity,
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: FractionallySizedBox(
-                                  widthFactor:
-                                  math.sqrt(
-                                    bidDepth / globalMaxDepth,
-                                  ).clamp(0.0, 1.0),
+                                  widthFactor: depthWidth(
+                                    index,
+                                    asks.length,
+                                  ),
+                                  heightFactor: 1,
                                   child: Container(
                                     color: AppColors.red.withOpacity(
-                                      dark ? 0.12 : 0.12,
+                                      dark ? 0.18 : 0.12,
                                     ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
+
 
                           Row(
                             children: [
@@ -543,11 +592,26 @@ class OrderBookTab extends ConsumerWidget {
 }
 
 
+double depthWidth(
+    int index,
+    int totalRows,
+    ) {
+  if (totalRows <= 0) {
+    return 0;
+  }
+
+  final progress = (index + 1) / totalRows;
+
+  return progress.clamp(0.0, 1.0);
+}
+
+
 
 
 List<OrderBookEntry> aggregateLevels(
     List<OrderBookEntry> levels,
     double step,
+    bool isBid
     ) {
   final map = <double, double>{};
 
@@ -571,7 +635,9 @@ List<OrderBookEntry> aggregateLevels(
       .toList();
 
   result.sort(
-        (a, b) => b.price.compareTo(a.price),
+    isBid
+        ? (a, b) => b.price.compareTo(a.price)
+        : (a, b) => a.price.compareTo(b.price),
   );
 
   return result;

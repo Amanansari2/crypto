@@ -100,6 +100,7 @@ final chartHeight = ChartConfig.mainChartHeight
                                   ),
                                 ),
 
+
                                 Text(
                                   "${ticker.bid}",
                                   style: TextStyle(

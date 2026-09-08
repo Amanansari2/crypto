@@ -9,11 +9,7 @@ import '../../../data/providers/trade_provider.dart';
 class AdvancedOrderTypeSheet extends ConsumerWidget {
   const AdvancedOrderTypeSheet({super.key});
 
-  // static const items = [
-  //   'Post Only',
-  //   'Fill Or Kill (FOK)',
-  //   'Immediate Or Cancel (IOC)',
-  // ];
+
 
 
   @override

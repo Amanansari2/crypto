@@ -9,10 +9,7 @@ import '../../../data/providers/trade_provider.dart';
 class TriggerPriceTypeSheet extends ConsumerWidget {
   const TriggerPriceTypeSheet({super.key});
 
-  // static const items = [
-  //   'Market Order',
-  //   'Limit Order',
-  // ];
+ 
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

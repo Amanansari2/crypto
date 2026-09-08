@@ -13,13 +13,14 @@ class OrderBookModel {
       Map<String, dynamic> json,
       ) {
     return OrderBookModel(
-      lastUpdateId: json['lastUpdateId'] ?? 0,
+      lastUpdateId:
+      (json['updateId'] ?? json['lastUpdateId'] ?? 0) as int,
 
       bids: (json['bids'] as List)
           .map(
             (e) => OrderBookEntry(
-          price: double.parse(e[0]),
-          quantity: double.parse(e[1]),
+          price: (e[0] as num).toDouble(),
+          quantity: (e[1] as num).toDouble(),
         ),
       )
           .toList(),
@@ -27,8 +28,8 @@ class OrderBookModel {
       asks: (json['asks'] as List)
           .map(
             (e) => OrderBookEntry(
-          price: double.parse(e[0]),
-          quantity: double.parse(e[1]),
+          price: (e[0] as num).toDouble(),
+          quantity: (e[1] as num).toDouble(),
         ),
       )
           .toList(),

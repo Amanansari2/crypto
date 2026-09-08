@@ -1,18 +1,46 @@
-import 'package:crypto_app/features/market/domain/entities/binance/ticker_entity.dart';
+class BinanceTickerModel {
+  final String symbol;
 
-class BinanceTickerModel extends BinanceTickerEntity {
+  // Price
+  final double lastPrice;
+  final double priceChange;
+  final double priceChangePercent;
+
+  // 24H statistics
+  final double open;
+  final double high;
+  final double low;
+  final double weightedAveragePrice;
+  final double volume;
+  final double quoteVolume;
+  final double tradeCount;
+
+  // Market data
+  final double bid;
+  final double ask;
+  final double bidQuantity;
+  final double askQuantity;
+
+  // Futures
+  final double markPrice;
+
   BinanceTickerModel({
-    required super.symbol,
-    required super.lastPrice,
-    required super.priceChangePercent,
-    required super.priceChange,
-    required super.high,
-    required super.low,
-    required super.open,
-    required super.volume,
-    required super.quoteVolume,
-    required super.bid,
-    required super.ask,
+    required this.symbol,
+    required this.lastPrice,
+    required this.priceChange,
+    required this.priceChangePercent,
+    required this.open,
+    required this.high,
+    required this.low,
+    required this.weightedAveragePrice,
+    required this.volume,
+    required this.quoteVolume,
+    required this.tradeCount,
+    required this.bid,
+    required this.ask,
+    required this.bidQuantity,
+    required this.askQuantity,
+    required this.markPrice,
   });
 
   factory BinanceTickerModel.fromJson(Map<String, dynamic> json) {
@@ -23,17 +51,22 @@ class BinanceTickerModel extends BinanceTickerEntity {
     }
 
     return BinanceTickerModel(
-      symbol: json['s'] ?? '',
-      lastPrice: parse(json['c']),
-      priceChangePercent: parse(json['P']),
-      priceChange: parse(json['p']),
-      high: parse(json['h']),
-      low: parse(json['l']),
-      open: parse(json['o']),
-      volume: parse(json['v']),
-      quoteVolume: parse(json['q']),
-      bid: parse(json['b']),
-      ask: parse(json['a']),
+      symbol: json['symbol'] ?? '',
+      lastPrice: parse(json['lastPrice']),
+      priceChange: parse(json['priceChange']),
+      priceChangePercent: parse(json['priceChangePercent']),
+      open: parse(json['openPrice']),
+      high: parse(json['highPrice']),
+      low: parse(json['lowPrice']),
+      weightedAveragePrice: parse(json['weightedAveragePrice']),
+      volume: parse(json['volume']),
+      quoteVolume: parse(json['quoteVolume']),
+      tradeCount: parse(json['tradeCount']),
+      bid: parse(json['bidPrice']),
+      ask: parse(json['askPrice']),
+      bidQuantity: parse(json['bidQuantity']),
+      askQuantity: parse(json['askQuantity']),
+      markPrice: parse(json['markPrice']),
     );
   }
 }
