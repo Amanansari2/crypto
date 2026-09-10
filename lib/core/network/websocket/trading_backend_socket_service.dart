@@ -205,6 +205,7 @@ class TradingBackendSocketService
   final Set<String> _sharedMarketDataSubscriptions = {};
   final Set<String> _orderBookSubscriptions = {};
   final Set<String> _tradeSubscriptions = {};
+  final Set<String> _klineSubscriptions = {};
 
   final StreamController<Map<String, dynamic>>
   _messageController =
@@ -231,7 +232,7 @@ class TradingBackendSocketService
     _manualDisconnect = false;
 
     const url =
-        "ws://192.168.1.72:5001/ws/trading";
+        "ws://192.168.1.33:5001/ws/trading";
 
     LogHelper.log(
       "🔌 Connecting to backend WebSocket",
@@ -498,6 +499,62 @@ class TradingBackendSocketService
 
 
   // =========================================================
+  // KLINES
+  // =========================================================
+
+  void subscribeKlines(
+      String symbol,
+      String interval,
+      ) {
+    final normalizedSymbol =
+    symbol.toUpperCase();
+
+    final normalizedInterval =
+    interval.trim();
+
+    final subscriptionKey =
+        "$normalizedSymbol:$normalizedInterval";
+
+    _klineSubscriptions.add(
+      subscriptionKey,
+    );
+
+    connect();
+
+    if (_channel != null) {
+      send({
+        "type": "SUBSCRIBE_KLINES",
+        "symbol": normalizedSymbol,
+        "interval": normalizedInterval,
+      });
+    }
+  }
+
+  void unsubscribeKlines(
+      String symbol,
+      String interval,
+      ) {
+    final normalizedSymbol =
+    symbol.toUpperCase();
+
+    final normalizedInterval =
+    interval.trim();
+
+    final subscriptionKey =
+        "$normalizedSymbol:$normalizedInterval";
+
+    _klineSubscriptions.remove(
+      subscriptionKey,
+    );
+
+    send({
+      "type": "UNSUBSCRIBE_KLINES",
+      "symbol": normalizedSymbol,
+      "interval": normalizedInterval,
+    });
+  }
+
+  // =========================================================
   // RESTORE SUBSCRIPTIONS
   // =========================================================
 
@@ -540,6 +597,26 @@ class TradingBackendSocketService
       send({
         "type": "SUBSCRIBE_TRADES",
         "symbol": symbol,
+      });
+    }
+
+    for (final subscriptionKey
+    in _klineSubscriptions) {
+
+      final parts =
+      subscriptionKey.split(":");
+
+      if (parts.length != 2) {
+        continue;
+      }
+
+      final symbol = parts[0];
+      final interval = parts[1];
+
+      send({
+        "type": "SUBSCRIBE_KLINES",
+        "symbol": symbol,
+        "interval": interval,
       });
     }
 

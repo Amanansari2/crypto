@@ -21,213 +21,157 @@ import '../widgets/chart_canvas.dart';
 class CustomChartScreen extends ConsumerStatefulWidget {
   final String symbol;
 
-  const CustomChartScreen({
-    super.key,
-    required this.symbol
-  });
+  const CustomChartScreen({super.key, required this.symbol});
 
   @override
-  ConsumerState<CustomChartScreen>
-  createState() =>
-      _CustomChartScreenState();
+  ConsumerState<CustomChartScreen> createState() => _CustomChartScreenState();
 }
 
 class _CustomChartScreenState extends ConsumerState<CustomChartScreen> {
-
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) {
-      ref
-          .read(candleProvider.notifier)
-          .changeSymbol(widget.symbol);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(candleProvider.notifier).changeSymbol(widget.symbol);
     });
   }
 
   @override
-  void didUpdateWidget(covariant CustomChartScreen oldWidget,) {
+  void didUpdateWidget(covariant CustomChartScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.symbol != widget.symbol) {
-      ref
-          .read(candleProvider.notifier)
-          .changeSymbol(widget.symbol);
+      ref.read(candleProvider.notifier).changeSymbol(widget.symbol);
     }
   }
 
   @override
-  Widget build(BuildContext context,) {
-
+  Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
 
+    final candlesAsync = ref.watch(candleProvider);
 
-    final candlesAsync =
-    ref.watch(candleProvider);
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(ChartConfig.chartRadius),
 
-    return
-      Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(ChartConfig.chartRadius),
+        color: dark ? AppColors.blue.withOpacity(0.08) : AppColors.white,
+      ),
 
-          color: dark
-              ? AppColors.blue.withOpacity(0.08)
-              : AppColors.white,
-        ),
+      child: candlesAsync.when(
+        loading: () {
+          return const Center(child: CircularProgressIndicator());
+        },
 
-        child: candlesAsync.when(
+        error: (e, _) {
+          return Center(
+            child: Text(
+              e.toString(),
+              style: const TextStyle(color: Colors.white),
+            ),
+          );
+        },
 
-          loading: () {
-            return const Center(
-              child:
-              CircularProgressIndicator(),
-            );
-          },
+        data: (candles) {
+          return ChartGestureLayer(
+            candles: candles,
+            child: Column(
+              children: [
+                /// 🔥 CHART + PRICE AXIS
+                SizedBox(
+                  height: ChartConfig.mainChartHeight,
 
-          error: (e, _) {
-
-            return Center(
-              child: Text(
-                e.toString(),
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            );
-          },
-
-          data: (candles) {
-            return ChartGestureLayer(
-              candles: candles,
-              child: Column(
-                children: [
-                  /// 🔥 CHART + PRICE AXIS
-                  SizedBox(
-                    height: ChartConfig.mainChartHeight,
-
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          top: BorderSide(
-                            color: Colors.grey.withOpacity(0.25),
-                          ),
-                          bottom: BorderSide(
-                            color: Colors.grey.withOpacity(0.25),
-                          ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: Colors.grey.withOpacity(0.25)),
+                        bottom: BorderSide(
+                          color: Colors.grey.withOpacity(0.25),
                         ),
                       ),
-                      child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            return Stack(
+                    ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Stack(
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: ChartCanvas(
-                                        candles: candles,
-                                      ),
-                                    ),
+                                Expanded(child: ChartCanvas(candles: candles)),
 
-                                    ChartAxis(
-                                      candles: candles,
-                                      viewport: ref.watch(viewportProvider),
-                                      chartWidth: constraints.maxWidth -
-                                          ChartConfig.axisWidth,
-                                    )
-                                  ],
-                                ),
-
-                                CurrentPriceLine(
-
+                                ChartAxis(
                                   candles: candles,
-
-                                  chartHeight:
-                                  constraints.maxHeight,
-
-                                  minPrice:
-                                  ref
-                                      .watch(
-                                    visiblePriceProvider,
-                                  )
-                                      .minPrice,
-
-                                  maxPrice:
-                                  ref
-                                      .watch(
-                                    visiblePriceProvider,
-                                  )
-                                      .maxPrice,
-                                ),
-                                ChartTooltip(
-                                  candles: candles,
-                                ),
-                                Positioned.fill(
-                                  right: ChartConfig.axisWidth,
-                                  child: CrosshairWidget(
-                                    candles: candles,
-                                  ),
-                                ),
-
-
-                                CurrentPriceLabel(
-
-                                  candles: candles,
-
-                                  chartHeight:
-                                  constraints.maxHeight,
-
-                                  minPrice:
-                                  ref
-                                      .watch(
-                                    visiblePriceProvider,
-                                  )
-                                      .minPrice,
-
-                                  maxPrice:
-                                  ref
-                                      .watch(
-                                    visiblePriceProvider,
-                                  )
-                                      .maxPrice,
-                                ),
-
-                                AxisPriceLabel(
-                                  candles: candles,
-                                  chartHeight: constraints.maxHeight,
-                                  chartWidth: constraints.maxWidth -
+                                  viewport: ref.watch(viewportProvider),
+                                  chartWidth:
+                                      constraints.maxWidth -
                                       ChartConfig.axisWidth,
                                 ),
-
-
-                                TimeLabel(
-                                  candles: candles,
-                                  chartWidth: constraints.maxWidth -
-                                      ChartConfig.axisWidth,
-                                ),
-
                               ],
-                            );
-                          }
-                      ),
+                            ),
+
+                            CurrentPriceLine(
+                              candles: candles,
+
+                              chartHeight: constraints.maxHeight,
+
+                              minPrice: ref
+                                  .watch(visiblePriceProvider)
+                                  .minPrice,
+
+                              maxPrice: ref
+                                  .watch(visiblePriceProvider)
+                                  .maxPrice,
+                            ),
+                            ChartTooltip(candles: candles),
+                            Positioned.fill(
+                              right: ChartConfig.axisWidth,
+                              child: CrosshairWidget(candles: candles),
+                            ),
+
+                            CurrentPriceLabel(
+                              candles: candles,
+
+                              chartHeight: constraints.maxHeight,
+
+                              minPrice: ref
+                                  .watch(visiblePriceProvider)
+                                  .minPrice,
+
+                              maxPrice: ref
+                                  .watch(visiblePriceProvider)
+                                  .maxPrice,
+                            ),
+
+                            AxisPriceLabel(
+                              candles: candles,
+                              chartHeight: constraints.maxHeight,
+                              chartWidth:
+                                  constraints.maxWidth - ChartConfig.axisWidth,
+                            ),
+
+                            TimeLabel(
+                              candles: candles,
+                              chartWidth:
+                                  constraints.maxWidth - ChartConfig.axisWidth,
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
-                  TimeAxis(
+                ),
+                TimeAxis(
+                  candles: candles,
 
-                    candles: candles,
+                  viewport: ref.watch(viewportProvider),
+                ),
 
-                    viewport:
-                    ref.watch(
-                      viewportProvider,
-                    ),
-                  ),
-
-                  const IndicatorHost()
-                ],
-              ),
-            );
-          },
-        ),
-      );
+                const IndicatorHost(),
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 }

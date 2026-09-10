@@ -8,24 +8,19 @@ import 'package:crypto_app/features/market/chart_engine/overlays/indicators/volu
 import 'package:crypto_app/features/market/chart_engine/overlays/indicators/wr/wr_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/models/indicators/indicator_type.dart';
 import '../../providers/indicators/active_indicators_provider.dart';
 import 'macd/macd_widget.dart';
 
 class IndicatorHost extends ConsumerWidget {
-  const IndicatorHost({
-    super.key,
-  });
+  const IndicatorHost({super.key});
 
   static const double panelHeight = ChartConfig.chartPanelHeight;
 
   @override
-  Widget build(
-      BuildContext context,
-      WidgetRef ref,
-      ) {
-    final indicators =
-    ref.watch(activeIndicatorsProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final indicators = ref.watch(activeIndicatorsProvider);
 
     if (indicators.isEmpty) {
       return const SizedBox.shrink();
@@ -33,55 +28,38 @@ class IndicatorHost extends ConsumerWidget {
 
     return Column(
       children: indicators.map((type) {
-
         switch (type) {
-
           case IndicatorType.vol:
             return Container(
               height: panelHeight,
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
+                  top: BorderSide(color: Colors.grey.withOpacity(0.25)),
+                  bottom: BorderSide(color: Colors.grey.withOpacity(0.25)),
                 ),
               ),
               child: const VolumeWidget(),
             );
 
-
-            case IndicatorType.rsi:
+          case IndicatorType.rsi:
             return Container(
               height: panelHeight,
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
+                  top: BorderSide(color: Colors.grey.withOpacity(0.25)),
+                  bottom: BorderSide(color: Colors.grey.withOpacity(0.25)),
                 ),
               ),
               child: const RsiWidget(),
             );
-
-
 
           case IndicatorType.macd:
             return Container(
               height: panelHeight,
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
+                  top: BorderSide(color: Colors.grey.withOpacity(0.25)),
+                  bottom: BorderSide(color: Colors.grey.withOpacity(0.25)),
                 ),
               ),
               child: const MacdWidget(),
@@ -92,12 +70,8 @@ class IndicatorHost extends ConsumerWidget {
               height: panelHeight,
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
+                  top: BorderSide(color: Colors.grey.withOpacity(0.25)),
+                  bottom: BorderSide(color: Colors.grey.withOpacity(0.25)),
                 ),
               ),
               child: const KdjWidget(),
@@ -108,12 +82,8 @@ class IndicatorHost extends ConsumerWidget {
               height: panelHeight,
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
+                  top: BorderSide(color: Colors.grey.withOpacity(0.25)),
+                  bottom: BorderSide(color: Colors.grey.withOpacity(0.25)),
                 ),
               ),
               child: const WrWidget(),
@@ -124,12 +94,8 @@ class IndicatorHost extends ConsumerWidget {
               height: panelHeight,
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
+                  top: BorderSide(color: Colors.grey.withOpacity(0.25)),
+                  bottom: BorderSide(color: Colors.grey.withOpacity(0.25)),
                 ),
               ),
               child: const ObvWidget(),
@@ -140,12 +106,8 @@ class IndicatorHost extends ConsumerWidget {
               height: panelHeight,
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
+                  top: BorderSide(color: Colors.grey.withOpacity(0.25)),
+                  bottom: BorderSide(color: Colors.grey.withOpacity(0.25)),
                 ),
               ),
               child: const RocWidget(),
@@ -156,12 +118,8 @@ class IndicatorHost extends ConsumerWidget {
               height: panelHeight,
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.25),
-                  ),
+                  top: BorderSide(color: Colors.grey.withOpacity(0.25)),
+                  bottom: BorderSide(color: Colors.grey.withOpacity(0.25)),
                 ),
               ),
               child: const StochRsiWidget(),
