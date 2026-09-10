@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../provider/binance/contract_info_provider.dart';
+import '../../../../provider/contract_info_provider.dart';
 
 class InfoTab extends ConsumerWidget {
   final String symbol;

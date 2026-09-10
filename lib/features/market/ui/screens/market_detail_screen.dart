@@ -15,7 +15,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/utils/constants/app_colors.dart';
 import '../../chart_engine/ui/screen/chart_screen.dart';
 import '../../chart_engine/ui/widgets/settings/chart_settings_sheet.dart';
-import '../../provider/binance/ticker_provider.dart';
+import '../../provider/ticker_provider.dart';
 import '../widgets/market_detail_widget/last_section/provider/tab_provider.dart';
 import '../widgets/market_detail_widget/price_section.dart';
 import '../widgets/market_detail_widget/stats_section.dart';

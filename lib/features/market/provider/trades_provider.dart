@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/network/websocket/trading_backend_socket_service.dart';
-import '../../data/models/binance/trade_model.dart';
+import '../../../core/network/websocket/trading_backend_socket_service.dart';
+import '../data/models/trade_model.dart';
 
 final tradeProvider =
 StreamProvider.autoDispose.family<

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/models/binance/binance_ticker_model.dart';
-import '../../data/repositories/ticker_repository.dart';
+import '../data/models/binance_ticker_model.dart';
+import '../data/repositories/ticker_repository.dart';
 
 final tickerProvider =
 StreamNotifierProvider.autoDispose.family<TickerNotifier, BinanceTickerModel, String>(

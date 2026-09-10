@@ -29,8 +29,7 @@ class CandleNotifier extends AsyncNotifier<List<CandleModel>> {
   late final CandleRestSource _source;
   late final TradingBackendSocketService _socket;
 
-  String _symbol = "BTCUSDT";
-  //  String? _symbol;
+   String _symbol = "BTCUSDT";
 
   late String _interval;
 

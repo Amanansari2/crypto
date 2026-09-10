@@ -1,5 +1,5 @@
 import '../../../../../core/network/websocket/trading_backend_socket_service.dart';
-import '../models/binance/binance_ticker_model.dart';
+import '../models/binance_ticker_model.dart';
 
 class TickerRepository {
   final TradingBackendSocketService _socket =

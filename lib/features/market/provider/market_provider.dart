@@ -36,15 +36,6 @@ class MarketNotifier extends AsyncNotifier<MarketResponseModel> {
     );
   }
 
-  // Future<void> loadTrending() async {
-  //   _currentType = MarketType.trending;
-  //   state = const AsyncLoading();
-  //
-  //   state = await AsyncValue.guard(
-  //         () => _repository.getTrendingCoins(),
-  //   );
-  // }
-
   Future<void> loadGainers() async {
     LogHelper.log("Load gainers");
     _currentType = MarketType.gainers;

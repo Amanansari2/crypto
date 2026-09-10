@@ -1,4 +1,3 @@
-import 'package:crypto_app/features/market/domain/entities/binance/pair_entity.dart';
 
 class BinanceResponseModel {
   final bool success;
@@ -21,8 +20,15 @@ class BinanceResponseModel {
   }
 }
 
-class PairModel extends PairEntity {
-  PairModel({required super.symbol, required super.baseAsset});
+
+class PairModel {
+  final String symbol;
+  final String baseAsset;
+
+  PairModel({
+    required this.symbol,
+    required this.baseAsset,
+  });
 
   factory PairModel.fromJson(Map<String, dynamic> json) {
     return PairModel(

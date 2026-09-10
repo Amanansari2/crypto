@@ -3,14 +3,14 @@ import 'dart:math' as math;
 
 import 'package:crypto_app/core/utils/constants/app_colors.dart';
 import 'package:crypto_app/core/utils/helpers/logger_helper.dart';
-import 'package:crypto_app/features/market/provider/binance/orderbook/order_book_provider.dart';
+import 'package:crypto_app/features/market/provider/orderbook/order_book_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../data/models/binance/order_book_model.dart';
-import '../../../../provider/binance/orderbook/order_book_step_provider.dart';
+import '../../../../data/models/order_book_model.dart';
+import '../../../../provider/orderbook/order_book_step_provider.dart';
 
 
 class OrderBookTab extends ConsumerWidget {

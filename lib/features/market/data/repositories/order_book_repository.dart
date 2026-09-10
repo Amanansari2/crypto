@@ -1,5 +1,5 @@
 import '../../../../../core/network/websocket/trading_backend_socket_service.dart';
-import '../models/binance/order_book_model.dart';
+import '../models/order_book_model.dart';
 
 class OrderBookRepository {
   final TradingBackendSocketService _socket =

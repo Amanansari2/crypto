@@ -1,4 +1,4 @@
-import 'package:crypto_app/features/market/provider/binance/orderbook/order_book_provider.dart';
+import 'package:crypto_app/features/market/provider/orderbook/order_book_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

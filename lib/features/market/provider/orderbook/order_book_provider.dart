@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/models/binance/order_book_model.dart';
-import '../../../data/repositories/order_book_repository.dart';
+import '../../data/models/order_book_model.dart';
+import '../../data/repositories/order_book_repository.dart';
 
 final orderBookProvider =
 StreamNotifierProvider.autoDispose

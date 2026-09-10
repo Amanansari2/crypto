@@ -1,4 +1,4 @@
-import 'package:crypto_app/features/market/data/models/binance/binance_ticker_model.dart';
+import 'package:crypto_app/features/market/data/models/binance_ticker_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

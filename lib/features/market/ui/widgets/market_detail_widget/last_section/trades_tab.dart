@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../provider/binance/trades_provider.dart';
+import '../../../../provider/trades_provider.dart';
 
 class TradeTab extends ConsumerWidget {
   final String symbol;
