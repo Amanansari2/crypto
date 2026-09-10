@@ -11,6 +11,8 @@ class RouteNames {
   static const String subHome = "subHome";
   static const String subSettings = "subSetting";
   static const String marketDetail = "detail/:symbol";
+  static const String marketSearch = "search";
+  static const String marketSearchName = "MarketSearch";
   static const customInterval = '/custom-interval';
   static const customIntervalName = 'CustomInterval';
   static const customIndicator = '/custom-indicator';

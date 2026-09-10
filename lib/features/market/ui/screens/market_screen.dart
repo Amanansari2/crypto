@@ -44,12 +44,80 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Market"), centerTitle: true),
+      appBar: AppBar(title: Text("Market", style: TextStyle(color: isDark ? AppColors.white : AppColors.black),), centerTitle: true),
       body: Padding(
         padding: EdgeInsets.all(6.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+
+            Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(18.r),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(18.r),
+                onTap: (){
+                  context.pushNamed(RouteNames.marketSearchName);
+                },
+                child: Container(
+                  height: 42.h,
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18.r),
+                    color: isDark
+                        ? AppColors.blue.withOpacity(0.08)
+                        : AppColors.white,
+                
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.blue.withOpacity(0.4)
+                          : Colors.grey.withOpacity(0.4),
+                    ),
+                
+                    boxShadow: isDark
+                        ? []
+                        : [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(
+                          0.05,
+                        ),
+                        blurRadius: 8,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.search,
+                        size: 18.sp,
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
+                      ),
+                      SizedBox(width: 8.w),
+                      Text(
+                        "Search coins, symbol or name...",
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: isDark
+                              ? Colors.grey.shade400
+                              : Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 8.h),
+
+
+
+
             Text(
               AppStrings.trendingCoins,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),

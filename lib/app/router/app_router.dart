@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/market/chart_engine/ui/widgets/interval/custom_inetrval.dart';
+import '../../features/market/ui/screens/search_screen.dart';
 import '../../features/navigation/ui/screens/bottom_nav_screen.dart';
 import '../../features/onboarding/ui/screen/onboarding_screen.dart';
 import 'route_names.dart';
@@ -109,7 +110,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: RouteNames.market,
                 name: "Markets",
                 builder: (context, state) => const MarketScreen(),
-
                 routes: [
                   GoRoute(
                       path: RouteNames.marketDetail,
@@ -118,8 +118,15 @@ final routerProvider = Provider<GoRouter>((ref) {
                         final symbol = state.pathParameters['symbol']!;
                         return MarketDetailScreen(symbol: symbol);
                       },
+                  ),
 
-                  )
+                  GoRoute(
+                    path: RouteNames.marketSearch,
+                    name: RouteNames.marketSearchName,
+                    builder: (context, state) {
+                      return const SearchScreen();
+                    },
+                  ),
                 ],
               ),
             ],
