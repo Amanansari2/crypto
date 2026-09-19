@@ -1,7 +1,7 @@
-import '../../../../../core/network/websocket/trading_backend_socket_service.dart';
-import '../models/order_book_model.dart';
+import '../../../../core/network/websocket/trading_backend_socket_service.dart';
+import '../../../market/data/models/order_book_model.dart';
 
-class OrderBookRepository {
+class HomeOrderBookRepository {
   final TradingBackendSocketService _socket =
   TradingBackendSocketService();
 
@@ -10,8 +10,9 @@ class OrderBookRepository {
 
     _socket.subscribeOrderBook(
       normalizedSymbol,
-      "DETAIL",
+      "HOME",
     );
+
     return _socket.messages
         .where(
           (message) =>
@@ -27,8 +28,8 @@ class OrderBookRepository {
 
   void unsubscribe(String symbol) {
     _socket.unsubscribeOrderBook(
-      symbol,
-      "DETAIL",
+      symbol.toUpperCase(),
+      "HOME",
     );
   }
 }

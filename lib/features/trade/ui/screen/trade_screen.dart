@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../data/providers/order_book_home_provider.dart';
+import '../../data/providers/home_order_book_provider.dart';
 import '../../data/providers/trade_provider.dart';
 import '../widgets/bottom_sheets/order_type_sheet.dart';
 import '../widgets/order_form/order_type_tile.dart';
@@ -20,7 +20,7 @@ class TradeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(tradeHomeProvider);
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final orderBook = ref.watch(orderBookHomeProvider("BTCUSDT"));
+    final orderBook = ref.watch(homeOrderBookProvider("BTCUSDT"));
     return Scaffold(
       appBar: AppBar(
         title:  Text('Trade', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: dark ? AppColors.white : AppColors.black),),

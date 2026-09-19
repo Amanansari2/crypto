@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/providers/order_book_home_provider.dart';
+import '../../../data/providers/home_order_book_provider.dart';
 import 'current_price_tile.dart';
 import 'order_book_header.dart';
 import 'order_book_row.dart';
@@ -16,7 +16,7 @@ class OrderBookWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final orderBook = ref.watch(orderBookHomeProvider(symbol));
+    final orderBook = ref.watch(homeOrderBookProvider(symbol));
 
     return orderBook.when(
       loading: () => const Center(

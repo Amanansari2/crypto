@@ -1,177 +1,3 @@
-// import 'dart:async';
-// import 'dart:convert';
-// import 'dart:developer' as LogHelper;
-//
-// import 'package:web_socket_channel/web_socket_channel.dart';
-//
-// class TradingBackendSocketService {
-//   static final TradingBackendSocketService _instance =
-//   TradingBackendSocketService._internal();
-//
-//   factory TradingBackendSocketService() => _instance;
-//
-//   TradingBackendSocketService._internal();
-//
-//   WebSocketChannel? _channel;
-//   StreamSubscription? _subscription;
-//
-//   final StreamController<Map<String, dynamic>> _messageController =
-//   StreamController<Map<String, dynamic>>.broadcast();
-//
-//   Stream<Map<String, dynamic>> get messages =>
-//       _messageController.stream;
-//
-//   bool get isConnected => _channel != null;
-//
-//   void connect() {
-//     if (_channel != null) {
-//       return;
-//     }
-//
-//     const url = "ws://192.168.1.72:5001/ws/trading";
-//
-//     LogHelper.log("🔌 Connecting to backend WebSocket");
-//     LogHelper.log("🌐 URL: $url");
-//
-//     try {
-//       final channel =
-//       WebSocketChannel.connect(Uri.parse(url));
-//
-//       _channel = channel;
-//
-//
-//       _subscription = channel.stream.listen(
-//             (event) {
-//           try {
-//             final data =
-//             jsonDecode(event as String);
-//
-//             LogHelper.log(
-//               "📥 BACKEND WS: $data",
-//             );
-//
-//             if (data is Map<String, dynamic>) {
-//               _messageController.add(data);
-//             }
-//           } catch (e) {
-//             LogHelper.log(
-//               "❌ Backend WS JSON error: $e",
-//             );
-//           }
-//         },
-//         onError: (error) {
-//           LogHelper.log(
-//             "❌ Backend WS error: $error",
-//           );
-//
-//           _cleanup();
-//         },
-//         onDone: () {
-//           LogHelper.log(
-//             "⚠️ Backend WS disconnected",
-//           );
-//
-//           _cleanup();
-//         },
-//         cancelOnError: false,
-//       );
-//     } catch (e) {
-//       LogHelper.log(
-//         "❌ Backend WS connection failed: $e",
-//       );
-//
-//       _cleanup();
-//     }
-//   }
-//
-//   void send(Map<String, dynamic> message) {
-//     if (_channel == null) {
-//       LogHelper.log(
-//         "⚠️ Cannot send. Backend WS not connected.",
-//       );
-//       return;
-//     }
-//
-//     final encoded = jsonEncode(message);
-//
-//     LogHelper.log(
-//       "📤 BACKEND WS: $encoded",
-//     );
-//
-//     _channel!.sink.add(encoded);
-//   }
-//
-//   void subscribeSymbol(String symbol) {
-//     connect();
-//
-//     send({
-//       "type": "SUBSCRIBE_SYMBOL",
-//       "symbol": symbol.toUpperCase(),
-//     });
-//   }
-//
-//   void unsubscribeSymbol(String symbol) {
-//     send({
-//       "type": "UNSUBSCRIBE_SYMBOL",
-//       "symbol": symbol.toUpperCase(),
-//     });
-//   }
-//
-//   void subscribeSharedMarketData(String symbol) {
-//     connect();
-//
-//     send({
-//       "type": "SUBSCRIBE_SHARED_MARKET_DATA",
-//       "symbol": symbol.toUpperCase(),
-//     });
-//   }
-//
-//   void unsubscribeSharedMarketData(String symbol) {
-//     send({
-//       "type": "UNSUBSCRIBE_SHARED_MARKET_DATA",
-//       "symbol": symbol.toUpperCase(),
-//     });
-//   }
-//
-//   void subscribeOrderBook(String symbol) {
-//     connect();
-//
-//     send({
-//       "type": "SUBSCRIBE_ORDER_BOOK",
-//       "symbol": symbol.toUpperCase(),
-//     });
-//   }
-//
-//   void unsubscribeOrderBook(String symbol) {
-//     send({
-//       "type": "UNSUBSCRIBE_ORDER_BOOK",
-//       "symbol": symbol.toUpperCase(),
-//     });
-//   }
-//
-//   void disconnect() {
-//     LogHelper.log(
-//       "🔌 Disconnecting backend WebSocket",
-//     );
-//
-//     _subscription?.cancel();
-//     _subscription = null;
-//
-//     _channel?.sink.close();
-//     _channel = null;
-//   }
-//
-//   void _cleanup() {
-//     _subscription?.cancel();
-//     _subscription = null;
-//     _channel = null;
-//   }
-//
-//   void dispose() {
-//     disconnect();
-//     _messageController.close();
-//   }
-// }
 
 
 import 'dart:async';
@@ -203,7 +29,8 @@ class TradingBackendSocketService
 
   final Set<String> _symbolSubscriptions = {};
   final Set<String> _sharedMarketDataSubscriptions = {};
-  final Set<String> _orderBookSubscriptions = {};
+  // final Set<String> _orderBookSubscriptions = {};
+  final Map<String, Set<String>> _orderBookSubscriptions = {};
   final Set<String> _tradeSubscriptions = {};
   final Set<String> _klineSubscriptions = {};
 
@@ -232,7 +59,7 @@ class TradingBackendSocketService
     _manualDisconnect = false;
 
     const url =
-        "ws://192.168.1.33:5001/ws/trading";
+        "ws://192.168.1.72:5001/ws/trading";
 
     LogHelper.log(
       "🔌 Connecting to backend WebSocket",
@@ -333,45 +160,7 @@ class TradingBackendSocketService
     _channel!.sink.add(encoded);
   }
 
-  // =========================================================
-  // SYMBOL
-  // =========================================================
 
-  void subscribeSymbol(
-      String symbol,
-      ) {
-    final normalized =
-    symbol.toUpperCase();
-
-    _symbolSubscriptions.add(
-      normalized,
-    );
-
-    connect();
-
-    if (_channel != null) {
-      send({
-        "type": "SUBSCRIBE_SYMBOL",
-        "symbol": normalized,
-      });
-    }
-  }
-
-  void unsubscribeSymbol(
-      String symbol,
-      ) {
-    final normalized =
-    symbol.toUpperCase();
-
-    _symbolSubscriptions.remove(
-      normalized,
-    );
-
-    send({
-      "type": "UNSUBSCRIBE_SYMBOL",
-      "symbol": normalized,
-    });
-  }
 
   // =========================================================
   // SHARED MARKET DATA
@@ -419,40 +208,63 @@ class TradingBackendSocketService
   // ORDER BOOK
   // =========================================================
 
+
+
   void subscribeOrderBook(
       String symbol,
+      String owner,
       ) {
-    final normalized =
-    symbol.toUpperCase();
+    final normalizedSymbol = symbol.toUpperCase();
+    final normalizedOwner = owner.toUpperCase();
 
-    _orderBookSubscriptions.add(
-      normalized,
+    final owners = _orderBookSubscriptions.putIfAbsent(
+      normalizedSymbol,
+          () => <String>{},
     );
+
+    final wasEmpty = owners.isEmpty;
+
+    owners.add(normalizedOwner);
 
     connect();
 
-    if (_channel != null) {
+    // Send to backend only when the first owner subscribes.
+    if (wasEmpty && _channel != null) {
       send({
         "type": "SUBSCRIBE_ORDER_BOOK",
-        "symbol": normalized,
+        "symbol": normalizedSymbol,
       });
     }
   }
 
+
   void unsubscribeOrderBook(
       String symbol,
+      String owner,
       ) {
-    final normalized =
-    symbol.toUpperCase();
+    final normalizedSymbol = symbol.toUpperCase();
+    final normalizedOwner = owner.toUpperCase();
 
-    _orderBookSubscriptions.remove(
-      normalized,
-    );
+    final owners =
+    _orderBookSubscriptions[normalizedSymbol];
+
+    if (owners == null) {
+      return;
+    }
+
+    owners.remove(normalizedOwner);
+
+    // Other consumers still need this order book.
+    if (owners.isNotEmpty) {
+      return;
+    }
+
+    // No consumers remain.
+    _orderBookSubscriptions.remove(normalizedSymbol);
 
     send({
-      "type":
-      "UNSUBSCRIBE_ORDER_BOOK",
-      "symbol": normalized,
+      "type": "UNSUBSCRIBE_ORDER_BOOK",
+      "symbol": normalizedSymbol,
     });
   }
 
@@ -584,8 +396,10 @@ class TradingBackendSocketService
       });
     }
 
+
+
     for (final symbol
-    in _orderBookSubscriptions) {
+    in _orderBookSubscriptions.keys) {
       send({
         "type": "SUBSCRIBE_ORDER_BOOK",
         "symbol": symbol,
