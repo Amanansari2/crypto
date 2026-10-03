@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as LogHelper;
 
+import 'package:crypto_app/core/utils/constants/api_urls.dart';
 import 'package:flutter/widgets.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -28,8 +29,8 @@ class TradingBackendSocketService
   bool _manualDisconnect = false;
 
   final Set<String> _symbolSubscriptions = {};
-  final Set<String> _sharedMarketDataSubscriptions = {};
-  // final Set<String> _orderBookSubscriptions = {};
+  final Map<String, Set<String>> _positionPnlSubscriptions = {};
+  final Map<String, Set<String>> _sharedMarketDataSubscriptions = {};
   final Map<String, Set<String>> _orderBookSubscriptions = {};
   final Set<String> _tradeSubscriptions = {};
   final Set<String> _klineSubscriptions = {};
@@ -58,8 +59,7 @@ class TradingBackendSocketService
 
     _manualDisconnect = false;
 
-    const url =
-        "ws://192.168.1.72:5001/ws/trading";
+    const url = ApiUrls.websocketUrl;
 
     LogHelper.log(
       "🔌 Connecting to backend WebSocket",
@@ -166,41 +166,61 @@ class TradingBackendSocketService
   // SHARED MARKET DATA
   // =========================================================
 
+
   void subscribeSharedMarketData(
       String symbol,
+      String owner,
       ) {
-    final normalized =
-    symbol.toUpperCase();
+    final normalizedSymbol = symbol.toUpperCase();
+    final normalizedOwner = owner.toUpperCase();
 
-    _sharedMarketDataSubscriptions.add(
-      normalized,
+    final owners = _sharedMarketDataSubscriptions.putIfAbsent(
+      normalizedSymbol,
+          () => <String>{},
     );
+
+    final wasEmpty = owners.isEmpty;
+
+    owners.add(normalizedOwner);
 
     connect();
 
-    if (_channel != null) {
+    // Send to backend only when the first owner subscribes.
+    if (wasEmpty && _channel != null) {
       send({
-        "type":
-        "SUBSCRIBE_SHARED_MARKET_DATA",
-        "symbol": normalized,
+        "type": "SUBSCRIBE_SHARED_MARKET_DATA",
+        "symbol": normalizedSymbol,
       });
     }
   }
 
   void unsubscribeSharedMarketData(
       String symbol,
+      String owner,
       ) {
-    final normalized =
-    symbol.toUpperCase();
+    final normalizedSymbol = symbol.toUpperCase();
+    final normalizedOwner = owner.toUpperCase();
 
-    _sharedMarketDataSubscriptions.remove(
-      normalized,
-    );
+    final owners =
+    _sharedMarketDataSubscriptions[normalizedSymbol];
+
+    if (owners == null) {
+      return;
+    }
+
+    owners.remove(normalizedOwner);
+
+    // Other consumers still need this shared market data.
+    if (owners.isNotEmpty) {
+      return;
+    }
+
+    // No consumers remain.
+    _sharedMarketDataSubscriptions.remove(normalizedSymbol);
 
     send({
-      "type":
-      "UNSUBSCRIBE_SHARED_MARKET_DATA",
-      "symbol": normalized,
+      "type": "UNSUBSCRIBE_SHARED_MARKET_DATA",
+      "symbol": normalizedSymbol,
     });
   }
 
@@ -265,6 +285,58 @@ class TradingBackendSocketService
     send({
       "type": "UNSUBSCRIBE_ORDER_BOOK",
       "symbol": normalizedSymbol,
+    });
+  }
+
+  // =========================================================
+// POSITION LIVE PNL
+// =========================================================
+
+  void subscribePositionPnl(String accountId , String owner) {
+    final normalizedAccountId = accountId.trim();
+    final normalizedOwner = owner.toUpperCase();
+
+    if (normalizedAccountId.isEmpty || normalizedOwner.isEmpty) {
+      return;
+    }
+
+    final owners = _positionPnlSubscriptions.putIfAbsent(normalizedAccountId, () => <String>{});
+
+final wasEmpty = owners.isEmpty;
+owners.add(normalizedOwner);
+    connect();
+
+    if (wasEmpty && _channel != null) {
+      send({
+        "type": "SUBSCRIBE_POSITION_PNL",
+        "accountId": normalizedAccountId,
+      });
+    }
+  }
+
+  void unsubscribePositionPnl(String accountId, String owner) {
+    final normalizedAccountId = accountId.trim();
+    final normalizedOwner = owner.toUpperCase();
+
+    if (normalizedAccountId.isEmpty || normalizedOwner.isEmpty) {
+      return;
+    }
+
+final owners = _positionPnlSubscriptions[normalizedAccountId];
+if(owners == null){
+  return;
+}
+owners.remove(normalizedOwner);
+
+if(owners.isNotEmpty){
+  return;
+}
+
+_positionPnlSubscriptions.remove(normalizedAccountId);
+
+    send({
+      "type": "UNSUBSCRIBE_POSITION_PNL",
+      "accountId": normalizedAccountId,
     });
   }
 
@@ -388,7 +460,7 @@ class TradingBackendSocketService
     }
 
     for (final symbol
-    in _sharedMarketDataSubscriptions) {
+    in _sharedMarketDataSubscriptions.keys) {
       send({
         "type":
         "SUBSCRIBE_SHARED_MARKET_DATA",
@@ -411,6 +483,13 @@ class TradingBackendSocketService
       send({
         "type": "SUBSCRIBE_TRADES",
         "symbol": symbol,
+      });
+    }
+
+    for (final accountId in _positionPnlSubscriptions.keys) {
+      send({
+        "type": "SUBSCRIBE_POSITION_PNL",
+        "accountId": accountId,
       });
     }
 

@@ -126,11 +126,10 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
             SizedBox(height: 4.h),
 
             SizedBox(
-              height: 150.h,
+              height: 165.h,
               child: trending.when(
                 data: (data) {
                   final coins = data.coins;
-                  // final pairs = data.pairs;
                   if (coins.isEmpty) {
                     return const Center(child: Text(AppStrings.noTrending));
                   }
@@ -142,9 +141,6 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                       final coin = coins[i];
                       final change = coin.priceChangePercentage24h;
                       final symbol = coin.symbol.toUpperCase() + "USDT";
-
-                      // final isAvailable =
-                      // pairs.any((p) => p.symbol == symbol);
 
                       const isAvailable = true;
                       return GestureDetector(
@@ -209,6 +205,8 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                                             children: [
                                               Text(
                                                 coin.name,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 12.sp,
@@ -217,6 +215,8 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
 
                                               Text(
                                                 coin.symbol,
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                   fontSize: 8.sp,
@@ -324,7 +324,7 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                                                 ),
                                               ),
 
-                                              SizedBox(height: 2.h),
+                                              SizedBox(height: 4.h),
 
                                               Text(
                                                 coin.highPrice.toStringAsFixed(
@@ -355,7 +355,7 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                                                       : AppColors.black,
                                                 ),
                                               ),
-                                              SizedBox(height: 2.h),
+                                              SizedBox(height: 4.h),
 
                                               Text(
                                                 coin.lowPrice.toStringAsFixed(
@@ -378,7 +378,7 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                                           child: Column(
                                             children: [
                                               Text(
-                                                "Open Price",
+                                                "Opening",
                                                 style: TextStyle(
                                                   fontSize: 8,
                                                   color: isDark
@@ -386,7 +386,7 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                                                       : AppColors.black,
                                                 ),
                                               ),
-                                              SizedBox(height: 2.h),
+                                              SizedBox(height: 4.h),
                                               Text(
                                                 coin.openPrice.toStringAsFixed(
                                                   2,

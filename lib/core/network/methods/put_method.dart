@@ -1,18 +1,15 @@
-
-
 import 'package:dio/dio.dart';
 
 import '../dio_client.dart';
 
-class PostMethod {
+class PutMethod {
   final Dio _dio = DioClient().dio;
 
-  Future<Response> postRequest({
+  Future<Response> putRequest({
     required String endpoint,
     dynamic data,
     bool requireAuth = false,
     Map<String, String>? customHeaders,
-    bool isFormData = false,
   }) async {
     try {
       final headers = <String, String>{};
@@ -25,7 +22,7 @@ class PostMethod {
         headers.addAll(customHeaders);
       }
 
-      final response = await _dio.post(
+      final response = await _dio.put(
         endpoint,
         data: data,
         options: Options(headers: headers),
@@ -48,8 +45,10 @@ class PostMethod {
       if (data is Map && data['message'] != null) {
         return Exception(data['message'].toString());
       }
+
       return Exception(
-          "Server error: ${e.response?.statusCode} - ${e.response?.data}");
+        "Server error: ${e.response?.statusCode} - ${e.response?.data}",
+      );
     } else {
       return Exception("Unexpected error");
     }

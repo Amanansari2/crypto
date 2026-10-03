@@ -1,7 +1,8 @@
 class ApiUrls {
 
     // static const String baseUrl = "http://www.tradingfloors.shop/api";
-  static const String baseUrl = "http://192.168.1.72:5001/api";
+  static const String baseUrl = "http://192.168.1.5:5001/api";
+  static const String websocketUrl = "ws://192.168.1.5:5001/ws/trading";
 
   // https://www.tradingfloors.in/api
 
@@ -17,6 +18,15 @@ class ApiUrls {
 
   static const getPairs = "/binance/pairs";
   static const getCandles = "/binance/candles";
-  static const getOrderBook = "/binance/order-book";
   static const getContractInfo = "/binance/contract-info";
+
+//------------------------
+//Trading
+//------------------------
+  static const tradingAccount = "/trading/accounts";
+  static const tradingPositions = "/trading/positions";
+
+//Market Execution
+  static const marketOrder = "/trading/orders/market";
+//------------------------
 }

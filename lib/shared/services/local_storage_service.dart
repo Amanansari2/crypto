@@ -1,11 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
-  // static late SharedPreferences _prefs;
 
-  // static Future<void> init() async {
-  //   _prefs = await SharedPreferences.getInstance();
-  // }
 
   final SharedPreferences prefs;
 
@@ -13,6 +9,7 @@ class LocalStorageService {
 
   static const String _themeKey = "themeMode";
   static const String _onboardingKey = "onboarding_seen";
+  static const String _closeAllConfirmationKey = "close_all_confirmation_skipped";
 
   // static const String _tokenKey = "auth_token";
 
@@ -36,5 +33,21 @@ class LocalStorageService {
 
   bool isOnboardingSeen() {
     return prefs.getBool(_onboardingKey) ?? false;
+  }
+
+  //<<----------------[ Close All Confirmation ]----------------->>
+
+  Future<void> setCloseAllConfirmationSkipped() async {
+    await prefs.setBool(
+      _closeAllConfirmationKey,
+      true,
+    );
+  }
+
+  bool isCloseAllConfirmationSkipped() {
+    return prefs.getBool(
+      _closeAllConfirmationKey,
+    ) ??
+        false;
   }
 }

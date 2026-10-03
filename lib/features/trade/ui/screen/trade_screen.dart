@@ -1,26 +1,51 @@
 import 'package:crypto_app/core/utils/constants/app_colors.dart';
+import 'package:crypto_app/core/utils/helpers/logger_helper.dart';
+import 'package:crypto_app/features/trade/data/providers/order_calculation_provider.dart';
+import 'package:crypto_app/features/trade/data/providers/position/position_provider.dart';
 import 'package:crypto_app/features/trade/ui/widgets/bottom_sheets/leverage_sheet.dart';
 import 'package:crypto_app/features/trade/ui/widgets/bottom_sheets/margin_mode_sheet.dart';
 import 'package:crypto_app/features/trade/ui/widgets/order_form/order_form_builder.dart';
+import 'package:crypto_app/features/trade/ui/widgets/position/position_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../data/providers/home_order_book_provider.dart';
 import '../../data/providers/trade_provider.dart';
+import '../../data/providers/trading_account_provider.dart';
 import '../widgets/bottom_sheets/order_type_sheet.dart';
 import '../widgets/order_form/order_type_tile.dart';
 import '../widgets/order_form/trade_header.dart';
 import '../widgets/orderbook/order_book_widget.dart';
 
-class TradeScreen extends ConsumerWidget {
+class TradeScreen extends ConsumerStatefulWidget  {
   const TradeScreen({super.key});
+  @override
+  ConsumerState<TradeScreen> createState() => _TradeScreenState();
+}
+
+class _TradeScreenState extends ConsumerState<TradeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+
+    await  ref.read(tradingAccountProvider.notifier).getTradingAccount('DEMO001');
+
+      final account = ref.read(tradingAccountProvider).account;
+
+      if (account != null) {
+        ref.read(orderCalculationProvider.notifier).setAvailableBalance(account.availableBalance);
+      }
+
+      await ref.read(positionProvider.notifier).getOpenPositions('DEMO001');
+    });
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context, ) {
     final state = ref.watch(tradeHomeProvider);
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final orderBook = ref.watch(homeOrderBookProvider("BTCUSDT"));
+    final accountState = ref.watch(tradingAccountProvider);
     return Scaffold(
       appBar: AppBar(
         title:  Text('Trade', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: dark ? AppColors.white : AppColors.black),),
@@ -28,9 +53,13 @@ class TradeScreen extends ConsumerWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children:  [
-            Row(children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               Expanded(
+                flex: 5,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -65,7 +94,9 @@ class TradeScreen extends ConsumerWidget {
                       ),
                       ),
 
-                        Text("Available balance USDT",
+                        Text( accountState.account == null
+                            ? '-- USDT'
+                            : '${accountState.account!.availableBalance.toStringAsFixed(2)} USDT',
                           style: TextStyle(
                               color: dark ? AppColors.white : AppColors.black,
                               fontSize: 12,
@@ -97,10 +128,12 @@ class TradeScreen extends ConsumerWidget {
               ),
 
 
+              SizedBox(width: 15,),
 
               Expanded(
+                flex: 3,
                 child: SizedBox(
-                  height: 650,
+                  height: 460,
                   child: OrderBookWidget(
                     symbol: "BTCUSDT",
                   ),
@@ -109,11 +142,7 @@ class TradeScreen extends ConsumerWidget {
             ],),
 
 
-
-
-
-
-
+            PositionsSection(accountId: "DEMO001")
            ],
         ),
       ),

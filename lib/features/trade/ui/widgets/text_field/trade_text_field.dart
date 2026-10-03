@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../../../../core/utils/constants/app_colors.dart';
 
@@ -14,6 +15,8 @@ class TradeTextField extends StatefulWidget {
 
   final Widget? prefix;
   final Widget? suffix;
+  final String? errorText;
+
 
   final VoidCallback? onPrefixTap;
   final VoidCallback? onSuffixTap;
@@ -21,6 +24,7 @@ class TradeTextField extends StatefulWidget {
   final bool hideAffixesWhenTyping;
   final bool readOnly;
   final bool showAffixesUntilFocused;
+  final List<TextInputFormatter>? inputFormatters;
 
   const TradeTextField({
     super.key,
@@ -31,11 +35,13 @@ class TradeTextField extends StatefulWidget {
     this.labelText,
     this.prefix,
     this.suffix,
+    this.errorText,
     this.onPrefixTap,
     this.onSuffixTap,
     this.hideAffixesWhenTyping = false,
     this.readOnly = false,
     this.showAffixesUntilFocused = false,
+    this.inputFormatters,
   });
 
   @override
@@ -97,7 +103,8 @@ class _TradeTextFieldState extends State<TradeTextField> {
         : (widget.hideAffixesWhenTyping && hasText);
 
     return SizedBox(
-      height: 40,
+      // height: 40,
+      height: widget.errorText != null ? 55 : 40,
       child: Center(
         child: Theme(
           data: Theme.of(context).copyWith(
@@ -120,6 +127,7 @@ class _TradeTextFieldState extends State<TradeTextField> {
             ),
           ),
           child: TextFormField(
+            inputFormatters: widget.inputFormatters,
             readOnly: widget.readOnly,
             controller: widget.controller,
             focusNode: _focusNode,
@@ -139,6 +147,7 @@ class _TradeTextFieldState extends State<TradeTextField> {
               labelText: widget.showAffixesUntilFocused
                   ? (isEditing ? widget.labelText : null)
                   : widget.labelText,
+              errorText: widget.errorText,
               labelStyle: TextStyle(
                 color: widget.dark ? AppColors.white : AppColors.black
               ),

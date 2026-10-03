@@ -16,13 +16,13 @@ class TradeButtons extends StatelessWidget {
     return Column(
       children: [
         _TradeButton(
-          label: 'Demo Buy (Long)',
+          label: 'Buy (Long)',
           color: AppColors.green,
           onTap: onBuy,
         ),
         const SizedBox(height: 10),
         _TradeButton(
-          label: 'Demo Sell (Short)',
+          label: 'Sell (Short)',
           color: AppColors.red,
           onTap: onSell,
         ),

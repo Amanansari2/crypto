@@ -24,37 +24,28 @@ class OrderBookRow extends StatelessWidget {
         : AppColors.green;
 
     return SizedBox(
-      height: 22.h,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.w),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                price.toStringAsFixed(2),
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w500,
-                  color: priceColor,
-                ),
-              ),
+      height: 18.h,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            price.toStringAsFixed(2),
+            style: TextStyle(
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w500,
+              color: priceColor,
             ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  quantity.toStringAsFixed(4),
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: dark
-                        ? AppColors.white
-                        : AppColors.black,
-                  ),
-                ),
-              ),
+          ),
+          Text(
+            quantity.toStringAsFixed(4),
+            style: TextStyle(
+              fontSize: 10.sp,
+              color: dark
+                  ? AppColors.white
+                  : AppColors.black,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

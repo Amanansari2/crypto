@@ -40,6 +40,12 @@ class TradeHomeNotifier extends Notifier<TradeState> {
     );
   }
 
+  void setAmount(double value) {
+    state = state.copyWith(
+      amount: value,
+    );
+  }
+
   void setOrderType(String value) {
     state = state.copyWith(orderType: value);
   }

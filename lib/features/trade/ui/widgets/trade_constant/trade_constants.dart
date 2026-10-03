@@ -38,4 +38,9 @@ class TradeConstants {
     'Decreasing',
     'Random',
   ];
+
+  static const priceType = [
+    'USDT',
+    'BTC',
+  ];
 }
