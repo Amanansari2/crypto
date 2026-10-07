@@ -22,6 +22,8 @@ class PositionsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final positionNotifier = ref.read(positionProvider.notifier);
+    positionNotifier.listenPositionClosed(accountId);
     final state = ref.watch(positionProvider);
     final pnlState = ref.watch(positionPnlProvider(accountId));
 
@@ -68,9 +70,12 @@ class PositionsSection extends ConsumerWidget {
           Column(
             children: state.positions
                 .map(
-                  (position) => PositionCard(
-                    position: position,
-                    livePnl: pnlState.value?[position.id],
+                  (position) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: PositionCard(
+                      position: position,
+                      livePnl: pnlState.value?[position.id],
+                    ),
                   ),
                 )
                 .toList(),

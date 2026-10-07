@@ -8,7 +8,8 @@ import '../../../data/providers/trade_provider.dart';
 import '../order_form/leverage_slider.dart';
 
 class LeverageSheet extends ConsumerStatefulWidget {
-  const LeverageSheet({super.key});
+  final String symbol;
+  const LeverageSheet({super.key, required this.symbol});
 
   @override
   ConsumerState<LeverageSheet> createState() => _LeverageSheetState();
@@ -66,8 +67,8 @@ class _LeverageSheetState extends ConsumerState<LeverageSheet> {
 
             Row(
               children: [
-                const Text(
-                  'BTCUSDT Perp',
+                 Text(
+                  '${widget.symbol} Perp',
                   style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
 

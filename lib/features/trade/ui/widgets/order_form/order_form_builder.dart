@@ -9,7 +9,8 @@ import 'market_order_form.dart';
 import 'trigger_order_form.dart';
 
 class OrderFormBuilder extends ConsumerWidget {
-  const OrderFormBuilder({super.key});
+  final String symbol;
+  const OrderFormBuilder({super.key, required this.symbol});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,7 +18,7 @@ class OrderFormBuilder extends ConsumerWidget {
 
     switch (state.orderType) {
       case 'Market':
-        return const MarketOrderForm();
+        return  MarketOrderForm(symbol: symbol,);
 
       case 'Advanced Limit':
         return const AdvancedLimitForm();

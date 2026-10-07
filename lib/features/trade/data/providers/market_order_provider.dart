@@ -54,17 +54,17 @@ class MarketOrderNotifier extends Notifier<MarketOrderState> {
     return const MarketOrderState();
   }
 
-  Future<void> placeBuyOrder() async {
-    await _placeOrder('BUY');
+  Future<void> placeBuyOrder(String symbol) async {
+    await _placeOrder('BUY', symbol);
   }
 
-  Future<void> placeSellOrder() async {
-    await _placeOrder('SELL');
+  Future<void> placeSellOrder(String symbol) async {
+    await _placeOrder('SELL', symbol);
   }
 
-  Future<void> _placeOrder(String side) async {
+  Future<void> _placeOrder(String side, String symbol) async {
     final calculation = ref.read(orderCalculationProvider);
-    final tickerAsync = ref.read(homeTickerProvider('BTCUSDT'));
+    final tickerAsync = ref.read(homeTickerProvider(symbol));
 
     if (!tickerAsync.hasValue) {
       state = state.copyWith(
@@ -113,7 +113,7 @@ class MarketOrderNotifier extends Notifier<MarketOrderState> {
 
     final request = MarketOrderRequest(
       accountId: 'DEMO001',
-      symbol: 'BTCUSDT',
+      symbol: symbol,
       side: side,
       quantity: quantity,
       leverage: calculation.leverage,

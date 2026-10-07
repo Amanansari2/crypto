@@ -6,11 +6,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../data/providers/home_ticker_provider.dart';
 
 class CurrentPriceTile extends ConsumerWidget {
-  const CurrentPriceTile({super.key});
+  final String symbol;
+  const CurrentPriceTile({super.key, required this.symbol});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(homeTickerProvider("BTCUSDT"),);
+    final provider = ref.watch(homeTickerProvider(symbol),);
     final dark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 6.h),

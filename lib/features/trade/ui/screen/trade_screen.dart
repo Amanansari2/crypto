@@ -1,5 +1,4 @@
 import 'package:crypto_app/core/utils/constants/app_colors.dart';
-import 'package:crypto_app/core/utils/helpers/logger_helper.dart';
 import 'package:crypto_app/features/trade/data/providers/order_calculation_provider.dart';
 import 'package:crypto_app/features/trade/data/providers/position/position_provider.dart';
 import 'package:crypto_app/features/trade/ui/widgets/bottom_sheets/leverage_sheet.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../data/providers/trade_provider.dart';
 import '../../data/providers/trading_account_provider.dart';
+import '../widgets/bottom_sheets/coin_search_sheet.dart';
 import '../widgets/bottom_sheets/order_type_sheet.dart';
 import '../widgets/order_form/order_type_tile.dart';
 import '../widgets/order_form/trade_header.dart';
@@ -24,6 +24,7 @@ class TradeScreen extends ConsumerStatefulWidget  {
 }
 
 class _TradeScreenState extends ConsumerState<TradeScreen> {
+  String _selectedSymbol = 'BTCUSDT';
   @override
   void initState() {
     super.initState();
@@ -63,6 +64,8 @@ class _TradeScreenState extends ConsumerState<TradeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _buildCoinSearchBar(context, dark,),
+                    SizedBox(height: 10,),
                     TradeHeader(
                       isIsolated: state.isIsolated,
                       leverage: state.leverage,
@@ -77,7 +80,7 @@ class _TradeScreenState extends ConsumerState<TradeScreen> {
                         showModalBottomSheet(
                           backgroundColor: Colors.transparent,
                           context: context,
-                          builder: (context) => const LeverageSheet(),
+                          builder: (context) =>  LeverageSheet(symbol: _selectedSymbol,),
                         );
                       },
                     ),
@@ -117,7 +120,7 @@ class _TradeScreenState extends ConsumerState<TradeScreen> {
                       },
                     ),
                     SizedBox(height: 8),
-                    const OrderFormBuilder(),
+                     OrderFormBuilder( symbol: _selectedSymbol,),
 
                     SizedBox(height: 12),
 
@@ -135,7 +138,7 @@ class _TradeScreenState extends ConsumerState<TradeScreen> {
                 child: SizedBox(
                   height: 460,
                   child: OrderBookWidget(
-                    symbol: "BTCUSDT",
+                    symbol: _selectedSymbol,
                   ),
                 ),
               ),
@@ -144,6 +147,76 @@ class _TradeScreenState extends ConsumerState<TradeScreen> {
 
             PositionsSection(accountId: "DEMO001")
            ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCoinSearchBar(
+      BuildContext context,
+      bool dark,
+      ) {
+    return InkWell(
+      onTap: () async {
+        final selectedSymbol =
+        await showModalBottomSheet<String>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) {
+            return const CoinSearchSheet();
+          },
+        );
+
+        if (selectedSymbol == null) {
+          return;
+        }
+        setState(() {
+          _selectedSymbol = selectedSymbol;
+        });
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        height: 42,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: dark
+              ? AppColors.blue.withOpacity(0.08)
+              : AppColors.white,
+          border: Border.all(
+            color: dark
+                ? AppColors.blue.withOpacity(0.4)
+                : Colors.grey.withOpacity(0.4),
+          ),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.search,
+              size: 18,
+            ),
+
+            const SizedBox(width: 8),
+
+             Expanded(
+              child: Text(
+                _selectedSymbol,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+            const Icon(
+              Icons.keyboard_arrow_down,
+              size: 18,
+            ),
+          ],
         ),
       ),
     );

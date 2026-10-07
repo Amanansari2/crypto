@@ -77,7 +77,7 @@ class OrderBookWidget extends ConsumerWidget {
               },
             ),
 
-            Center(child:  CurrentPriceTile()),
+            Center(child:  CurrentPriceTile(symbol: symbol,)),
 
             /// BID
             ListView.builder(

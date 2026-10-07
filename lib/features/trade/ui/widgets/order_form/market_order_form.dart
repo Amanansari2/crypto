@@ -12,7 +12,8 @@ import '../bottom_sheets/price_type_sheet.dart';
 import '../text_field/trade_text_field.dart';
 
 class MarketOrderForm extends ConsumerStatefulWidget {
-  const MarketOrderForm({super.key});
+  final String symbol;
+  const MarketOrderForm({super.key, required this.symbol});
 
   @override
   ConsumerState<MarketOrderForm> createState() => _MarketOrderFormState();
@@ -31,12 +32,26 @@ class _MarketOrderFormState extends ConsumerState<MarketOrderForm> {
 
       ref.read(orderCalculationProvider.notifier).setLeverage(leverage);
     });
-    ref.listenManual(homeTickerProvider("BTCUSDT"),
-        (previous, next){
-      next.whenData((ticker){
-        ref.read(orderCalculationProvider.notifier).setMarketPrice(ticker.lastPrice);
-      });
+    // ref.listenManual(homeTickerProvider(widget.symbol),
+    //     (previous, next){
+    //   next.whenData((ticker){
+    //     ref.read(orderCalculationProvider.notifier).setMarketPrice(ticker.lastPrice);
+    //   });
+    //     });
+    _listenToTicker(widget.symbol);
+  }
+
+  void _listenToTicker(String symbol) {
+    ref.listenManual(
+      homeTickerProvider(symbol),
+          (previous, next) {
+        next.whenData((ticker) {
+          ref
+              .read(orderCalculationProvider.notifier)
+              .setMarketPrice(ticker.lastPrice);
         });
+      },
+    );
   }
 
   @override
@@ -57,7 +72,7 @@ class _MarketOrderFormState extends ConsumerState<MarketOrderForm> {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final tickerAsync = ref.watch(homeTickerProvider("BTCUSDT"),);
+    final tickerAsync = ref.watch(homeTickerProvider(widget.symbol),);
     final marketOrderState = ref.watch(marketOrderProvider);
     final calculationState = ref.watch(orderCalculationProvider);
 
@@ -290,10 +305,10 @@ class _MarketOrderFormState extends ConsumerState<MarketOrderForm> {
 
         TradeButtons(
           onBuy: () {
-           ref.read(marketOrderProvider.notifier).placeBuyOrder();
+           ref.read(marketOrderProvider.notifier).placeBuyOrder(widget.symbol);
           },
           onSell: () {
-            ref.read(marketOrderProvider.notifier).placeSellOrder();
+            ref.read(marketOrderProvider.notifier).placeSellOrder(widget.symbol);
           },
         ),
 

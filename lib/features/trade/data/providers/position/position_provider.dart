@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:crypto_app/core/network/websocket/trading_backend_socket_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/position/position_model.dart';
@@ -36,10 +39,22 @@ class PositionState {
 
 class PositionNotifier extends Notifier<PositionState> {
   late final PositionRepository _repository;
+  String? _listeningAccountId;
+
+  final TradingBackendSocketService _socket = TradingBackendSocketService();
+
+
+  StreamSubscription<Map<String, dynamic>>? _positionClosedSubscription;
 
   @override
   PositionState build() {
     _repository = PositionRepository();
+
+    ref.onDispose(() {
+      _positionClosedSubscription?.cancel();
+      _positionClosedSubscription = null;
+      _listeningAccountId = null;
+    });
 
     return const PositionState();
   }
@@ -68,6 +83,32 @@ class PositionNotifier extends Notifier<PositionState> {
       );
     }
   }
+
+  void listenPositionClosed(String accountId) {
+    final normalizedAccountId = accountId.trim();
+
+    // Already listening for this account.
+    if (_listeningAccountId == normalizedAccountId &&
+        _positionClosedSubscription != null) {
+      return;
+    }
+
+    _positionClosedSubscription?.cancel();
+
+    _listeningAccountId = normalizedAccountId;
+
+    _positionClosedSubscription = _socket.messages
+        .where(
+          (message) =>
+      message['type'] == 'POSITION_CLOSED' &&
+          message['accountId']?.toString() ==
+              normalizedAccountId,
+    )
+        .listen((message) {
+      getOpenPositions(normalizedAccountId);
+    });
+  }
+
 
   void clear() {
     state = const PositionState();

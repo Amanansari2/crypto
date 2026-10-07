@@ -26,7 +26,7 @@ class OrderCalculationState {
     this.cost = 0,
     this.notional = 0,
     this.minimumAmount = 0,
-    this.minimumLotSize = 0.0001,
+    this.minimumLotSize = 0.00001,
     this.maxAmount = 0,
     this.sliderPercent = 0,
     this.availableBalance = 0,
@@ -69,7 +69,7 @@ class OrderCalculationState {
 
 class OrderCalculationNotifier
     extends Notifier<OrderCalculationState> {
-  static const double minimumLotSize = 0.0001;
+  static const double minimumLotSize = 0.00001;
 
   @override
   OrderCalculationState build() {

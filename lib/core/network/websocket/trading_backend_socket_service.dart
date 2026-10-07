@@ -35,12 +35,9 @@ class TradingBackendSocketService
   final Set<String> _tradeSubscriptions = {};
   final Set<String> _klineSubscriptions = {};
 
-  final StreamController<Map<String, dynamic>>
-  _messageController =
-  StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<Map<String, dynamic>> _messageController = StreamController<Map<String, dynamic>>.broadcast();
 
-  Stream<Map<String, dynamic>> get messages =>
-      _messageController.stream;
+  Stream<Map<String, dynamic>> get messages => _messageController.stream;
 
   bool get isConnected => _channel != null;
 
@@ -65,9 +62,7 @@ class TradingBackendSocketService
       "🔌 Connecting to backend WebSocket",
     );
 
-    LogHelper.log(
-      "🌐 URL: $url",
-    );
+    LogHelper.log("🌐 URL: $url",);
 
     try {
       final channel =
@@ -174,10 +169,7 @@ class TradingBackendSocketService
     final normalizedSymbol = symbol.toUpperCase();
     final normalizedOwner = owner.toUpperCase();
 
-    final owners = _sharedMarketDataSubscriptions.putIfAbsent(
-      normalizedSymbol,
-          () => <String>{},
-    );
+    final owners = _sharedMarketDataSubscriptions.putIfAbsent(normalizedSymbol, () => <String>{},);
 
     final wasEmpty = owners.isEmpty;
 
@@ -201,8 +193,7 @@ class TradingBackendSocketService
     final normalizedSymbol = symbol.toUpperCase();
     final normalizedOwner = owner.toUpperCase();
 
-    final owners =
-    _sharedMarketDataSubscriptions[normalizedSymbol];
+    final owners = _sharedMarketDataSubscriptions[normalizedSymbol];
 
     if (owners == null) {
       return;
