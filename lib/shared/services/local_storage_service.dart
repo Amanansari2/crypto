@@ -10,6 +10,7 @@ class LocalStorageService {
   static const String _themeKey = "themeMode";
   static const String _onboardingKey = "onboarding_seen";
   static const String _closeAllConfirmationKey = "close_all_confirmation_skipped";
+  static const String _cancelOrderConfirmationKey = "cancel_order_confirmation_skipped";
 
   // static const String _tokenKey = "auth_token";
 
@@ -50,4 +51,22 @@ class LocalStorageService {
     ) ??
         false;
   }
+
+
+  //<<----------------[ Cancel Order Confirmation ]----------------->>
+
+  Future<void> setCancelOrderConfirmationSkipped() async {
+    await prefs.setBool(
+      _cancelOrderConfirmationKey,
+      true,
+    );
+  }
+
+  bool isCancelOrderConfirmationSkipped() {
+    return prefs.getBool(
+      _cancelOrderConfirmationKey,
+    ) ??
+        false;
+  }
+
 }

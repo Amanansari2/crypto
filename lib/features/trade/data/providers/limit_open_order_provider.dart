@@ -107,6 +107,55 @@ class LimitOpenOrderNotifier extends Notifier<LimitOpenOrderState> {
   }
 
 
+  Future<bool> modifyLimitOrder({
+    required String tradeId,
+    required Map<String, dynamic> data,
+    required String accountId,
+  }) async {
+    state = state.copyWith(clearError: true);
+
+    try {
+      final response = await _repository.modifyLimitOrder(
+        tradeId: tradeId,
+        data: data,
+      );
+
+      if (response['success'] != true) {
+        throw Exception(
+          response['message']?.toString() ??
+              'Failed to modify limit order',
+        );
+      }
+
+      await getOpenLimitOrders(accountId);
+
+      return true;
+    } catch (e) {
+     rethrow;
+    }
+  }
+
+  Future<bool> cancelLimitOrder({
+    required String tradeId,
+    required String accountId,
+  }) async {
+    final response = await _repository.cancelLimitOrder(
+      tradeId: tradeId,
+      accountId: accountId,
+    );
+
+    if (response['success'] != true) {
+      throw Exception(
+        response['message']?.toString() ?? 'Failed to cancel order',
+      );
+    }
+
+    await getOpenLimitOrders(accountId);
+    return true;
+  }
+
+
+
   void clear() {
     state = const LimitOpenOrderState();
   }

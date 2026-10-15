@@ -14,6 +14,8 @@ class LimitOpenOrder{
   final String status;
   final double filledQuantity;
   final double? averagePrice;
+  final double? takeProfit;
+  final double? stopLoss;
   final DateTime? createdAt;
 
   const LimitOpenOrder({
@@ -31,6 +33,8 @@ class LimitOpenOrder{
     required this.status,
     required this.filledQuantity,
     required this.averagePrice,
+    required this.takeProfit,
+    required this.stopLoss,
     required this.createdAt,
   });
 
@@ -53,6 +57,13 @@ class LimitOpenOrder{
       averagePrice: json['averagePrice'] == null
           ? null
           : double.parse(json['averagePrice'].toString()),
+      takeProfit: json['takeProfit'] == null
+          ? null
+          : double.parse(json['takeProfit'].toString()),
+
+      stopLoss: json['stopLoss'] == null
+          ? null
+          : double.parse(json['stopLoss'].toString()),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.tryParse(json['createdAt'].toString()),

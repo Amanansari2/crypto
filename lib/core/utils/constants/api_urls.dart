@@ -35,4 +35,7 @@ class ApiUrls {
 
 //Open Order
   static const String openLimitOrders = '/trading/orders/open';
+//Modify Order
+  static const String modifyLimitOrders = '/trading/orders';
+
 }

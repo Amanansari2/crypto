@@ -14,6 +14,7 @@ class DeleteMethod {
     Map<String, dynamic>? queryParams,
     bool requireAuth = false,
     Map<String, String>? customHeaders,
+    Map<String, dynamic>? data,
   }) async {
     try {
       final headers = <String, String>{};
@@ -28,6 +29,7 @@ class DeleteMethod {
 
       final response = await _dio.delete(
         endpoint,
+        data: data,
         queryParameters: queryParams,
         options: Options(headers: headers),
       );

@@ -15,6 +15,7 @@ import '../../../data/providers/position/position_close_provider.dart';
 import '../../../data/providers/position/position_pnl_provider.dart';
 import '../../../data/providers/position/position_provider.dart';
 import '../../../data/providers/trading_account_provider.dart';
+import 'modify_limit_order_bottom_sheet.dart';
 
 
 class PositionsSection extends ConsumerStatefulWidget {
@@ -525,14 +526,18 @@ class PositionCard extends ConsumerWidget {
                 onPressed: () async {
                   final localStorage = ref.read(localStorageProvider);
 
-                  final skipConfirmation = localStorage
-                      .isCloseAllConfirmationSkipped();
 
-                  if (!skipConfirmation) {
-                    final confirmed = await _showCloseAllConfirmation(
-                      context,
-                      position,
-                      localStorage,
+
+                  if (!localStorage.isCloseAllConfirmationSkipped()) {
+                    final confirmed = await _showTradeConfirmation(
+                      context: context,
+                      title: 'Close Position',
+                      message:
+                      'Are you sure you want to close the entire '
+                          '${position.symbol} ${position.side} position?',
+                      confirmText: 'Close All',
+
+                      onNeverShowAgain: localStorage.setCloseAllConfirmationSkipped
                     );
                     if (!confirmed) {
                       return;
@@ -585,123 +590,10 @@ class PositionCard extends ConsumerWidget {
       ),
     );
   }
-
-  Future<bool> _showCloseAllConfirmation(
-    BuildContext context,
-    PositionModel position,
-    LocalStorageService localStorage,
-  ) async {
-    bool neverShowAgain = false;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-
-    final result = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Text('Close Position?'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Are you sure you want to close the entire '
-                    '${position.symbol} ${position.side} position?',
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: neverShowAgain,
-                        onChanged: (value) {
-                          setDialogState(() {
-                            neverShowAgain = value ?? false;
-                          });
-                        },
-                      ),
-                      const Expanded(child: Text('Never show this again')),
-                    ],
-                  ),
-                ],
-              ),
-              actions: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 40,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: dark ? AppColors.blue : Colors.grey.shade400,
-                              foregroundColor:  dark ? AppColors.white : AppColors.black,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)
-                              ),
-                            textStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-
-                          onPressed: () {
-                            Navigator.pop(dialogContext, false);
-                          },
-                          child: const Text('Cancel'),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20,),
-
-                    Expanded(
-                      child: SizedBox(
-                        height: 40,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Colors.blue,
-                            foregroundColor: dark
-                                ? AppColors.white
-                                : AppColors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            textStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                          onPressed: () async {
-                            if (neverShowAgain) {
-                              await localStorage.setCloseAllConfirmationSkipped();
-                            }
-
-                            if (dialogContext.mounted) {
-                              Navigator.pop(dialogContext, true);
-                            }
-                          },
-                          child: const Text('Close All'),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-
-    return result ?? false;
-  }
 }
 
 
-class LimitOpenOrderCard extends StatelessWidget {
+class LimitOpenOrderCard extends ConsumerWidget {
   const LimitOpenOrderCard({
     super.key,
     required this.order,
@@ -710,7 +602,7 @@ class LimitOpenOrderCard extends StatelessWidget {
   final LimitOpenOrder order;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isBuy = order.side.toUpperCase() == 'BUY';
 
@@ -781,6 +673,7 @@ class LimitOpenOrderCard extends StatelessWidget {
           const Divider(),
           const SizedBox(height: 8),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
                 child: _InfoItem(
@@ -789,9 +682,12 @@ class LimitOpenOrderCard extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: _InfoItem(
-                  label: 'Quantity',
-                  value: order.quantity.toStringAsFixed(5),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: _InfoItem(
+                    label: 'Quantity',
+                    value: order.quantity.toStringAsFixed(5),
+                  ),
                 ),
               ),
               Expanded(
@@ -810,32 +706,155 @@ class LimitOpenOrderCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _InfoItem(
-                  label: 'Filled Quantity',
-                  value: order.filledQuantity.toString(),
+                  label: 'Created At',
+                  value: createdAtText,
                 ),
               ),
               Expanded(
-                child: _InfoItem(
-                  label: 'Position Side',
-                  value: order.positionSide,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: _InfoItem(
+                    label: 'Take Profit',
+                    value: order.takeProfit?.toString()?? '--',
+                  ),
                 ),
               ),
               Expanded(
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: _InfoItem(
-                    label: 'Margin Mode',
-                    value: order.marginMode,
+                    label: 'Stop Loss',
+                    value: order.stopLoss?.toString() ?? '--',
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          _InfoItem(
-            label: 'Created At',
-            value: createdAtText,
+          const SizedBox(height: 14),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDark
+                        ? AppColors.blue.withOpacity(0.08)
+                        : AppColors.white,
+                    side: BorderSide(
+                      color: isDark
+                          ? Colors.blue.withOpacity(0.4)
+                          : Colors.grey.withOpacity(0.4),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    foregroundColor: isDark ? AppColors.white : AppColors.black,
+                    textStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                  onPressed: () async {
+                    final updated = await showModalBottomSheet<bool>(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(18),
+                        ),
+                      ),
+                      builder: (_) => ModifyLimitOrderBottomSheet(
+                        order: order,
+                        accountId: order.accountId,
+                      ),
+                    );
+
+                    if (updated == true && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Limit order modified successfully'),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Modify Order'),
+                ),
+              ),
+              SizedBox(width: 20,),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDark
+                        ? AppColors.blue.withOpacity(0.08)
+                        : AppColors.white,
+                    side: BorderSide(
+                      color: isDark
+                          ? Colors.blue.withOpacity(0.4)
+                          : Colors.grey.withOpacity(0.4),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    foregroundColor: isDark ? AppColors.white : AppColors.black,
+                    textStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+
+                  onPressed: () async {
+                    final localStorage = ref.read(localStorageProvider);
+
+                    if (!localStorage.isCancelOrderConfirmationSkipped()) {
+                      final confirmed = await _showTradeConfirmation(
+                        context: context,
+                        title: 'Cancel Order',
+                        message:
+                        'Are you sure you want to cancel the '
+                            '${order.symbol} ${order.side} limit order?',
+                        confirmText: 'Cancel Order',
+
+                        onNeverShowAgain:
+                        localStorage.setCancelOrderConfirmationSkipped,
+                      );
+
+                      if (!confirmed) return;
+                    }
+
+                    try {
+                      await ref
+                          .read(limitOpenOrderProvider.notifier)
+                          .cancelLimitOrder(
+                        tradeId: order.tradeId,
+                        accountId: order.accountId,
+                      );
+
+                      if (!context.mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Limit order cancelled successfully'),
+                        ),
+                      );
+                    } catch (e) {
+                      if (!context.mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to cancel order: $e'),
+                        ),
+                      );
+                    }
+                  },
+
+                  child: const Text('Cancel Order'),
+                ),
+              ),
+            ],
           ),
+
         ],
       ),
     );
@@ -880,3 +899,116 @@ class _InfoItem extends StatelessWidget {
     );
   }
 }
+
+Future<bool> _showTradeConfirmation({
+  required BuildContext context,
+  required String title,
+  required String message,
+  required String confirmText,
+  required Future<void> Function() onNeverShowAgain,
+}) async {
+  bool neverShowAgain = false;
+  final dark = Theme.of(context).brightness == Brightness.dark;
+
+  final result = await showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (dialogContext) {
+      return StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: Text(title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(message),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: neverShowAgain,
+                      onChanged: (value) {
+                        setDialogState(() {
+                          neverShowAgain = value ?? false;
+                        });
+                      },
+                    ),
+                    const Expanded(
+                      child: Text('Never show this again'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            actions: [
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 40,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: dark
+                              ? AppColors.blue
+                              : Colors.grey.shade400,
+                          foregroundColor: dark
+                              ? AppColors.white
+                              : AppColors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(dialogContext, false);
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: SizedBox(
+                      height: 40,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: dark
+                              ? AppColors.white
+                              : AppColors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                        onPressed: () async {
+                          if (neverShowAgain) {
+                            await onNeverShowAgain();
+                          }
+
+                          if (dialogContext.mounted) {
+                            Navigator.pop(dialogContext, true);
+                          }
+                        },
+                        child: Text(confirmText),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+
+  return result ?? false;
+}
+
