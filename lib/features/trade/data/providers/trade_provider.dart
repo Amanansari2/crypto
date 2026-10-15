@@ -19,16 +19,15 @@ class TradeHomeNotifier extends Notifier<TradeState> {
       isIsolated: true,
       leverage: 3,
       orderType: TradeConstants.orderTypes.first,
-      bboType: TradeConstants.bboTypes.first,
       price: 0,
       amount: 0,
       sliderPercent: 0,
       reduceOnly: false,
       tpSl: false,
-      advancedOrderType: TradeConstants.advancedOrderTypes.first,
+      // advancedOrderType: TradeConstants.advancedOrderTypes.first,
       triggerPriceType: TradeConstants.triggerPriceTypes.first,
       triggerOrderType: TradeConstants.triggerOrderTypes.first,
-      useBbo: false,
+
       selectedDistributionType: TradeConstants.distributionType.first,
       minPriceError: null,
       maxPriceError: null,
@@ -118,11 +117,7 @@ class TradeHomeNotifier extends Notifier<TradeState> {
     );
   }
 
-  void toggleBbo() {
-    state = state.copyWith(
-      useBbo: !state.useBbo,
-    );
-  }
+
 
   void setDistributionType(String value) {
     state = state.copyWith(

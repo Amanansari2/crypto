@@ -1,4 +1,3 @@
-import 'package:crypto_app/core/utils/helpers/logger_helper.dart';
 import 'package:crypto_app/features/trade/data/models/position/position_pnl_model.dart';
 import 'package:crypto_app/features/trade/ui/widgets/position/partial_close_bottom_sheet.dart';
 import 'package:crypto_app/features/trade/ui/widgets/position/tp_sl_bottom_sheet.dart';
@@ -9,81 +8,199 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../shared/providers/app_provider.dart';
 import '../../../../../shared/services/local_storage_service.dart';
+import '../../../data/models/limit_order/limit_open_order.dart';
 import '../../../data/models/position/position_model.dart';
+import '../../../data/providers/limit_open_order_provider.dart';
 import '../../../data/providers/position/position_close_provider.dart';
 import '../../../data/providers/position/position_pnl_provider.dart';
 import '../../../data/providers/position/position_provider.dart';
 import '../../../data/providers/trading_account_provider.dart';
 
-class PositionsSection extends ConsumerWidget {
+
+class PositionsSection extends ConsumerStatefulWidget {
   const PositionsSection({super.key, required this.accountId});
 
   final String accountId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PositionsSection> createState() =>
+      _PositionsSectionState();
+}
+
+class _PositionsSectionState extends ConsumerState<PositionsSection> {
+  int selectedTab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final accountId = widget.accountId.trim();
+      if (accountId.isEmpty) return;
+
+      ref
+          .read(limitOpenOrderProvider.notifier)
+          .getOpenLimitOrders(accountId);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final positionNotifier = ref.read(positionProvider.notifier);
-    positionNotifier.listenPositionClosed(accountId);
+    final orderNotifier = ref.read(limitOpenOrderProvider.notifier);
+
+    positionNotifier.listenPositionClosed(widget.accountId);
+    positionNotifier.listenLimitOrderFilled(widget.accountId);
+    orderNotifier.listenLimitOrderFilled(widget.accountId);
+
     final state = ref.watch(positionProvider);
-    final pnlState = ref.watch(positionPnlProvider(accountId));
+    final pnlState = ref.watch(positionPnlProvider(widget.accountId));
+    final orderState = ref.watch(limitOpenOrderProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(
-              'Positions (${state.positions.length})',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            Expanded(
+              child: _buildTabButton(
+                title: 'Positions (${state.positions.length})',
+                isSelected: selectedTab == 0,
+                onTap: () {
+                  setState(() => selectedTab = 0);
+                },
+              ),
             ),
-            const SizedBox(width: 24),
-            Text(
-              'Open Orders',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildTabButton(
+                title: 'Open Orders (${orderState.orders.length})',
+                isSelected: selectedTab == 1,
+                onTap: () {
+                  setState(() => selectedTab = 1);
+                },
+              ),
             ),
           ],
         ),
-
         const SizedBox(height: 12),
 
-        if (state.isLoading)
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: CircularProgressIndicator(),
-            ),
-          )
-        else if (state.error != null)
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              state.error!,
-              style: const TextStyle(color: Colors.red),
-            ),
-          )
-        else if (state.positions.isEmpty)
-          const Padding(
-            padding: EdgeInsets.all(20),
-            child: Center(child: Text('No open positions')),
-          )
-        else
-          Column(
-            children: state.positions
-                .map(
-                  (position) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
+        if (selectedTab == 0) ...[
+          if (state.isLoading)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else if (state.error != null)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                state.error!,
+                style: const TextStyle(color: Colors.red),
+              ),
+            )
+          else if (state.positions.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(child: Text('No open positions')),
+              )
+            else
+              Column(
+                children: state.positions.map((position) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
                     child: PositionCard(
                       position: position,
                       livePnl: pnlState.value?[position.id],
                     ),
-                  ),
-                )
-                .toList(),
-          ),
+                  );
+                }).toList(),
+              ),
+        ] else ...[
+          if (orderState.isLoading)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else if (orderState.error != null)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                orderState.error!,
+                style: const TextStyle(color: Colors.red),
+              ),
+            )
+          else if (orderState.orders.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(child: Text('No open orders')),
+              )
+            else
+              Column(
+                children: orderState.orders.map((order) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: LimitOpenOrderCard(order: order),
+                  );
+                }).toList(),
+              ),
+        ],
       ],
     );
   }
+
+  Widget _buildTabButton({
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: isSelected
+              ? Colors.blue
+              : Colors.transparent,
+          border: Border.all(
+            color: isSelected
+                ? Colors.transparent
+                : (isDark
+                ? Colors.grey.shade700
+                : Colors.grey.shade300),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight:
+              isSelected ? FontWeight.w600 : FontWeight.normal,
+              color: isSelected
+                  ? AppColors.white
+                  :  (isDark ? AppColors.white : AppColors.black)
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
+
 
 class PositionCard extends ConsumerWidget {
   const PositionCard({super.key, required this.position, this.livePnl});
@@ -582,6 +699,149 @@ class PositionCard extends ConsumerWidget {
     return result ?? false;
   }
 }
+
+
+class LimitOpenOrderCard extends StatelessWidget {
+  const LimitOpenOrderCard({
+    super.key,
+    required this.order,
+  });
+
+  final LimitOpenOrder order;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isBuy = order.side.toUpperCase() == 'BUY';
+
+    final createdAt = order.createdAt?.toLocal();
+    final createdAtText = createdAt == null
+        ? '--'
+        : '${createdAt.year}-'
+        '${createdAt.month.toString().padLeft(2, '0')}-'
+        '${createdAt.day.toString().padLeft(2, '0')} '
+        '${createdAt.hour.toString().padLeft(2, '0')}:'
+        '${createdAt.minute.toString().padLeft(2, '0')}';
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18.r),
+        color: isDark
+            ? AppColors.blue.withOpacity(0.08)
+            : AppColors.white,
+        border: Border.all(
+          color: isDark
+              ? AppColors.blue.withOpacity(0.4)
+              : Colors.grey.withOpacity(0.4),
+        ),
+        boxShadow: isDark
+            ? []
+            : [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  order.symbol,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Text(
+                order.side.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: isBuy ? AppColors.green : AppColors.red,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                order.status,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const Divider(),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _InfoItem(
+                  label: 'Limit Price',
+                  value: order.price.toStringAsFixed(2),
+                ),
+              ),
+              Expanded(
+                child: _InfoItem(
+                  label: 'Quantity',
+                  value: order.quantity.toStringAsFixed(5),
+                ),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: _InfoItem(
+                    label: 'Leverage',
+                    value: '${order.leverage}x',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _InfoItem(
+                  label: 'Filled Quantity',
+                  value: order.filledQuantity.toString(),
+                ),
+              ),
+              Expanded(
+                child: _InfoItem(
+                  label: 'Position Side',
+                  value: order.positionSide,
+                ),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: _InfoItem(
+                    label: 'Margin Mode',
+                    value: order.marginMode,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _InfoItem(
+            label: 'Created At',
+            value: createdAtText,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 class _InfoItem extends StatelessWidget {
   const _InfoItem({

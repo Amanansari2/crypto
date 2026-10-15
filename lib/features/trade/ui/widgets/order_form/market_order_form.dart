@@ -32,12 +32,7 @@ class _MarketOrderFormState extends ConsumerState<MarketOrderForm> {
 
       ref.read(orderCalculationProvider.notifier).setLeverage(leverage);
     });
-    // ref.listenManual(homeTickerProvider(widget.symbol),
-    //     (previous, next){
-    //   next.whenData((ticker){
-    //     ref.read(orderCalculationProvider.notifier).setMarketPrice(ticker.lastPrice);
-    //   });
-    //     });
+
     _listenToTicker(widget.symbol);
   }
 

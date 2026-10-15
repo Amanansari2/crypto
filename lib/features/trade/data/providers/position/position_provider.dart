@@ -45,6 +45,7 @@ class PositionNotifier extends Notifier<PositionState> {
 
 
   StreamSubscription<Map<String, dynamic>>? _positionClosedSubscription;
+  StreamSubscription<Map<String, dynamic>>? _limitOrderFilledSubscription;
 
   @override
   PositionState build() {
@@ -53,6 +54,8 @@ class PositionNotifier extends Notifier<PositionState> {
     ref.onDispose(() {
       _positionClosedSubscription?.cancel();
       _positionClosedSubscription = null;
+      _limitOrderFilledSubscription?.cancel();
+      _limitOrderFilledSubscription = null;
       _listeningAccountId = null;
     });
 
@@ -83,6 +86,35 @@ class PositionNotifier extends Notifier<PositionState> {
       );
     }
   }
+
+
+  String? _limitOrderListeningAccountId;
+
+  void listenLimitOrderFilled(String accountId) {
+    final normalizedAccountId = accountId.trim();
+
+    if (normalizedAccountId.isEmpty) return;
+
+    if (_limitOrderListeningAccountId == normalizedAccountId &&
+        _limitOrderFilledSubscription != null) {
+      return;
+    }
+
+    _limitOrderFilledSubscription?.cancel();
+
+    _limitOrderListeningAccountId = normalizedAccountId;
+
+    _limitOrderFilledSubscription = _socket.messages
+        .where(
+          (message) =>
+      message['type'] == 'LIMIT_ORDER_FILLED' &&
+          message['accountId']?.toString() == normalizedAccountId,
+    )
+        .listen((message) {
+      getOpenPositions(normalizedAccountId);
+    });
+  }
+
 
   void listenPositionClosed(String accountId) {
     final normalizedAccountId = accountId.trim();

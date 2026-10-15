@@ -28,5 +28,11 @@ class ApiUrls {
 
 //Market Execution
   static const marketOrder = "/trading/orders/market";
-//------------------------
+
+
+//Limit Execution
+  static const limitOrder = "/trading/orders/limit";
+
+//Open Order
+  static const String openLimitOrders = '/trading/orders/open';
 }

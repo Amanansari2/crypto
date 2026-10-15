@@ -136,7 +136,7 @@ class _TradeScreenState extends ConsumerState<TradeScreen> {
               Expanded(
                 flex: 3,
                 child: SizedBox(
-                  height: 460,
+                  height: 480,
                   child: OrderBookWidget(
                     symbol: _selectedSymbol,
                   ),
@@ -144,6 +144,7 @@ class _TradeScreenState extends ConsumerState<TradeScreen> {
               ),
             ],),
 
+            Divider(thickness: 0.1, ),
 
             PositionsSection(accountId: "DEMO001")
            ],
