@@ -1,13 +1,14 @@
+import 'package:crypto_app/app/router/route_names.dart';
 import 'package:crypto_app/features/trade/data/models/position/position_pnl_model.dart';
 import 'package:crypto_app/features/trade/ui/widgets/position/partial_close_bottom_sheet.dart';
 import 'package:crypto_app/features/trade/ui/widgets/position/tp_sl_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../shared/providers/app_provider.dart';
-import '../../../../../shared/services/local_storage_service.dart';
 import '../../../data/models/limit_order/limit_open_order.dart';
 import '../../../data/models/position/position_model.dart';
 import '../../../data/providers/limit_open_order_provider.dart';
@@ -84,6 +85,18 @@ class _PositionsSectionState extends ConsumerState<PositionsSection> {
                 },
               ),
             ),
+
+            const SizedBox(width: 8,),
+            IconButton(
+              tooltip: 'Trading History',
+              onPressed: (){
+                context.pushNamed(RouteNames.tradingHistoryName);
+              },
+              icon: const Icon(
+                Icons.history,
+                size: 24,
+              ),
+            )
           ],
         ),
         const SizedBox(height: 12),

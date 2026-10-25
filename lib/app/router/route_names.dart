@@ -4,12 +4,13 @@ class RouteNames {
   static const String onboarding = "/";
 
   static const String trade = "/trade";
-  static const String settings = "/settings";
   static const String market = "/market";
+
+  static const String wallet = '/wallet';
+  static const String walletName = 'Wallet';
 
   // nested
   static const String subHome = "subHome";
-  static const String subSettings = "subSetting";
   static const String marketDetail = "detail/:symbol";
   static const String marketSearch = "search";
   static const String marketSearchName = "MarketSearch";
@@ -21,4 +22,8 @@ class RouteNames {
   //routeNames
   static const String marketDetailName = "MarketDetail";
   static const String tradeName = "Trade";
+
+  // Trading History
+  static const String tradingHistory = '/trading-history';
+  static const String tradingHistoryName = 'TradingHistory';
 }

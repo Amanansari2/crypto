@@ -110,7 +110,7 @@ class _LeverageSheetState extends ConsumerState<LeverageSheet> {
               ],
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
 
             /// - 50X +
             Row(
@@ -152,7 +152,7 @@ class _LeverageSheetState extends ConsumerState<LeverageSheet> {
               ],
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
 
             LeverageSlider(
               value: leverage,
@@ -163,7 +163,7 @@ class _LeverageSheetState extends ConsumerState<LeverageSheet> {
               },
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
 
             /// Info Card
             Container(
@@ -262,6 +262,8 @@ class _LeverageSheetState extends ConsumerState<LeverageSheet> {
                 ),
               ),
             ),
+
+
           ],
         ),
       ),

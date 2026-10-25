@@ -2,7 +2,6 @@ import 'package:crypto_app/core/utils/constants/app_colors.dart';
 import 'package:crypto_app/features/trade/data/providers/order_calculation_provider.dart';
 import 'package:crypto_app/features/trade/data/providers/position/position_provider.dart';
 import 'package:crypto_app/features/trade/ui/widgets/bottom_sheets/leverage_sheet.dart';
-import 'package:crypto_app/features/trade/ui/widgets/bottom_sheets/margin_mode_sheet.dart';
 import 'package:crypto_app/features/trade/ui/widgets/order_form/order_form_builder.dart';
 import 'package:crypto_app/features/trade/ui/widgets/position/position_section.dart';
 import 'package:flutter/material.dart';
@@ -69,18 +68,14 @@ class _TradeScreenState extends ConsumerState<TradeScreen> {
                     TradeHeader(
                       isIsolated: state.isIsolated,
                       leverage: state.leverage,
-                      onMarginTap: (){
-                        showModalBottomSheet(
-                          backgroundColor: Colors.transparent,
-                          context: context,
-                          builder: (context) => const MarginModeSheet(),
-                        );
-                      },
                       onLeverageTap: (){
                         showModalBottomSheet(
                           backgroundColor: Colors.transparent,
                           context: context,
-                          builder: (context) =>  LeverageSheet(symbol: _selectedSymbol,),
+                          isScrollControlled: true,
+                          builder: (context) =>  FractionallySizedBox(
+                              heightFactor: 0.65,
+                              child: LeverageSheet(symbol: _selectedSymbol,)),
                         );
                       },
                     ),

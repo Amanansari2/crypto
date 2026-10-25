@@ -6,14 +6,12 @@ class TradeHeader extends StatelessWidget {
   final bool isIsolated;
   final int leverage;
   final VoidCallback? onLeverageTap;
-  final VoidCallback? onMarginTap;
 
   const TradeHeader({
     super.key,
     required this.isIsolated,
     required this.leverage,
     this.onLeverageTap,
-    this.onMarginTap
   });
 
   @override
@@ -22,68 +20,23 @@ class TradeHeader extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        InkWell(
-          onTap: onMarginTap,
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            height: 28,
-            width: 78,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 6,
-              vertical: 4,
-            ),
-            decoration: BoxDecoration(
-              color: dark
-                  ? AppColors.blue.withOpacity(0.008)
-                  : AppColors.white,
 
-              borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(
-                color: dark
-                    ? AppColors.blue
-                    : Colors.grey.withOpacity(0.4),
-              ),
-              boxShadow: dark
-                  ? []
-                  : [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  spreadRadius: 2,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    isIsolated ? 'Isolated' : 'Cross',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: dark ? AppColors.white : AppColors.black
-                    ),
-                  ),
-                ),
-                const Icon(
-                  Icons.keyboard_arrow_down,
-                  size: 12,
-                ),
-              ],
-            ),
+
+        Text(
+          'Leverage',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
           ),
         ),
 
-        const SizedBox(width: 10),
+        Spacer(),
 
         InkWell(
           onTap: onLeverageTap,
           borderRadius: BorderRadius.circular(8),
           child: Container(
             height: 28,
-            width: 58,
+            width: 90,
             padding: const EdgeInsets.symmetric(
               horizontal: 6,
               vertical: 4,
@@ -113,12 +66,15 @@ class TradeHeader extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                      '${leverage}X',
-                    style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: dark ? AppColors.white : AppColors.black
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                        '${leverage}X',
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: dark ? AppColors.white : AppColors.black
+                      ),
                     ),
                   ),
                 ),

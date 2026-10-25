@@ -2,6 +2,7 @@ import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indi
 import 'package:crypto_app/features/market/ui/screens/market_detail_screen.dart';
 import 'package:crypto_app/features/market/ui/screens/market_screen.dart';
 import 'package:crypto_app/features/trade/ui/screen/trade_screen.dart';
+import 'package:crypto_app/features/wallet/ui/wallet_screen.dart';
 import 'package:crypto_app/placeholder_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +12,7 @@ import '../../features/market/chart_engine/ui/widgets/interval/custom_inetrval.d
 import '../../features/market/ui/screens/search_screen.dart';
 import '../../features/navigation/ui/screens/bottom_nav_screen.dart';
 import '../../features/onboarding/ui/screen/onboarding_screen.dart';
+import '../../features/trade_history/ui/trading_history_screen.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -21,8 +23,8 @@ class AppRouter {
   static final homeNavigatorKey = GlobalKey<NavigatorState>(
     debugLabel: 'homeNav',
   );
-  static final settingsNavigatorKey = GlobalKey<NavigatorState>(
-    debugLabel: 'settingsNav',
+  static final walletNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'walletNav',
   );
 
   static final marketNavigatorKey = GlobalKey<NavigatorState>(
@@ -76,28 +78,17 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          /// SETTINGS
+          /// wallet
           StatefulShellBranch(
-            navigatorKey: AppRouter.settingsNavigatorKey,
+            navigatorKey: AppRouter.walletNavigatorKey,
             routes: [
               GoRoute(
-                path: RouteNames.settings,
-                name: "Settings",
+                path: RouteNames.wallet,
+                name: RouteNames.walletName,
                 builder: (context, state) =>
-                    const PlaceholderScreen(title: "settings"),
+                    const WalletScreen(accountId: 'DEMO001',),
 
                 routes: [
-                  GoRoute(
-                    path: RouteNames.subSettings,
-                    name: "SubSettings",
-                    pageBuilder: (context, state) => CustomTransitionPage(
-                      key: state.pageKey,
-                      child: const PlaceholderScreen(title: "subSetting"),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) =>
-                              FadeTransition(opacity: animation, child: child),
-                    ),
-                  ),
                 ],
               ),
             ],
@@ -152,6 +143,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           return  IndicatorSettingsSheet();
         },
+      ),
+
+      GoRoute(
+        path: RouteNames.tradingHistory,
+        name: RouteNames.tradingHistoryName,
+        builder: (context, state) => const TradingHistoryScreen(),
       ),
 
 
