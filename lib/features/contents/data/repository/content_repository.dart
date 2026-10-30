@@ -78,9 +78,6 @@ class SubscriptionPolicyRepository {
 }
 
 
-
-
-
 class FaqRepository {
   final GetMethod _getMethod = GetMethod();
 
@@ -95,4 +92,17 @@ class FaqRepository {
   }
 }
 
+class AboutUsRepository {
+  final GetMethod _getMethod = GetMethod();
+
+  Future<ContentResponseModel> getAboutUs() async {
+    final response = await _getMethod.getRequest(
+      endpoint: ApiUrls.aboutUs,
+    );
+
+    return ContentResponseModel.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+    );
+  }
+}
 

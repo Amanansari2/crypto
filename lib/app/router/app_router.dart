@@ -1,24 +1,24 @@
+import 'package:crypto_app/features/contents/widgets/about_us_screen.dart';
+import 'package:crypto_app/features/home/ui/screen/home_screen.dart';
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicator_settings_sheet.dart';
 import 'package:crypto_app/features/market/ui/screens/market_detail_screen.dart';
 import 'package:crypto_app/features/market/ui/screens/market_screen.dart';
-import 'package:crypto_app/features/settings/ui/settings_screen.dart';
-import 'package:crypto_app/features/settings/ui/widgets/refund_policy_screen.dart';
 import 'package:crypto_app/features/trade/ui/screen/trade_screen.dart';
 import 'package:crypto_app/features/wallet/ui/wallet_screen.dart';
-import 'package:crypto_app/placeholder_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/contents/widgets/faq_screen.dart';
+import '../../features/contents/widgets/privacy_policy_screen.dart';
+import '../../features/contents/widgets/refund_policy_screen.dart';
+import '../../features/contents/widgets/reward_referral_policy_screen.dart';
+import '../../features/contents/widgets/subscription_policy_screen.dart';
+import '../../features/contents/widgets/term_condition_screen.dart';
 import '../../features/market/chart_engine/ui/widgets/interval/custom_inetrval.dart';
 import '../../features/market/ui/screens/search_screen.dart';
-import '../../features/navigation/ui/screens/bottom_nav_screen.dart';
+import '../../features/navigation/screens/bottom_nav_screen.dart';
 import '../../features/onboarding/ui/screen/onboarding_screen.dart';
-import '../../features/settings/ui/widgets/faq_screen.dart';
-import '../../features/settings/ui/widgets/privacy_policy_screen.dart';
-import '../../features/settings/ui/widgets/reward_referral_policy_screen.dart';
-import '../../features/settings/ui/widgets/subscription_policy_screen.dart';
-import '../../features/settings/ui/widgets/term_condition_screen.dart';
 import '../../features/trade_history/ui/trading_history_screen.dart';
 import 'route_names.dart';
 
@@ -51,9 +51,9 @@ class AppRouter {
   );
 
   // 4. Settings
-  static final settingsNavigatorKey = GlobalKey<NavigatorState>(
-    debugLabel: 'settingsNav',
-  );
+  // static final settingsNavigatorKey = GlobalKey<NavigatorState>(
+  //   debugLabel: 'settingsNav',
+  // );
 }
 
 /// Riverpod Provider
@@ -83,7 +83,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: RouteNames.home,
                 name: RouteNames.homeName,
                 builder: (context, state) =>
-                const PlaceholderScreen(title: 'Home'),
+                const HomeScreen(),
               ),
             ],
           ),
@@ -141,17 +141,17 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
 
           // 4. SETTINGS
-          StatefulShellBranch(
-            navigatorKey: AppRouter.settingsNavigatorKey,
-            routes: [
-              GoRoute(
-                path: RouteNames.settings,
-                name: RouteNames.settingsName,
-                builder: (context, state) =>
-                const SettingsScreen(),
-              ),
-            ],
-          ),
+          // StatefulShellBranch(
+          //   navigatorKey: AppRouter.settingsNavigatorKey,
+          //   routes: [
+          //     GoRoute(
+          //       path: RouteNames.settings,
+          //       name: RouteNames.settingsName,
+          //       builder: (context, state) =>
+          //       const SettingsScreen(),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
 
@@ -217,6 +217,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: RouteNames.faq,
         name: RouteNames.faqName,
         builder: (context, state) => const FaqScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.aboutUs,
+        name: RouteNames.aboutUsName,
+        builder: (context, state) => const AboutUsScreen(),
       ),
     ],
   );

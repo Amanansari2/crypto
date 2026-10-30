@@ -3,7 +3,7 @@ import 'package:crypto_app/core/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/provider/content_provider.dart';
+import '../data/provider/content_provider.dart';
 
 class FaqScreen extends ConsumerStatefulWidget {
   const FaqScreen({super.key});

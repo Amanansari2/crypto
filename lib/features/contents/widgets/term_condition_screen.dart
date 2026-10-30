@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/provider/content_provider.dart';
+import '../data/provider/content_provider.dart';
 
 class TermsConditionScreen extends ConsumerWidget {
   const TermsConditionScreen({super.key});

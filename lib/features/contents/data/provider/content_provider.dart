@@ -48,3 +48,11 @@ final faqProvider = FutureProvider<FaqResponseModel>((ref) async {
   final repository = FaqRepository();
   return repository.getFaq();
 });
+
+
+final aboutUsProvider =
+FutureProvider<ContentResponseModel>((ref) async {
+  final repository = AboutUsRepository();
+
+  return repository.getAboutUs();
+});

@@ -68,4 +68,8 @@ class RouteNames {
   // Faq
   static const String faq = '/faq';
   static const String faqName = 'FAQ';
+
+  // About us
+  static const String aboutUs = '/about-us';
+  static const String aboutUsName = 'AboutUs';
 }

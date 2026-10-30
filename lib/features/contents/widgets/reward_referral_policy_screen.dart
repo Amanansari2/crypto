@@ -2,20 +2,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/provider/content_provider.dart';
+import '../data/provider/content_provider.dart';
 
-class SubscriptionPolicyScreen extends ConsumerWidget {
-  const SubscriptionPolicyScreen({super.key});
+class RewardReferralPolicyScreen extends ConsumerWidget {
+  const RewardReferralPolicyScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final policyAsync = ref.watch(subscriptionPolicyProvider);
+    final policyAsync = ref.watch(rewardReferralPolicyProvider);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Subscription Top-Up Policy'),
+        title: const Text('Reward & Referral Policy'),
       ),
       body: policyAsync.when(
         loading: () => const Center(
@@ -30,13 +30,13 @@ class SubscriptionPolicyScreen extends ConsumerWidget {
                 const Icon(Icons.error_outline, size: 42),
                 const SizedBox(height: 12),
                 const Text(
-                  'Unable to load Subscription Policy.',
+                  'Unable to load Reward & Referral Policy.',
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 FilledButton(
                   onPressed: () {
-                    ref.invalidate(subscriptionPolicyProvider);
+                    ref.invalidate(rewardReferralPolicyProvider);
                   },
                   child: const Text('Retry'),
                 ),
@@ -47,7 +47,7 @@ class SubscriptionPolicyScreen extends ConsumerWidget {
         data: (response) {
           if (!response.success) {
             return const Center(
-              child: Text('Subscription Policy is unavailable.'),
+              child: Text('Reward & Referral Policy is unavailable.'),
             );
           }
 
@@ -144,8 +144,7 @@ class SubscriptionPolicyScreen extends ConsumerWidget {
                                 Expanded(
                                   child: Text(
                                     content,
-                                    style:
-                                    theme.textTheme.bodyMedium?.copyWith(
+                                    style: theme.textTheme.bodyMedium?.copyWith(
                                       height: 1.6,
                                     ),
                                   ),

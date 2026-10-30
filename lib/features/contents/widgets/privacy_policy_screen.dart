@@ -1,21 +1,20 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/provider/content_provider.dart';
+import '../data/provider/content_provider.dart';
 
-class RewardReferralPolicyScreen extends ConsumerWidget {
-  const RewardReferralPolicyScreen({super.key});
+class PrivacyPolicyScreen extends ConsumerWidget {
+  const PrivacyPolicyScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final policyAsync = ref.watch(rewardReferralPolicyProvider);
+    final policyAsync = ref.watch(privacyPolicyProvider);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reward & Referral Policy'),
+        title: const Text('Privacy Policy'),
       ),
       body: policyAsync.when(
         loading: () => const Center(
@@ -30,13 +29,13 @@ class RewardReferralPolicyScreen extends ConsumerWidget {
                 const Icon(Icons.error_outline, size: 42),
                 const SizedBox(height: 12),
                 const Text(
-                  'Unable to load Reward & Referral Policy.',
+                  'Unable to load Privacy Policy.',
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 FilledButton(
                   onPressed: () {
-                    ref.invalidate(rewardReferralPolicyProvider);
+                    ref.invalidate(privacyPolicyProvider);
                   },
                   child: const Text('Retry'),
                 ),
@@ -47,7 +46,7 @@ class RewardReferralPolicyScreen extends ConsumerWidget {
         data: (response) {
           if (!response.success) {
             return const Center(
-              child: Text('Reward & Referral Policy is unavailable.'),
+              child: Text('Privacy Policy is unavailable.'),
             );
           }
 
@@ -105,13 +104,12 @@ class RewardReferralPolicyScreen extends ConsumerWidget {
                       const SizedBox(height: 10),
                       ...blocks.map((block) {
                         final content = block.content.trim();
-                        final type = block.type.toLowerCase();
 
                         if (content.isEmpty) {
                           return const SizedBox.shrink();
                         }
 
-                        if (type == 'subheading') {
+                        if (block.type.toLowerCase() == 'subheading') {
                           return Padding(
                             padding: const EdgeInsets.only(
                               top: 10,
@@ -122,34 +120,6 @@ class RewardReferralPolicyScreen extends ConsumerWidget {
                               style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
-                            ),
-                          );
-                        }
-
-                        if (type == 'list_item') {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 7),
-                                  child: Icon(
-                                    Icons.circle,
-                                    size: 6,
-                                    color: colors.onSurfaceVariant,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    content,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      height: 1.6,
-                                    ),
-                                  ),
-                                ),
-                              ],
                             ),
                           );
                         }

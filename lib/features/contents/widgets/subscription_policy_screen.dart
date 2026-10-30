@@ -1,20 +1,21 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/provider/content_provider.dart';
+import '../data/provider/content_provider.dart';
 
-class PrivacyPolicyScreen extends ConsumerWidget {
-  const PrivacyPolicyScreen({super.key});
+class SubscriptionPolicyScreen extends ConsumerWidget {
+  const SubscriptionPolicyScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final policyAsync = ref.watch(privacyPolicyProvider);
+    final policyAsync = ref.watch(subscriptionPolicyProvider);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Privacy Policy'),
+        title: const Text('Subscription Top-Up Policy'),
       ),
       body: policyAsync.when(
         loading: () => const Center(
@@ -29,13 +30,13 @@ class PrivacyPolicyScreen extends ConsumerWidget {
                 const Icon(Icons.error_outline, size: 42),
                 const SizedBox(height: 12),
                 const Text(
-                  'Unable to load Privacy Policy.',
+                  'Unable to load Subscription Policy.',
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 FilledButton(
                   onPressed: () {
-                    ref.invalidate(privacyPolicyProvider);
+                    ref.invalidate(subscriptionPolicyProvider);
                   },
                   child: const Text('Retry'),
                 ),
@@ -46,7 +47,7 @@ class PrivacyPolicyScreen extends ConsumerWidget {
         data: (response) {
           if (!response.success) {
             return const Center(
-              child: Text('Privacy Policy is unavailable.'),
+              child: Text('Subscription Policy is unavailable.'),
             );
           }
 
@@ -104,12 +105,13 @@ class PrivacyPolicyScreen extends ConsumerWidget {
                       const SizedBox(height: 10),
                       ...blocks.map((block) {
                         final content = block.content.trim();
+                        final type = block.type.toLowerCase();
 
                         if (content.isEmpty) {
                           return const SizedBox.shrink();
                         }
 
-                        if (block.type.toLowerCase() == 'subheading') {
+                        if (type == 'subheading') {
                           return Padding(
                             padding: const EdgeInsets.only(
                               top: 10,
@@ -120,6 +122,35 @@ class PrivacyPolicyScreen extends ConsumerWidget {
                               style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
+                            ),
+                          );
+                        }
+
+                        if (type == 'list_item') {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 7),
+                                  child: Icon(
+                                    Icons.circle,
+                                    size: 6,
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    content,
+                                    style:
+                                    theme.textTheme.bodyMedium?.copyWith(
+                                      height: 1.6,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           );
                         }

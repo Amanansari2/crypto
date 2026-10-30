@@ -61,6 +61,7 @@ class ApiUrls {
   static const String rewardReferralPolicy = '/content-pages/reward-referral-policy';
   static const String subscriptionPolicy = '/content-pages/subscription-topup';
   static const String faq = '/content-pages/faq';
+  static const String aboutUs = '/content-pages/about-us';
 
 
 }
