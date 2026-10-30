@@ -1,6 +1,8 @@
 import 'package:crypto_app/features/market/chart_engine/ui/widgets/settings/indicator_settings_sheet.dart';
 import 'package:crypto_app/features/market/ui/screens/market_detail_screen.dart';
 import 'package:crypto_app/features/market/ui/screens/market_screen.dart';
+import 'package:crypto_app/features/settings/ui/settings_screen.dart';
+import 'package:crypto_app/features/settings/ui/widgets/refund_policy_screen.dart';
 import 'package:crypto_app/features/trade/ui/screen/trade_screen.dart';
 import 'package:crypto_app/features/wallet/ui/wallet_screen.dart';
 import 'package:crypto_app/placeholder_screen.dart';
@@ -12,23 +14,45 @@ import '../../features/market/chart_engine/ui/widgets/interval/custom_inetrval.d
 import '../../features/market/ui/screens/search_screen.dart';
 import '../../features/navigation/ui/screens/bottom_nav_screen.dart';
 import '../../features/onboarding/ui/screen/onboarding_screen.dart';
+import '../../features/settings/ui/widgets/faq_screen.dart';
+import '../../features/settings/ui/widgets/privacy_policy_screen.dart';
+import '../../features/settings/ui/widgets/reward_referral_policy_screen.dart';
+import '../../features/settings/ui/widgets/subscription_policy_screen.dart';
+import '../../features/settings/ui/widgets/term_condition_screen.dart';
 import '../../features/trade_history/ui/trading_history_screen.dart';
 import 'route_names.dart';
 
 class AppRouter {
   AppRouter._();
 
-  /// Navigator Keys
-  static final rootNavigatorKey = GlobalKey<NavigatorState>();
+  // Root navigator
+  static final rootNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'rootNav',
+  );
+
+  // 0. Home
   static final homeNavigatorKey = GlobalKey<NavigatorState>(
     debugLabel: 'homeNav',
   );
+
+  // 1. Markets
+  static final marketNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'marketNav',
+  );
+
+  // 2. Trade
+  static final tradeNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'tradeNav',
+  );
+
+  // 3. Wallet
   static final walletNavigatorKey = GlobalKey<NavigatorState>(
     debugLabel: 'walletNav',
   );
 
-  static final marketNavigatorKey = GlobalKey<NavigatorState>(
-    debugLabel: 'marketNav',
+  // 4. Settings
+  static final settingsNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'settingsNav',
   );
 }
 
@@ -45,40 +69,65 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: "Onboarding",
         builder: (context, state) => const OnboardingScreen(),
       ),
+
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainWrapper(navigationShell: navigationShell);
         },
-
         branches: [
-          /// HOME
+          // 0. HOME
           StatefulShellBranch(
             navigatorKey: AppRouter.homeNavigatorKey,
             routes: [
               GoRoute(
-                path: RouteNames.trade,
-                name: RouteNames.tradeName,
+                path: RouteNames.home,
+                name: RouteNames.homeName,
                 builder: (context, state) =>
-                const TradeScreen(),
+                const PlaceholderScreen(title: 'Home'),
+              ),
+            ],
+          ),
 
+          // 1. MARKETS
+          StatefulShellBranch(
+            navigatorKey: AppRouter.marketNavigatorKey,
+            routes: [
+              GoRoute(
+                path: RouteNames.market,
+                name: RouteNames.marketName,
+                builder: (context, state) => const MarketScreen(),
                 routes: [
                   GoRoute(
-                    path: RouteNames.subHome,
-                    name: "SubHome",
-                    pageBuilder: (context, state) => CustomTransitionPage(
-                      key: state.pageKey,
-                      child: const PlaceholderScreen(title: "subhome"),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) =>
-                              FadeTransition(opacity: animation, child: child),
-                    ),
+                    path: RouteNames.marketDetail,
+                    name: RouteNames.marketDetailName,
+                    builder: (context, state) {
+                      final symbol = state.pathParameters['symbol']!;
+                      return MarketDetailScreen(symbol: symbol);
+                    },
+                  ),
+                  GoRoute(
+                    path: RouteNames.marketSearch,
+                    name: RouteNames.marketSearchName,
+                    builder: (context, state) => const SearchScreen(),
                   ),
                 ],
               ),
             ],
           ),
 
-          /// wallet
+          // 2. TRADE
+          StatefulShellBranch(
+            navigatorKey: AppRouter.tradeNavigatorKey,
+            routes: [
+              GoRoute(
+                path: RouteNames.trade,
+                name: RouteNames.tradeName,
+                builder: (context, state) => const TradeScreen(),
+              ),
+            ],
+          ),
+
+          // 3. WALLET
           StatefulShellBranch(
             navigatorKey: AppRouter.walletNavigatorKey,
             routes: [
@@ -86,44 +135,26 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: RouteNames.wallet,
                 name: RouteNames.walletName,
                 builder: (context, state) =>
-                    const WalletScreen(accountId: 'DEMO001',),
-
-                routes: [
-                ],
+                const WalletScreen(accountId: 'DEMO001'),
               ),
             ],
           ),
 
+          // 4. SETTINGS
           StatefulShellBranch(
-            navigatorKey: AppRouter.marketNavigatorKey,
+            navigatorKey: AppRouter.settingsNavigatorKey,
             routes: [
               GoRoute(
-                path: RouteNames.market,
-                name: "Markets",
-                builder: (context, state) => const MarketScreen(),
-                routes: [
-                  GoRoute(
-                      path: RouteNames.marketDetail,
-                      name: RouteNames.marketDetailName,
-                      builder: (context, state) {
-                        final symbol = state.pathParameters['symbol']!;
-                        return MarketDetailScreen(symbol: symbol);
-                      },
-                  ),
-
-                  GoRoute(
-                    path: RouteNames.marketSearch,
-                    name: RouteNames.marketSearchName,
-                    builder: (context, state) {
-                      return const SearchScreen();
-                    },
-                  ),
-                ],
+                path: RouteNames.settings,
+                name: RouteNames.settingsName,
+                builder: (context, state) =>
+                const SettingsScreen(),
               ),
             ],
           ),
         ],
       ),
+
 
       GoRoute(
 
@@ -151,7 +182,42 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const TradingHistoryScreen(),
       ),
 
+      GoRoute(
+        path: RouteNames.termsCondition,
+        name: RouteNames.termsConditionName,
+        builder: (context, state) => const TermsConditionScreen(),
+      ),
 
+      GoRoute(
+        path: RouteNames.privacyPolicy,
+        name: RouteNames.privacyPolicyName,
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.refundPolicy,
+        name: RouteNames.refundPolicyName,
+        builder: (context, state) => const RefundPolicyScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.rewardReferralPolicy,
+        name: RouteNames.rewardReferralPolicyName,
+        builder: (context, state) =>
+        const RewardReferralPolicyScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.subscriptionPolicy,
+        name: RouteNames.subscriptionPolicyName,
+        builder: (context, state) => const SubscriptionPolicyScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.faq,
+        name: RouteNames.faqName,
+        builder: (context, state) => const FaqScreen(),
+      ),
     ],
   );
 });

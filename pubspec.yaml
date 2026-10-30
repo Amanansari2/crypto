@@ -47,6 +47,7 @@ dependencies:
   shimmer: ^3.0.0
   web_socket_channel: ^3.0.3
   syncfusion_flutter_charts: ^30.2.7
+  font_awesome_flutter: ^11.0.0
 
  
 

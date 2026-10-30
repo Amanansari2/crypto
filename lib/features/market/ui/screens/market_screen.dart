@@ -46,7 +46,7 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
     return Scaffold(
       appBar: AppBar(title: Text("Market", style: TextStyle(color: isDark ? AppColors.white : AppColors.black),), centerTitle: true),
       body: Padding(
-        padding: EdgeInsets.all(6.w),
+        padding: EdgeInsets.only(left: 6, top: 6, right: 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

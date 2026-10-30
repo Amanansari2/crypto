@@ -1,195 +1,3 @@
-// import 'package:crypto_app/core/utils/constants/app_colors.dart';
-// import 'package:crypto_app/shared/widgets/clippers/custom_Clipper.dart';
-// import 'package:crypto_app/core/theme/theme_provider.dart';
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-//
-// import '../../../../sample_widget.dart';
-// import '../../logic/helpers/nav_animation_helper.dart';
-// import '../../logic/provider/nav_provider.dart';
-// import '../widgets/bottom_nav_button.dart';
-//
-// class BottomNavScreen extends ConsumerStatefulWidget {
-//   const BottomNavScreen({super.key, });
-//
-//
-//   @override
-//   ConsumerState<BottomNavScreen> createState() => _BottomNavScreenState();
-// }
-//
-// class _BottomNavScreenState extends ConsumerState<BottomNavScreen> {
-//   final PageController pageController = PageController();
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-//   }
-//
-//   @override
-//   void dispose() {
-//     pageController.dispose();
-//     super.dispose();
-//   }
-//
-//   void animateToPage(int page) {
-//     pageController.animateToPage(
-//       page,
-//       duration: const Duration(
-//         milliseconds: 400,
-//       ),
-//       curve: Curves.decelerate,
-//     );
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-// final currentIndex = ref.watch(navProvider).index;
-//
-// final screens = [
-//   const SampleWidget(label: 'HOME', color: Colors.deepPurpleAccent),
-//   const SampleWidget(label: 'SEARCH', color: Colors.amber),
-//   const SampleWidget(label: 'EXPLORE', color: Colors.cyan),
-// ];
-//     return Scaffold(
-//       backgroundColor: Colors.black,
-//       appBar: AppBar(
-//         backgroundColor: Colors.grey[900],
-//         title: const Text(
-//           "Custom Bottom Navigation Bar",
-//           style: TextStyle(color: Colors.white),
-//         ),
-//         leading: IconButton(
-//           onPressed: (){
-//             ref.read(themeProvider.notifier).toggleTheme();
-//           },
-//           icon: Icon(
-//             Theme.of(context).brightness == Brightness.light
-//                 ? Icons.dark_mode
-//                 : Icons.light_mode,
-//           ),
-//         ),
-//       ),
-//       body: Stack(
-//         children: [
-//           Positioned.fill(
-//               child: PageView(
-//             onPageChanged: (value) {
-//                ref.read(navProvider.notifier).setIndex(value);
-//             },
-//             controller: pageController,
-//             children: screens,
-//           )),
-//           Positioned(
-//             bottom: 10,
-//             right: 0,
-//             left: 0,
-//             child: bottomNav(currentIndex, context  ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget bottomNav(int currentIndex, BuildContext context) {
-//     return Padding(
-//       padding: EdgeInsets.fromLTRB(
-//         16.w, 0,
-//           16.w, 0),
-//       child: Material(
-//         borderRadius: BorderRadius.circular(30),
-//         color: Colors.transparent,
-//         elevation: 6,
-//         child: Container(
-//             height: 70.h,
-//             width: double.infinity,
-//             decoration: BoxDecoration(
-//               color: Colors.grey[900],
-//               borderRadius: BorderRadius.circular(30),
-//             ),
-//             child: Stack(
-//               children: [
-//                 Positioned(
-//                   top: 0,
-//                   bottom: 0,
-//                   left: 12.w,
-//                   right: 12.w,
-//                   child: Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                     crossAxisAlignment: CrossAxisAlignment.center,
-//                     children: [
-//                       BottomNavButton(
-//                         onPressed: (val) {
-//                           animateToPage(val);
-//
-//                         },
-//                         icon: CupertinoIcons.house,
-//                         currentIndex: currentIndex,
-//                         index: 0,
-//                       ),
-//                       BottomNavButton(
-//                         onPressed: (val) {
-//                           animateToPage(val);
-//                         },
-//                         icon: CupertinoIcons.search,
-//                         currentIndex: currentIndex,
-//                         index: 1,
-//                       ),
-//                       BottomNavButton(
-//                         onPressed: (val) {
-//                           animateToPage(val);
-//                         },
-//                         icon: CupertinoIcons.square_favorites_alt,
-//                         currentIndex: currentIndex,
-//                         index: 2,
-//                       ),
-//
-//                     ],
-//                   ),
-//                 ),
-//                 AnimatedPositioned(
-//                     duration: const Duration(milliseconds: 300),
-//                     curve: Curves.decelerate,
-//                     // top: 0,
-//                     bottom: 0,
-//                     left: animatedPositionedLEftValue(currentIndex, context),
-//                     child: Column(
-//                       children: [
-//
-//                         ClipPath(
-//                           clipper: MyCustomClipper(),
-//                           child: Container(
-//                             height: 60.h,
-//                             width: 50.w,
-//                             decoration: BoxDecoration(
-//                                 gradient: LinearGradient(
-//                               begin: Alignment.bottomCenter,
-//                               end: Alignment.topCenter,
-//                               colors: AppColors.navGradient,
-//                             )),
-//                           ),
-//                         ),
-//                          Container(
-//                           height: 4.h,
-//                           width: 50.w,
-//                           decoration: BoxDecoration(
-//                             color: Colors.yellow,
-//                             borderRadius: BorderRadius.circular(20),
-//                           ),
-//                         ),
-//                       ],
-//                     ))
-//               ],
-//             )),
-//       ),
-//     );
-//   }
-// }
-
-
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -197,10 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/utils/constants/app_colors.dart';
-import '../../../../shared/widgets/clippers/custom_Clipper.dart';
-import '../../logic/helpers/nav_animation_helper.dart';
-import '../widgets/bottom_nav_button.dart';
 
 class MainWrapper extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -213,87 +17,197 @@ class MainWrapper extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = navigationShell.currentIndex;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      body: navigationShell,
+    const inactiveColor = Color(0xFF9CA8BC);
+    const activeColor = Color(0xFF1685FF);
 
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-        child: Container(
-          height: 70.h,
-          decoration: BoxDecoration(
-            color: Theme
-                .of(context)
-                .colorScheme
-                .surface,
-            borderRadius: BorderRadius.circular(30),
+    void selectTab(int index) {
+      navigationShell.goBranch(
+        index,
+        initialLocation: index == currentIndex,
+      );
+    }
 
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withOpacity(0.25),
-                blurRadius: 25,
-                spreadRadius: 1,
-              )
-            ],
-          ),
-          child: Stack(
+    Widget navItem({
+      required int index,
+      required IconData icon,
+      required String label,
+    }) {
+      final isActive = currentIndex == index;
+
+      return Expanded(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => selectTab(index),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  BottomNavButton(
-                    index: 0,
-                    currentIndex: currentIndex,
-                    icon: CupertinoIcons.house,
-                    onPressed: (i) => navigationShell.goBranch(i),
-                  ),
-                  BottomNavButton(
-                    index: 1,
-                    currentIndex: currentIndex,
-                    icon: CupertinoIcons.search,
-                    onPressed: (i) => navigationShell.goBranch(i),
-                  ),
-                  BottomNavButton(
-                    index: 2,
-                    currentIndex: currentIndex,
-                    icon: CupertinoIcons.square_favorites_alt,
-                    onPressed: (i) => navigationShell.goBranch(i),
-                  ),
-                ],
-              ),
-
-              /// Indicator
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                left: animatedPositionedLEftValue(currentIndex, context),
-                bottom: 0,
-                child: Column(
-                  children: [
-                    ClipPath(
-                      clipper: MyCustomClipper(),
-                      child: Container(
-                        height: 60.h,
-                        width: 50.w,
-                        decoration: BoxDecoration(
-                            gradient: AppColors.navGradient
-                        ),
-                      ),
+              Container(
+                decoration: BoxDecoration(
+                  boxShadow: isActive
+                      ? [
+                    BoxShadow(
+                      color: activeColor.withOpacity(0.45),
+                      blurRadius: 14,
+                      spreadRadius: 1,
                     ),
-                    Container(
-                      height: 4.h,
-                      width: 50.w,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                  ],
+                  ]
+                      : [],
+                ),
+                child: Icon(
+                  icon,
+                  size: 18.sp,
+                  color: isActive ? activeColor : inactiveColor,
                 ),
               ),
+              SizedBox(height: 5.h),
+              Text(
+                label,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  fontWeight:
+                  isActive ? FontWeight.w600 : FontWeight.w400,
+                  color: isActive ? activeColor : inactiveColor,
+                ),
+              ),
+
             ],
           ),
         ),
+      );
+    }
+
+    return Scaffold(
+      // extendBody: true,
+      body: navigationShell,
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 0.5.h,
+            // color: const Color(0xFF203047),
+            color: Colors.blue.withOpacity(0.4),
+          ),
+
+          Padding(
+            padding: EdgeInsets.fromLTRB(8.w, 2.h, 8.w, 8.h),
+            child: SizedBox(
+              height: 55.h,
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  // Main rounded navigation background.
+
+                  // Five navigation positions.
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 9.w),
+                    child: Row(
+                      children: [
+                        navItem(
+                          index: 0,
+                          icon: CupertinoIcons.house_fill,
+                          label: 'Home',
+                        ),
+                        navItem(
+                          index: 1,
+                          icon: CupertinoIcons.chart_bar_fill,
+                          label: 'Markets',
+                        ),
+
+                        // Space reserved for the raised Trade button.
+                        const Expanded(
+                          child: SizedBox(),
+                        ),
+
+                        navItem(
+                          index: 3,
+                          icon: CupertinoIcons.creditcard_fill,
+                          label: 'Wallet',
+                        ),
+                        navItem(
+                          index: 4,
+                          icon: CupertinoIcons.doc_text_fill,
+                          label: 'Setting',
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Raised center Trade button.
+                  Positioned(
+                    top: -20.h,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => selectTab(2),
+                      child: SizedBox(
+                        width: 78.w,
+                        height: 75.h,
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 50.w,
+                              height: 50.w,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xFF4387FF),
+                                    Color(0xFF0062F5),
+                                  ],
+                                ),
+                                border: Border.all(
+                                  color: const Color(0xFF8AB8FF),
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: activeColor.withOpacity(0.45),
+                                    blurRadius: 18,
+                                    spreadRadius: 2,
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.45),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                CupertinoIcons.arrow_left_right,
+                                color: Colors.white,
+                                size: 20.sp,
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              'Trade',
+                              style: TextStyle(
+                                color: currentIndex == 2
+                                    ? activeColor
+                                    : (isDark
+                                    ? Colors.white
+                                    : Theme.of(context)
+                                    .colorScheme
+                                    .onSurface),
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
