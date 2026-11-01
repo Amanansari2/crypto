@@ -11,7 +11,6 @@ import 'package:go_router/go_router.dart';
 import '../../provider/market_provider.dart';
 import '../../provider/tab_notifier.dart';
 import '../widgets/coin_view.dart';
-import '../widgets/market_tabs.dart';
 
 class MarketScreen extends ConsumerStatefulWidget {
   const MarketScreen({super.key});
@@ -20,26 +19,27 @@ class MarketScreen extends ConsumerStatefulWidget {
   ConsumerState<MarketScreen> createState() => _MarketScreenState();
 }
 
-class _MarketScreenState extends ConsumerState<MarketScreen> {
+class _MarketScreenState extends ConsumerState<MarketScreen>  with SingleTickerProviderStateMixin{
   late final PageController _pageController;
+  late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final selectedTab = ref.watch(marketTabProvider);
 
-    // final combined = ref.watch(combinedMarketProvider);
     final trending = ref.watch(trendingProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -439,11 +439,35 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
               ),
             ),
 
-            MarketTabs(
-              selectedIndex: selectedTab,
+
+
+            TabBar(
+              controller: _tabController,
+              isScrollable: false,
+              dividerColor: Colors.transparent,
+              labelColor: Colors.blue,
+              indicatorColor: Colors.blue,
+              splashFactory: NoSplash.splashFactory,
+              overlayColor:
+              WidgetStateProperty.all(Colors.transparent),
+              unselectedLabelColor: Colors.grey,
+              labelStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+              ),
+              indicator: UnderlineTabIndicator(
+                borderSide: const BorderSide(
+                  color: Colors.blue,
+                  width: 1.3,
+                ),
+                insets: EdgeInsets.zero,
+              ),
               onTap: (index) {
                 ref.read(marketTabProvider.notifier).setTab(index);
-
 
                 _pageController.animateToPage(
                   index,
@@ -451,9 +475,15 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                   curve: Curves.easeInOut,
                 );
               },
+              tabs: const [
+                Tab(text: 'All'),
+                Tab(text: 'Gainers'),
+                Tab(text: 'Losers'),
+                Tab(text: 'New'),
+              ],
             ),
 
-            const SizedBox(height: 8),
+
 
             /// 🔥 Coin List
             Expanded(
@@ -463,6 +493,7 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
                 controller: _pageController,
                 onPageChanged: (index) {
                   ref.read(marketTabProvider.notifier).setTab(index);
+                  _tabController.animateTo(index);
 
                   final notifier = ref.read(marketProvider.notifier);
 

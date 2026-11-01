@@ -27,10 +27,10 @@ class RouteNames {
   // Nested routes
   static const String subHome = 'subHome';
 
-  static const String marketDetail = 'detail/:symbol';
+  static const String marketDetail = '/detail/:symbol';
   static const String marketDetailName = 'MarketDetail';
 
-  static const String marketSearch = 'search';
+  static const String marketSearch = '/search';
   static const String marketSearchName = 'MarketSearch';
 
   // Custom interval

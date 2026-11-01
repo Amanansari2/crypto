@@ -366,7 +366,7 @@ class PremiumCoinCard extends ConsumerWidget {
                         "Avg Price",
                         _formatPrice(
                           _safeNum(
-                                () => coin.avgPrice,
+                                () => coin.weightedAvgPrice,
                           ),
                         ),
                       ),
@@ -379,7 +379,7 @@ class PremiumCoinCard extends ConsumerWidget {
                         "Volume (24H)",
                         _formatVolume(
                           _safeNum(
-                                () => coin.quoteVolume,
+                                () => coin.quoteVolumeRaw,
                           ),
                         ),
                       ),

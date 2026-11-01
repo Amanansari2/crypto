@@ -96,21 +96,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: RouteNames.market,
                 name: RouteNames.marketName,
                 builder: (context, state) => const MarketScreen(),
-                routes: [
-                  GoRoute(
-                    path: RouteNames.marketDetail,
-                    name: RouteNames.marketDetailName,
-                    builder: (context, state) {
-                      final symbol = state.pathParameters['symbol']!;
-                      return MarketDetailScreen(symbol: symbol);
-                    },
-                  ),
-                  GoRoute(
-                    path: RouteNames.marketSearch,
-                    name: RouteNames.marketSearchName,
-                    builder: (context, state) => const SearchScreen(),
-                  ),
-                ],
               ),
             ],
           ),
@@ -140,21 +125,22 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          // 4. SETTINGS
-          // StatefulShellBranch(
-          //   navigatorKey: AppRouter.settingsNavigatorKey,
-          //   routes: [
-          //     GoRoute(
-          //       path: RouteNames.settings,
-          //       name: RouteNames.settingsName,
-          //       builder: (context, state) =>
-          //       const SettingsScreen(),
-          //     ),
-          //   ],
-          // ),
         ],
       ),
 
+      GoRoute(
+        path: RouteNames.marketDetail,
+        name: RouteNames.marketDetailName,
+        builder: (context, state) {
+          final symbol = state.pathParameters['symbol']!;
+          return MarketDetailScreen(symbol: symbol);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.marketSearch,
+        name: RouteNames.marketSearchName,
+        builder: (context, state) => const SearchScreen(),
+      ),
 
       GoRoute(
 

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../core/theme/theme_mode_chip.dart';
 import '../data/provider/wallet_overview_provider.dart';
 
 class WalletScreen extends ConsumerStatefulWidget {
@@ -271,8 +270,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen>
 
                       TabBar(
                         controller: _tabController,
-                        isScrollable: true,
-                        tabAlignment: TabAlignment.start,
+                        isScrollable: false,
                         dividerColor: Colors.transparent,
                         labelColor: Colors.blue,
                         indicatorColor: Colors.blue,
