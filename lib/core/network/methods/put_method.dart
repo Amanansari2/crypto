@@ -14,9 +14,6 @@ class PutMethod {
     try {
       final headers = <String, String>{};
 
-      if (requireAuth) {
-        // future: token logic
-      }
 
       if (customHeaders != null) {
         headers.addAll(customHeaders);
@@ -25,7 +22,11 @@ class PutMethod {
       final response = await _dio.put(
         endpoint,
         data: data,
-        options: Options(headers: headers),
+        options: Options(headers: headers,
+          extra: {
+          'requireAuth': requireAuth,
+          },
+        ),
       );
 
       return response;

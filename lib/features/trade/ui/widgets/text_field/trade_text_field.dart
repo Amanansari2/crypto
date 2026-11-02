@@ -4,6 +4,11 @@ import 'package:flutter/services.dart';
 import '../../../../../../../core/utils/constants/app_colors.dart';
 
 class TradeTextField extends StatefulWidget {
+  final bool obscureText;
+  final double height;
+  final TextAlign textAlign;
+  final double textLetterSpacing;
+  final double hintLetterSpacing;
 
   final bool dark;
   final String? hintText;
@@ -12,6 +17,8 @@ class TradeTextField extends StatefulWidget {
   final TextEditingController controller;
 
   final ValueChanged<String> onChanged;
+  final TextInputType keyboardType;
+  final String? Function(String?)? validator;
 
   final Widget? prefix;
   final Widget? suffix;
@@ -27,7 +34,14 @@ class TradeTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
 
   const TradeTextField({
+    this.textLetterSpacing = 0,
+    this.hintLetterSpacing = 0,
+    this.textAlign = TextAlign.start,
+    this.height = 40,
     super.key,
+    this.keyboardType =
+    const TextInputType.numberWithOptions(decimal: true),
+    this.validator,
     required this.dark,
     required this.controller,
     required this.onChanged,
@@ -42,6 +56,7 @@ class TradeTextField extends StatefulWidget {
     this.readOnly = false,
     this.showAffixesUntilFocused = false,
     this.inputFormatters,
+    this.obscureText = false,
   });
 
   @override
@@ -104,7 +119,8 @@ class _TradeTextFieldState extends State<TradeTextField> {
 
     return SizedBox(
       // height: 40,
-      height: widget.errorText != null ? 55 : 40,
+      height: widget.errorText != null ? widget.height + 15 : widget.height,
+      // height: widget.errorText != null ? 55 : 40,
       child: Center(
         child: Theme(
           data: Theme.of(context).copyWith(
@@ -127,20 +143,22 @@ class _TradeTextFieldState extends State<TradeTextField> {
             ),
           ),
           child: TextFormField(
+            obscureText: widget.obscureText,
             inputFormatters: widget.inputFormatters,
             readOnly: widget.readOnly,
             controller: widget.controller,
             focusNode: _focusNode,
-            keyboardType:
-            TextInputType.numberWithOptions(decimal: true),
-            textAlign: TextAlign.left,
+            validator: widget.validator,
+            keyboardType: widget.keyboardType,
+            textAlign: widget.textAlign,
             textAlignVertical: TextAlignVertical.center,
             style: TextStyle(
                 color: widget.dark
                     ? AppColors.white
                     : AppColors.black,
                 fontSize: 16,
-                height: 1.0
+                height: 1.25,
+              letterSpacing: widget.textLetterSpacing,
             ),
 
             decoration:  InputDecoration(
@@ -153,7 +171,8 @@ class _TradeTextFieldState extends State<TradeTextField> {
               ),
               hintText: widget.hintText ,
                 hintStyle:  TextStyle(
-                    color: widget.dark ? AppColors.white : AppColors.black
+                    color: widget.dark ? AppColors.white : AppColors.black,
+                  letterSpacing: widget.hintLetterSpacing,
                 ),
                 fillColor: Colors.transparent,
                 filled: false,
@@ -165,6 +184,7 @@ class _TradeTextFieldState extends State<TradeTextField> {
               floatingLabelBehavior: FloatingLabelBehavior.auto,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 6,
+                vertical: 6
               ),
 
               prefixIcon: hideAffixes
@@ -179,13 +199,17 @@ class _TradeTextFieldState extends State<TradeTextField> {
                 child: widget.prefix,
               ),
 
-              suffixIcon: hideAffixes
+              suffixIcon: hideAffixes || widget.suffix == null
                   ? null
-                  : widget.suffix == null
-                  ? null
-                  : GestureDetector(
-                onTap: widget.onSuffixTap,
-                child: widget.suffix,
+                  : IconButton(
+                onPressed: widget.onSuffixTap,
+                icon: widget.suffix!,
+                splashRadius: 20,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 44,
+                  minHeight: 44,
+                ),
               ),
 
             ),

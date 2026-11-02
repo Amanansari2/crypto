@@ -28,7 +28,7 @@ class AppColors {
   static const green = Color(0xFF16C784);
   static const red = Color(0xFFEA3943);
 
-  /// ✨ GLOW / GRADIENT
+  // ✨ GLOW / GRADIENT
   static const primaryGradient = LinearGradient(
     colors: [
       Color(0xFF7B61FF),

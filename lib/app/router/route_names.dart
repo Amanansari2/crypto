@@ -72,4 +72,23 @@ class RouteNames {
   // About us
   static const String aboutUs = '/about-us';
   static const String aboutUsName = 'AboutUs';
+
+  // Authentication
+  static const String signIn = '/sign-in';
+  static const String signInName = 'SignIn';
+
+  static const String register = '/register';
+  static const String registerName = 'Register';
+
+  static const String otp = '/otp';
+  static const String otpName = 'Otp';
+
+  static const String forgotPassword = '/forgot-password';
+  static const String forgotPasswordName = 'ForgotPassword';
+
+  static const String resetOtp = '/reset-otp';
+  static const String resetOtpName = 'ResetOtp';
+
+  static const String resetPassword = '/reset-password';
+  static const String resetPasswordName = 'ResetPassword';
 }

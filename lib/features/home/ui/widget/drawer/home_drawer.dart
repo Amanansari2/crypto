@@ -2,13 +2,16 @@
 import 'package:crypto_app/app/router/route_names.dart';
 import 'package:crypto_app/core/theme/theme_provider.dart';
 import 'package:crypto_app/core/utils/enums/app_theme_type.dart';
+import 'package:crypto_app/shared/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../../../../core/utils/constants/app_colors.dart';
 import '../../../../../core/utils/constants/app_images.dart';
+import '../../../../authentication/data/providers/logout_provider.dart';
 import 'drawer_menu_item.dart';
 
 
@@ -33,6 +36,10 @@ class HomeDrawer extends ConsumerWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final user = ref.read(currentUserProvider);
+    final token = ref.read(localStorageProvider).getToken();
+
+    final isLoggedIn = token != null && token.trim().isNotEmpty;
 
     final selectedTheme = ref.watch(themeProvider);
 
@@ -48,7 +55,7 @@ class HomeDrawer extends ConsumerWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          _buildHeader(context),
+          _buildHeader(context, ref),
 
           SizedBox(height: 16.h),
 
@@ -196,17 +203,197 @@ class HomeDrawer extends ConsumerWidget {
             ),
           ),
 
+          if(isLoggedIn)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 14.w),
+            child: DrawerMenuItem(
+              icon: Icons.logout_rounded,
+              title: 'Logout',
+              subtitle: 'Sign out from your account',
+              color: Colors.red,
+              onTap: () => _logout(context, ref),
+            ),
+          ),
+
           SizedBox(height: 24.h),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Future<void> _logout(
+      BuildContext context,
+      WidgetRef ref,
+      ) async {
+    final localStorage = ref.read(localStorageProvider);
+
+    // Check Never Show Again preference
+    final neverShowAgain =
+    localStorage.getNeverShowLogoutConfirmation();
+
+    if (!neverShowAgain) {
+      final confirmed = await _showLogoutConfirmation(
+        context: context,
+        onNeverShowAgain: () async {
+          await localStorage.setNeverShowLogoutConfirmation(true);
+        },
+      );
+
+      if (!confirmed || !context.mounted) return;
+    }
+
+    try {
+      // Call Logout Provider
+      await ref.read(logoutProvider.notifier).logout();
+
+      if (!context.mounted) return;
+
+      // Refresh current user state
+      ref.invalidate(currentUserProvider);
+
+      // Navigate to Login
+      context.goNamed(RouteNames.signInName);
+
+    } catch (error) {
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error.toString().replaceFirst('Exception: ', ''),
+          ),
+        ),
+      );
+    }
+  }
+
+
+  Future<bool> _showLogoutConfirmation({
+    required BuildContext context,
+    required Future<void> Function() onNeverShowAgain,
+  }) async {
+    bool neverShowAgain = false;
+
+    final dark =
+        Theme.of(context).brightness == Brightness.dark;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Logout'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Are you sure you want to logout from your account?',
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: neverShowAgain,
+                        onChanged: (value) {
+                          setDialogState(() {
+                            neverShowAgain = value ?? false;
+                          });
+                        },
+                      ),
+                      const Expanded(
+                        child: Text('Never show this again'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 40,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: dark
+                                ? AppColors.blue
+                                : Colors.grey.shade400,
+                            foregroundColor: dark
+                                ? AppColors.white
+                                : AppColors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(dialogContext, false);
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: SizedBox(
+                        height: 40,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: dark
+                                ? AppColors.white
+                                : AppColors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                          onPressed: () async {
+                            if (neverShowAgain) {
+                              await onNeverShowAgain();
+                            }
+
+                            if (dialogContext.mounted) {
+                              Navigator.pop(dialogContext, true);
+                            }
+                          },
+                          child: const Text('Logout'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    return result ?? false;
+  }
+
+  Widget _buildHeader(BuildContext context, WidgetRef ref) {
+    final user = ref.read(currentUserProvider);
+    final firstName = user?['first_name']?.toString() ?? '';
+    final lastName = user?['last_name']?.toString() ?? '';
+    final uid = user?['uid']?.toString() ?? '';
+
+    final fullName = '$firstName $lastName'.trim();
+
+    final isLoggedIn = user != null && uid.isNotEmpty;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
-        20.w,
+        18.w,
         16.h,
         6.w,
         22.h,
@@ -228,11 +415,23 @@ class HomeDrawer extends ConsumerWidget {
 
           SizedBox(height: 25.h),
 
+          Text(
+            'Welcome to Terminal1',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+
+          SizedBox(height: 10.h),
+
+
           Row(
             children: [
               Container(
-                width: 65.w,
-                height: 65.w,
+                width: 55.w,
+                height: 55.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.transparent,
@@ -254,43 +453,42 @@ class HomeDrawer extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if(isLoggedIn)
                     Text(
-                      'Your Profile',
+                      (fullName.isNotEmpty ? fullName : 'User'),
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                    SizedBox(height: 9.h),
+                    SizedBox(height: 2.h),
 
-                    OutlinedButton.icon(
-                      onPressed: () => _showComingSoon(context),
-                      icon: Icon(
-                        Icons.person_outline_rounded,
-                        size: 15.sp,
+                    if (isLoggedIn)
+                      Text(
+                        'UID: $uid',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )
+                    else
+                      TextButton(
+                        onPressed:(){
+                          context.pushNamed(RouteNames.signInName);
+                        } ,
+                        child: Text(
+                        'Please Login',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        )
                       ),
-                      label: const Text('Update Profile'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: BorderSide(
-                          color: Colors.white.withOpacity(0.65),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10.w,
-                          vertical: 8.h,
-                        ),
-                        minimumSize: Size.zero,
-                        tapTargetSize:
-                        MaterialTapTargetSize.shrinkWrap,
-                        visualDensity: VisualDensity.compact,
-                        textStyle: TextStyle(
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+
                   ],
                 ),
               ),

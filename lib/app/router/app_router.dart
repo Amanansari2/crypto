@@ -9,6 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/authentication/ui/screen/forgot_password_screen.dart';
+import '../../features/authentication/ui/screen/login_screen.dart';
+import '../../features/authentication/ui/screen/otp_screen.dart';
+import '../../features/authentication/ui/screen/register_screen.dart';
+import '../../features/authentication/ui/screen/reset_otp_screen.dart';
+import '../../features/authentication/ui/screen/reset_password_screen.dart';
 import '../../features/contents/widgets/faq_screen.dart';
 import '../../features/contents/widgets/privacy_policy_screen.dart';
 import '../../features/contents/widgets/refund_policy_screen.dart';
@@ -209,6 +215,56 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: RouteNames.aboutUs,
         name: RouteNames.aboutUsName,
         builder: (context, state) => const AboutUsScreen(),
+      ),
+
+
+      //authentication
+
+      GoRoute(
+        path: RouteNames.signIn,
+        name: RouteNames.signInName,
+        builder: (context, state) => const LoginScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.register,
+        name: RouteNames.registerName,
+        builder: (context, state) => const RegisterScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.otp,
+        name: RouteNames.otpName,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+
+          return OtpScreen(
+              email: extra['email'] as String,
+              password : extra['password'] as String
+          );
+        },
+      ),
+
+      GoRoute(
+        path: RouteNames.forgotPassword,
+        name: RouteNames.forgotPasswordName,
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.resetOtp,
+        name: RouteNames.resetOtpName,
+        builder: (context, state) {
+          final email = state.extra as String;
+
+          return ResetOtpScreen(email: email);
+        },
+      ),
+
+      GoRoute(
+        path: RouteNames.resetPassword,
+        name: RouteNames.resetPasswordName,
+        builder: (context, state) => const ResetPasswordScreen(),
       ),
     ],
   );

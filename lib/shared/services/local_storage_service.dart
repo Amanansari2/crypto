@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class LocalStorageService {
 
@@ -11,8 +12,10 @@ class LocalStorageService {
   static const String _onboardingKey = "onboarding_seen";
   static const String _closeAllConfirmationKey = "close_all_confirmation_skipped";
   static const String _cancelOrderConfirmationKey = "cancel_order_confirmation_skipped";
+  static const String _logoutConfirmationKey = "logout_confirmation_skipped";
 
-  // static const String _tokenKey = "auth_token";
+  static const String _tokenKey = "auth_token";
+  static const String _userKey = "user";
 
   //<<----------------[ Theme ]----------------->>
 
@@ -52,6 +55,14 @@ class LocalStorageService {
         false;
   }
 
+  Future<void> setNeverShowLogoutConfirmation(bool value) async {
+    await prefs.setBool(_logoutConfirmationKey, value);
+  }
+
+  bool getNeverShowLogoutConfirmation() {
+    return prefs.getBool(_logoutConfirmationKey) ?? false;
+  }
+
 
   //<<----------------[ Cancel Order Confirmation ]----------------->>
 
@@ -68,5 +79,54 @@ class LocalStorageService {
     ) ??
         false;
   }
+
+
+  //<<----------------[ Authentication ]----------------->>
+
+// Save JWT Token
+  Future<void> saveToken(String token) async {
+    await prefs.setString(_tokenKey, token);
+  }
+
+// Get JWT Token
+  String? getToken() {
+    return prefs.getString(_tokenKey);
+  }
+
+// Save User Data
+  Future<void> saveUser(Map<String, dynamic> user) async {
+    await prefs.setString(
+      _userKey,
+      jsonEncode(user),
+    );
+  }
+
+// Get User Data
+  Map<String, dynamic>? getUser() {
+    final userData = prefs.getString(_userKey);
+
+    if (userData == null) return null;
+
+    return Map<String, dynamic>.from(
+      jsonDecode(userData),
+    );
+  }
+
+// Save Complete Auth Data
+  Future<void> saveAuthData({
+    required String token,
+    required Map<String, dynamic> user,
+  }) async {
+    await saveToken(token);
+    await saveUser(user);
+  }
+
+// Clear Auth Data (Logout)
+  Future<void> clearAuthData() async {
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_userKey);
+  }
+
+
 
 }

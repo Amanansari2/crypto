@@ -12,3 +12,7 @@ final localStorageProvider = Provider<LocalStorageService>((ref) {
   final prefs = ref.watch(sharedPrefsProvider);
   return LocalStorageService(prefs);
 });
+
+final currentUserProvider = Provider<Map<String, dynamic>?>((ref) {
+  return ref.watch(localStorageProvider).getUser();
+});

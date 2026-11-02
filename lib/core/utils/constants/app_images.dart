@@ -4,5 +4,7 @@ class AppImages {
   // Drawer
   static const String drawerHeaderBg = 'assets/background/drawer_header_bg.png';
 
-// Add future images here
+// authentication
+  static const String logoBg = 'assets/background/logo_terminal.png';
+
 }

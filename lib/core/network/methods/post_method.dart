@@ -1,11 +1,11 @@
-
-
 import 'package:dio/dio.dart';
 
 import '../dio_client.dart';
 
 class PostMethod {
   final Dio _dio = DioClient().dio;
+
+
 
   Future<Response> postRequest({
     required String endpoint,
@@ -14,12 +14,10 @@ class PostMethod {
     Map<String, String>? customHeaders,
     bool isFormData = false,
   }) async {
+
     try {
       final headers = <String, String>{};
 
-      if (requireAuth) {
-        // future: token logic
-      }
 
       if (customHeaders != null) {
         headers.addAll(customHeaders);
@@ -28,7 +26,12 @@ class PostMethod {
       final response = await _dio.post(
         endpoint,
         data: data,
-        options: Options(headers: headers),
+        options: Options(
+            headers: headers,
+          extra: {
+            'requireAuth': requireAuth,
+          },
+        ),
       );
 
       return response;

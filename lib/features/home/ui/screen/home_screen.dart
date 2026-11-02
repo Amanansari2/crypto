@@ -68,6 +68,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
             SizedBox(height: 8.h),
 
+            ElevatedButton(
+              onPressed: () {
+                context.pushNamed(RouteNames.registerName);
+              },
+              child: const Text('Create Account'),
+            ),
+
             Expanded(
               child: HomeMarketTab(
                 isDark: isDark,

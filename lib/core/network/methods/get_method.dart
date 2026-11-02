@@ -1,5 +1,3 @@
-
-
 //-------------------------
 
 import 'package:dio/dio.dart';
@@ -18,10 +16,6 @@ class GetMethod {
     try {
       final headers = <String, String>{};
 
-      if (requireAuth) {
-        // future: token logic
-      }
-
       if (customHeaders != null) {
         headers.addAll(customHeaders);
       }
@@ -29,7 +23,11 @@ class GetMethod {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParams,
-        options: Options(headers: headers),
+        options: Options(headers: headers,
+          extra: {
+            'requireAuth': requireAuth,
+          },
+        ),
       );
 
       return response;

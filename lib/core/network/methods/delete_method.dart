@@ -19,9 +19,6 @@ class DeleteMethod {
     try {
       final headers = <String, String>{};
 
-      if (requireAuth) {
-        // future: token logic
-      }
 
       if (customHeaders != null) {
         headers.addAll(customHeaders);
@@ -31,7 +28,9 @@ class DeleteMethod {
         endpoint,
         data: data,
         queryParameters: queryParams,
-        options: Options(headers: headers),
+        options: Options(headers: headers,   extra: {
+          'requireAuth': requireAuth,
+        },),
       );
 
       return response;
