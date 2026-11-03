@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_names.dart';
+import '../../../../core/utils/constants/app_images.dart';
 import '../widget/drawer/home_drawer.dart';
 import '../widget/home_market_tab.dart';
 import '../widget/home_search_bar.dart';
@@ -40,7 +41,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       drawer: const HomeDrawer(),
       appBar: AppBar(
-        title: const Text('Home'),
+        titleSpacing: 0,
+        title: Align(
+          alignment: AlignmentGeometry.centerLeft,
+          child: Image.asset(
+            AppImages.logoBg,
+            height: 100,
+            width: 150 ,
+            fit: BoxFit.fill,
+          ),
+        ),
         centerTitle: false,
         leading: Builder(
           builder: (context) {

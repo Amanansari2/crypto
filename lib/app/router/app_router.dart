@@ -26,6 +26,7 @@ import '../../features/market/ui/screens/search_screen.dart';
 import '../../features/navigation/screens/bottom_nav_screen.dart';
 import '../../features/onboarding/ui/screen/onboarding_screen.dart';
 import '../../features/trade_history/ui/trading_history_screen.dart';
+import '../../shared/providers/app_provider.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -64,6 +65,15 @@ class AppRouter {
 
 /// Riverpod Provider
 final routerProvider = Provider<GoRouter>((ref) {
+
+  final storage = ref.watch(localStorageProvider);
+
+  final initialLocation = !storage.isOnboardingSeen()
+      ? RouteNames.onboarding
+      : (storage.getToken()?.isNotEmpty == true
+      ? RouteNames.home
+      : RouteNames.signIn);
+
   return GoRouter(
     initialLocation: RouteNames.onboarding,
     debugLogDiagnostics: true,

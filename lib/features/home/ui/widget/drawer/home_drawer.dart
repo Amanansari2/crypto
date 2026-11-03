@@ -416,7 +416,7 @@ class HomeDrawer extends ConsumerWidget {
           SizedBox(height: 25.h),
 
           Text(
-            'Welcome to Terminal1',
+            'Welcome to Terminal',
             style: TextStyle(
               color: Colors.white,
               fontSize: 16.sp,

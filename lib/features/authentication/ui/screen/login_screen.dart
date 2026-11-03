@@ -72,6 +72,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            context.goNamed(RouteNames.homeName);
+                          },
+                          child: Text(
+                            'Skip',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
                       Center(
                         child: Image.asset(
                           AppImages.logoBg,
